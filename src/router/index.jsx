@@ -56,7 +56,7 @@ const routes = [
         meta: { title: 'AI Companion Chat' }
       },
       {
-        path: 'shadow-work',
+        path: 'shadow-work/:questionId?',
         element: (
           <ProtectedRoute>
             <PageLoader><ShadowWork /></PageLoader>

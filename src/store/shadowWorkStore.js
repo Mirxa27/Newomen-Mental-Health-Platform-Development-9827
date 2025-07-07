@@ -94,6 +94,12 @@ export const useShadowWorkStore = create(
           currentQuestion: Math.max(state.currentQuestion - 1, 0),
         }));
       },
+
+      setCurrentQuestion: (index) => {
+        set((state) => ({
+          currentQuestion: Math.min(Math.max(index, 0), state.questions.length - 1),
+        }));
+      },
       
       completeAssessment: () => {
         set({ isCompleted: true });
