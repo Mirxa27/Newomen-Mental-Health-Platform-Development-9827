@@ -5,6 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/authStore';
+import { useAIProviderStore } from '../store/aiProviderStore';
 import VoiceInput from '../components/chat/VoiceInput';
 import MessageBubble from '../components/chat/MessageBubble';
 import TypingIndicator from '../components/chat/TypingIndicator';
@@ -34,6 +35,7 @@ const Chat = () => {
     setTyping,
   } = useChatStore();
   const { subscription, deductMinutes } = useAuthStore();
+  const { getDefaultProvider } = useAIProviderStore();
 
   useEffect(() => {
     if (!currentConversation && conversations.length === 0) {
@@ -71,21 +73,20 @@ const Chat = () => {
     setTyping(true);
     
     try {
-      // Mock AI response - in production, this would call your AI service
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const aiContent = await generateAIResponse(message);
+
       const aiResponse = {
         id: (Date.now() + 1).toString(),
-        content: generateAIResponse(message),
+        content: aiContent,
         sender: 'ai',
         timestamp: new Date().toISOString(),
         culturalContext: 'mena',
       };
-      
+
       addMessage(aiResponse);
-      
-      // Deduct minutes (mock calculation)
-      const minutesUsed = Math.ceil(message.length / 100);
+
+      // Deduct minutes based on message length
+      const minutesUsed = Math.ceil(aiContent.length / 100);
       deductMinutes(minutesUsed);
     } catch (error) {
       toast.error('Failed to send message. Please try again.');
@@ -95,16 +96,46 @@ const Chat = () => {
     }
   };
 
-  const generateAIResponse = (userMessage) => {
-    const responses = [
-      `حبيبتي، I hear the depth in your words. What you're sharing takes courage, and I want you to know that your feelings are completely valid. Let's explore this together - what would it feel like to honor this part of yourself?`,
-      `ما شاء الله، the wisdom in your question shows how much you've grown. In our culture, we often carry the weight of others' expectations, but your authentic self deserves space to breathe. What would your heart tell you if it could speak freely?`,
-      `الحمد لله for your openness. I sense both strength and vulnerability in what you're sharing. This duality - being strong yet tender - is actually a profound gift. How can we nurture both aspects of who you are?`,
-      `Your words remind me of the beautiful Arabic saying: "الصبر مفتاح الفرج" - patience is the key to relief. Sometimes our greatest transformations happen in the quiet moments of self-reflection. What is your heart asking for right now?`,
-      `I feel the sincerity in your question, and it touches something deep. إن شاء الله, as we continue this journey together, you'll discover that your sensitivity is not a weakness but a superpower. What would it mean to embrace this gift fully?`,
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
+  const generateAIResponse = async (userMessage) => {
+    const systemPrompt = `You are Newomen, a compassionate AI companion for women's mental health and personal growth. Speak with warmth and cultural awareness using Arabic phrases like حبيبتي when appropriate.`;
+
+    const provider = getDefaultProvider();
+    const apiKey = provider?.apiKey || import.meta.env.VITE_OPENAI_API_KEY;
+    const endpoint = provider?.endpoint || 'https://api.openai.com/v1';
+    const model = provider?.model || 'gpt-4';
+    const settings = provider?.settings || {};
+
+    if (!apiKey) {
+      throw new Error('Missing AI provider API key');
+    }
+
+    try {
+      const response = await fetch(`${endpoint}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage },
+          ],
+          max_tokens: settings.maxTokens || 150,
+          temperature: settings.temperature ?? 0.7,
+          top_p: settings.topP ?? 1,
+          frequency_penalty: settings.frequencyPenalty ?? 0,
+          presence_penalty: settings.presencePenalty ?? 0,
+        }),
+      });
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content?.trim() || '';
+    } catch (error) {
+      console.error('OpenAI request failed:', error);
+      return 'Sorry, I had trouble responding right now.';
+    }
   };
 
   const handleVoiceInput = (transcript) => {

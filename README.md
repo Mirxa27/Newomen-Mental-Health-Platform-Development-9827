@@ -22,6 +22,7 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 - **Real-time Voice**: WebRTC and Speech APIs integration
 - **Secure Authentication**: Role-based access control
 - **Admin Dashboard**: Comprehensive management interface
+ - **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`. Provider settings are stored locally so they persist between sessions and all chat and voice interactions automatically use the selected provider, endpoint, model and tuning parameters.
 - **Analytics**: User engagement and usage tracking
 - **Subscription Management**: Tiered pricing with usage tracking
 
@@ -136,7 +137,7 @@ src/
 ### Environment Variables
 ```bash
 # OpenAI
-VITE_OPENAI_API_KEY=your_openai_key
+VITE_OPENAI_API_KEY=your_openai_key_here
 
 # Supabase (optional)
 VITE_SUPABASE_URL=your_supabase_url
@@ -145,6 +146,8 @@ VITE_SUPABASE_ANON_KEY=your_supabase_key
 # App Configuration
 VITE_APP_ENV=development
 ```
+
+Create a `.env` file based on `.env.example` and make sure `VITE_OPENAI_API_KEY` is set to a valid key. The admin panel allows storing provider keys, but the fallback environment value is required for voice chat initialization.
 
 ### Admin Access
 - **Admin Email**: `rayan.ahmed1822@gmail.com`

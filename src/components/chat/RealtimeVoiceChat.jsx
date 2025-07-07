@@ -5,6 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { NewomenVoiceSession, generateEphemeralKey } from '../../services/realtimeAgent';
 import { useAuthStore } from '../../store/authStore';
+import { useAIProviderStore } from '../../store/aiProviderStore';
 import { useChatStore } from '../../store/chatStore';
 import toast from 'react-hot-toast';
 
@@ -13,6 +14,7 @@ const { FiMic, FiMicOff, FiPhone, FiPhoneOff, FiVolume2 } = FiIcons;
 const RealtimeVoiceChat = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { user, subscription, deductMinutes } = useAuthStore();
+  const { getDefaultProvider } = useAIProviderStore();
   const { addMessage } = useChatStore();
   const [session, setSession] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -64,7 +66,8 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
     try {
       setIsLoading(true);
       
-      const apiKey = await generateEphemeralKey();
+      const provider = getDefaultProvider();
+      const apiKey = await generateEphemeralKey(provider?.apiKey);
       if (!apiKey) {
         throw new Error('Failed to obtain API key');
       }
@@ -73,7 +76,8 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
       sessionRef.current = voiceSession;
 
       // Set up event listeners
-      voiceSession.on('onConnectionChange', (connected) => {
+      voiceSession.on('connection_change', (state) => {
+        const connected = state === 'connected';
         setIsConnected(connected);
         if (connected) {
           startTimeRef.current = Date.now();
@@ -87,11 +91,7 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
         }
       });
 
-      voiceSession.on('onListeningChange', (listening) => {
-        setIsListening(listening);
-      });
-
-      voiceSession.on('onTranscript', (transcriptData) => {
+      voiceSession.on('transcript', (transcriptData) => {
         const userMessage = transcriptData.text || '';
         if (userMessage.trim()) {
           const messageObj = {
@@ -107,7 +107,7 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
         }
       });
 
-      voiceSession.on('onResponse', (responseData) => {
+      voiceSession.on('response', (responseData) => {
         const aiResponse = responseData.text || '';
         setIsSpeaking(true);
         
@@ -141,7 +141,7 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
         }, Math.max(2000, aiResponse.length * 80));
       });
 
-      voiceSession.on('onError', (error) => {
+      voiceSession.on('error', (error) => {
         console.error('Voice session error:', error);
         toast.error('Voice connection error: ' + error.message);
       });
@@ -154,7 +154,13 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
         sessionType: 'voice_chat',
       };
       
-      const connected = await voiceSession.connect(apiKey, userContext);
+      const connected = await voiceSession.connect({
+        apiKey,
+        endpoint: provider?.endpoint ? `${provider.endpoint}/realtime` : 'https://api.openai.com/v1/realtime',
+        model: provider?.model || 'gpt-4o-realtime-preview-2025-06-03',
+        voice: provider?.settings?.voice || 'nova',
+        userContext,
+      });
       setSession(voiceSession);
       
       if (!connected) {
@@ -203,11 +209,13 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
 
   const handleToggleListening = () => {
     if (!session || !isConnected) return;
-    
+
     if (isListening) {
       session.stopListening();
+      setIsListening(false);
     } else {
       session.startListening();
+      setIsListening(true);
     }
   };
 
