@@ -98,7 +98,6 @@ const Chat = () => {
 
   const generateAIResponse = async (userMessage) => {
     const systemPrompt = `You are Newomen, a compassionate AI companion for women's mental health and personal growth. Speak with warmth and cultural awareness using Arabic phrases like حبيبتي when appropriate.`;
-
     const provider = getDefaultProvider();
     const apiKey = provider?.apiKey || import.meta.env.VITE_OPENAI_API_KEY;
     const endpoint = provider?.endpoint || 'https://api.openai.com/v1';
@@ -128,6 +127,22 @@ const Chat = () => {
           frequency_penalty: settings.frequencyPenalty ?? 0,
           presence_penalty: settings.presencePenalty ?? 0,
         }),
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ],
+          max_tokens: 150,
+          temperature: 0.7
+        })
       });
 
       const data = await response.json();

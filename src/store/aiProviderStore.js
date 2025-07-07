@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
 const getInitialApiKey = () => {
   if (typeof window !== 'undefined') {
     const localKey = window.localStorage.getItem('newomen-openai-key');
@@ -15,6 +14,7 @@ const defaultProviders = [
     name: 'OpenAI',
     type: 'openai',
     apiKey: getInitialApiKey(),
+    apiKey: '',
     endpoint: 'https://api.openai.com/v1',
     model: 'gpt-4',
     isActive: true,

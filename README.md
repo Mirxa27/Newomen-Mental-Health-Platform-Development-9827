@@ -22,7 +22,9 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 - **Real-time Voice**: WebRTC and Speech APIs integration powered by the [OpenAI Agents SDK](https://openai.github.io/openai-agents-js/guides/voice-agents/quickstart/)
 - **Secure Authentication**: Role-based access control
 - **Admin Dashboard**: Comprehensive management interface
+
  - **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`. Provider settings are stored locally so they persist between sessions and all chat and voice interactions automatically use the selected provider, endpoint, model and tuning parameters.
+- **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`
 - **Analytics**: User engagement and usage tracking
 - **Subscription Management**: Tiered pricing with usage tracking
 
