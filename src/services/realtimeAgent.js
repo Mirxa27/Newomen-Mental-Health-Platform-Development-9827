@@ -111,9 +111,15 @@ export class NewomenVoiceSession {
 }
 
 export const generateEphemeralKey = async (providerApiKey) => {
-  if (providerApiKey) {
-    return providerApiKey;
+  const envKey = import.meta.env.VITE_OPENAI_API_KEY;
+  const localKey = window.localStorage.getItem('newomen-openai-key');
+
+  // Prefer provider key, then locally stored key, then env
+  if (providerApiKey || localKey || envKey) {
+    return providerApiKey || localKey || envKey || '';
   }
+
+  // Fall back to backend key generation when no key is available locally
   try {
     const response = await fetch('/api/openai/ephemeral-key', {
       method: 'POST',
@@ -124,8 +130,6 @@ export const generateEphemeralKey = async (providerApiKey) => {
     return data.apiKey;
   } catch (err) {
     console.error('Error generating ephemeral key:', err);
-    const envKey = import.meta.env.VITE_OPENAI_API_KEY;
-    const localKey = window.localStorage.getItem('newomen-openai-key');
-    return envKey || localKey || '';
+    return '';
   }
 };
