@@ -133,7 +133,7 @@ const AIProviderSettings = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Provider Name
@@ -180,7 +180,7 @@ const AIProviderSettings = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   API Endpoint
@@ -212,7 +212,7 @@ const AIProviderSettings = () => {
 
             <div>
               <h4 className="text-lg font-medium text-gray-900 mb-4">Model Settings</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Temperature: {formData.settings?.temperature}
@@ -311,7 +311,7 @@ const AIProviderSettings = () => {
       </div>
 
       {/* Providers List */}
-      <div className="grid gap-6">
+      <div className="grid gap-6 sm:grid-cols-2">
         {providers.map((provider, index) => (
           <motion.div
             key={provider.id}
