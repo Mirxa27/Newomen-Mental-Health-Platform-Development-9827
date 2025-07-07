@@ -8,18 +8,30 @@ import UserManagement from '../components/admin/UserManagement';
 import ConversationMonitor from '../components/admin/ConversationMonitor';
 import PromptManagement from '../components/admin/PromptManagement';
 import Analytics from '../components/admin/Analytics';
+import AIProviderSettings from '../components/admin/AIProviderSettings';
+import SystemSettings from '../components/admin/SystemSettings';
 
-const { FiHome, FiUsers, FiMessageSquare, FiEdit, FiBarChart3 } = FiIcons;
+const { 
+  FiHome, 
+  FiUsers, 
+  FiMessageSquare, 
+  FiEdit, 
+  FiBarChart3, 
+  FiCpu, 
+  FiSettings 
+} = FiIcons;
 
 const Admin = () => {
   const location = useLocation();
-  
+
   const adminNav = [
     { name: 'Dashboard', href: '/admin', icon: FiHome },
     { name: 'Users', href: '/admin/users', icon: FiUsers },
     { name: 'Conversations', href: '/admin/conversations', icon: FiMessageSquare },
     { name: 'Prompts', href: '/admin/prompts', icon: FiEdit },
     { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart3 },
+    { name: 'AI Providers', href: '/admin/ai-providers', icon: FiCpu },
+    { name: 'System Settings', href: '/admin/settings', icon: FiSettings },
   ];
 
   return (
@@ -49,7 +61,10 @@ const Admin = () => {
                       icon={item.icon} 
                       className={`
                         w-5 h-5 mr-3 transition-colors
-                        ${isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-600'}
+                        ${isActive 
+                          ? 'text-primary-600' 
+                          : 'text-gray-400 group-hover:text-primary-600'
+                        }
                       `} 
                     />
                     {item.name}
@@ -68,6 +83,8 @@ const Admin = () => {
             <Route path="conversations" element={<ConversationMonitor />} />
             <Route path="prompts" element={<PromptManagement />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="ai-providers" element={<AIProviderSettings />} />
+            <Route path="settings" element={<SystemSettings />} />
           </Routes>
         </div>
       </div>

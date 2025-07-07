@@ -132,11 +132,9 @@ i18n
     resources,
     fallbackLng: 'en',
     debug: import.meta.env.MODE === 'development',
-    
     interpolation: {
       escapeValue: false,
     },
-    
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],

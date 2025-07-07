@@ -13,18 +13,17 @@ const MessageBubble = ({ message }) => {
       transition={{ duration: 0.3 }}
       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
     >
-      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-        isUser 
-          ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white' 
-          : 'bg-white/80 backdrop-blur-sm text-gray-800 shadow-sm'
-      }`}>
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+      <div 
+        className={`max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 rounded-2xl ${
+          isUser 
+            ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white' 
+            : 'bg-white/80 backdrop-blur-sm text-gray-800 shadow-sm'
+        }`}
+      >
+        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
           {message.content}
         </p>
-        
-        <div className={`text-xs mt-2 ${
-          isUser ? 'text-primary-100' : 'text-gray-500'
-        }`}>
+        <div className={`text-xs mt-2 ${isUser ? 'text-primary-100' : 'text-gray-500'}`}>
           {format(timestamp, 'HH:mm')}
         </div>
         

@@ -52,15 +52,14 @@ const ShadowWork = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6 md:mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
             {t('shadowWorkTitle')}
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
             {t('shadowWorkSubtitle')}
           </p>
-          
           <ProgressBar current={currentQuestion + 1} total={questions.length} />
         </motion.div>
 
@@ -72,7 +71,7 @@ const ShadowWork = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}
             transition={{ duration: 0.3 }}
-            className="mb-8"
+            className="mb-6 md:mb-8"
           >
             <QuestionCard
               question={currentQuestionData}
@@ -87,23 +86,25 @@ const ShadowWork = () => {
           <button
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            className="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-2 md:py-3 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Previous question"
           >
-            <SafeIcon icon={FiArrowLeft} className="w-5 h-5" />
-            <span>{t('back')}</span>
+            <SafeIcon icon={FiArrowLeft} className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="text-sm md:text-base">{t('back')}</span>
           </button>
-
-          <div className="text-sm text-gray-500">
+          
+          <div className="text-xs md:text-sm text-gray-500">
             {t('question')} {currentQuestion + 1} {t('of')} {questions.length}
           </div>
-
+          
           <button
             onClick={handleNext}
             disabled={!hasAnswer}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={isLastQuestion ? "Complete assessment" : "Next question"}
           >
-            <span>{isLastQuestion ? 'Complete' : t('next')}</span>
-            <SafeIcon icon={isLastQuestion ? FiCheck : FiArrowRight} className="w-5 h-5" />
+            <span className="text-sm md:text-base">{isLastQuestion ? 'Complete' : t('next')}</span>
+            <SafeIcon icon={isLastQuestion ? FiCheck : FiArrowRight} className="w-4 h-4 md:w-5 md:h-5" />
           </button>
         </div>
       </div>

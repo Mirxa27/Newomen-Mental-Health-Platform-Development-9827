@@ -13,6 +13,7 @@ const Register = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuthStore();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,9 +37,9 @@ const Register = () => {
       toast.error('Passwords do not match');
       return;
     }
-
+    
     setIsLoading(true);
-
+    
     try {
       // Mock registration - in production, this would call your API
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -53,7 +54,7 @@ const Register = () => {
           culturalContext: 'mena',
         },
       };
-
+      
       login(userData);
       toast.success('Welcome to Newomen!');
       navigate('/shadow-work');
@@ -70,19 +71,20 @@ const Register = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="max-w-md w-full space-y-8"
+        className="max-w-md w-full space-y-6 md:space-y-8"
       >
         <div className="text-center">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">N</span>
+          <Link to="/" className="inline-flex items-center space-x-2 mb-6 md:mb-8">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-base md:text-lg">N</span>
             </div>
-            <span className="text-2xl font-bold gradient-text">Newomen</span>
+            <span className="text-xl md:text-2xl font-bold gradient-text">Newomen</span>
           </Link>
           
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Begin Your Journey
           </h2>
+          
           <p className="text-gray-600">
             Create your account and start your transformation
           </p>
@@ -93,7 +95,7 @@ const Register = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           onSubmit={handleSubmit}
-          className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl space-y-6"
+          className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 shadow-xl space-y-5 md:space-y-6"
         >
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -108,12 +110,12 @@ const Register = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Enter your full name"
               />
             </div>
           </div>
-
+          
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               {t('email')}
@@ -127,12 +129,12 @@ const Register = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Enter your email"
               />
             </div>
           </div>
-
+          
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               {t('password')}
@@ -146,19 +148,20 @@ const Register = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-12 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Create a password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 <SafeIcon icon={showPassword ? FiEyeOff : FiEye} className="w-5 h-5" />
               </button>
             </div>
           </div>
-
+          
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
               {t('confirmPassword')}
@@ -172,26 +175,23 @@ const Register = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Confirm your password"
               />
             </div>
           </div>
-
+          
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-3 px-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-2 md:py-3 px-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Creating Account...' : t('register')}
           </button>
-
+          
           <div className="text-center">
             <span className="text-gray-600">Already have an account? </span>
-            <Link
-              to="/login"
-              className="text-primary-600 hover:text-primary-500 font-semibold transition-colors"
-            >
+            <Link to="/login" className="text-primary-600 hover:text-primary-500 font-semibold transition-colors">
               {t('login')}
             </Link>
           </div>

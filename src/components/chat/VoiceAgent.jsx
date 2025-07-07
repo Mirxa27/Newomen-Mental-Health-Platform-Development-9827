@@ -45,16 +45,16 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         throw new Error('Speech recognition not supported in this browser');
       }
-
+      
       if (!('speechSynthesis' in window)) {
         throw new Error('Speech synthesis not supported in this browser');
       }
-
+      
       const apiKey = await generateEphemeralKey();
       if (!apiKey) {
         throw new Error('Failed to obtain API key');
       }
-
+      
       const voiceSession = new NewomenVoiceSession();
       sessionRef.current = voiceSession;
 
@@ -116,10 +116,10 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
         culturalContext: user?.preferences?.culturalContext || 'mena',
         language: user?.preferences?.language || 'en',
       };
-
+      
       const connected = await voiceSession.connect(apiKey, userContext);
       setSession(voiceSession);
-
+      
       if (!connected) {
         throw new Error('Failed to establish voice connection');
       }
@@ -136,7 +136,10 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
     intervalRef.current = setInterval(() => {
       if (startTimeRef.current) {
         const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
-        setSessionStats(prev => ({ ...prev, duration }));
+        setSessionStats(prev => ({
+          ...prev,
+          duration
+        }));
       }
     }, 1000);
   };
@@ -162,7 +165,6 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
 
   const handleToggleListening = () => {
     if (!session || !isConnected) return;
-
     if (isListening) {
       session.stopListening();
     } else {
@@ -173,7 +175,6 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
   const handleEndCall = async () => {
     await cleanup();
     onClose?.();
-    
     toast.success(
       `Session ended. Duration: ${formatDuration(sessionStats.duration)}`
     );
@@ -192,8 +193,8 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
         animate={{ opacity: 1 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       >
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <div className="bg-white rounded-xl md:rounded-2xl p-6 md:p-8 max-w-md w-full mx-4 text-center">
+          <div className="animate-spin w-10 h-10 md:w-12 md:h-12 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             Connecting to Newomen...
           </h3>
@@ -212,9 +213,9 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
         animate={{ opacity: 1 }}
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       >
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <SafeIcon icon={FiPhoneOff} className="w-8 h-8 text-red-500" />
+        <div className="bg-white rounded-xl md:rounded-2xl p-6 md:p-8 max-w-md w-full mx-4 text-center">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <SafeIcon icon={FiPhoneOff} className="w-7 h-7 md:w-8 md:h-8 text-red-500" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             Connection Failed
@@ -222,7 +223,7 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
           <p className="text-gray-600 mb-4">
             {connectionError}
           </p>
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
             <button
               onClick={initializeSession}
               className="flex-1 bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors"
@@ -246,15 +247,15 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 flex items-center justify-center z-50 p-4"
     >
-      <div className="w-full max-w-md mx-4">
+      <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <SafeIcon icon={FiVolume2} className="w-10 h-10 text-white" />
+        <div className="text-center mb-6 md:mb-8">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+            <SafeIcon icon={FiVolume2} className="w-8 h-8 md:w-10 md:h-10 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
             Voice Chat with Newomen
           </h2>
           <p className="text-white/80">
@@ -263,25 +264,25 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
         </div>
 
         {/* Session Stats */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-8">
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 mb-6 md:mb-8">
           <div className="flex justify-between items-center">
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-xl md:text-2xl font-bold text-white">
                 {formatDuration(sessionStats.duration)}
               </div>
-              <div className="text-sm text-white/80">Duration</div>
+              <div className="text-xs md:text-sm text-white/80">Duration</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-xl md:text-2xl font-bold text-white">
                 {sessionStats.messagesExchanged}
               </div>
-              <div className="text-sm text-white/80">Messages</div>
+              <div className="text-xs md:text-sm text-white/80">Messages</div>
             </div>
           </div>
         </div>
 
         {/* Status Indicators */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
           <AnimatePresence>
             {isListening && (
               <motion.div
@@ -296,7 +297,7 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
                 </div>
               </motion.div>
             )}
-
+            
             {isSpeaking && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -311,11 +312,7 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
                         key={i}
                         className="w-1 bg-blue-500 rounded-full"
                         animate={{ height: [4, 16, 4] }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          delay: i * 0.1,
-                        }}
+                        transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
                       />
                     ))}
                   </div>
@@ -327,52 +324,51 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
 
           {/* Transcript Display */}
           {transcript && (
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="text-sm text-white/80 mb-2">You said:</div>
-              <div className="text-white">{transcript}</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-white/80 mb-1 md:mb-2">You said:</div>
+              <div className="text-sm md:text-base text-white">{transcript}</div>
             </div>
           )}
-
+          
           {/* Response Display */}
           {response && (
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="text-sm text-white/80 mb-2">Newomen:</div>
-              <div className="text-white">{response}</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-white/80 mb-1 md:mb-2">Newomen:</div>
+              <div className="text-sm md:text-base text-white">{response}</div>
             </div>
           )}
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center space-x-6">
+        <div className="flex justify-center space-x-4 md:space-x-6">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleToggleListening}
             disabled={!isConnected}
-            className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-              isListening
-                ? 'bg-red-500 hover:bg-red-600 text-white'
+            className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center transition-all ${
+              isListening 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
                 : 'bg-white/20 hover:bg-white/30 text-white'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
+            aria-label={isListening ? "Stop listening" : "Start listening"}
           >
-            <SafeIcon 
-              icon={isListening ? FiMicOff : FiMic} 
-              className="w-8 h-8" 
-            />
+            <SafeIcon icon={isListening ? FiMicOff : FiMic} className="w-7 h-7 md:w-8 md:h-8" />
           </motion.button>
-
+          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleEndCall}
-            className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all"
+            aria-label="End call"
           >
-            <SafeIcon icon={FiPhoneOff} className="w-8 h-8" />
+            <SafeIcon icon={FiPhoneOff} className="w-7 h-7 md:w-8 md:h-8" />
           </motion.button>
         </div>
 
         {/* Instructions */}
-        <div className="text-center mt-8 text-white/80 text-sm">
+        <div className="text-center mt-6 md:mt-8 text-white/80 text-xs md:text-sm">
           <p>Tap the microphone to start speaking</p>
           <p>Speak naturally - Newomen will respond with voice</p>
         </div>

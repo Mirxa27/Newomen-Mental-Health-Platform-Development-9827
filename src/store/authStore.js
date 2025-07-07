@@ -12,14 +12,20 @@ export const useAuthStore = create(
         isActive: true,
         expiresAt: null,
       },
-      
+
       login: (userData) => {
+        // Check if user is admin based on email
+        const isAdmin = userData.email === 'rayan.ahmed1822@gmail.com';
+        
         set({
-          user: userData,
+          user: {
+            ...userData,
+            role: isAdmin ? 'admin' : 'user'
+          },
           isAuthenticated: true,
         });
       },
-      
+
       logout: () => {
         set({
           user: null,
@@ -32,7 +38,7 @@ export const useAuthStore = create(
           },
         });
       },
-      
+
       updateSubscription: (subscriptionData) => {
         set((state) => ({
           subscription: {
@@ -41,7 +47,7 @@ export const useAuthStore = create(
           },
         }));
       },
-      
+
       deductMinutes: (minutes) => {
         set((state) => ({
           subscription: {
@@ -50,7 +56,7 @@ export const useAuthStore = create(
           },
         }));
       },
-      
+
       updateProfile: (profileData) => {
         set((state) => ({
           user: {
@@ -58,6 +64,12 @@ export const useAuthStore = create(
             ...profileData,
           },
         }));
+      },
+
+      // Admin functions
+      isAdmin: () => {
+        const { user } = get();
+        return user?.role === 'admin' || user?.email === 'rayan.ahmed1822@gmail.com';
       },
     }),
     {
