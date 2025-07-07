@@ -22,6 +22,7 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 - **Real-time Voice**: WebRTC and Speech APIs integration
 - **Secure Authentication**: Role-based access control
 - **Admin Dashboard**: Comprehensive management interface
+- **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`
 - **Analytics**: User engagement and usage tracking
 - **Subscription Management**: Tiered pricing with usage tracking
 

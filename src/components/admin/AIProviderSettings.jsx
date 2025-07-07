@@ -3,45 +3,19 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import toast from 'react-hot-toast';
+import { useAIProviderStore } from '../../store/aiProviderStore';
 
 const { FiSettings, FiSave, FiEye, FiEyeOff, FiCheck, FiX, FiPlus, FiTrash2 } = FiIcons;
 
 const AIProviderSettings = () => {
-  const [providers, setProviders] = useState([
-    {
-      id: 'openai',
-      name: 'OpenAI',
-      type: 'openai',
-      apiKey: 'sk-proj-***************************',
-      endpoint: 'https://api.openai.com/v1',
-      model: 'gpt-4',
-      isActive: true,
-      isDefault: true,
-      settings: {
-        temperature: 0.7,
-        maxTokens: 1000,
-        topP: 1,
-        frequencyPenalty: 0,
-        presencePenalty: 0,
-      }
-    },
-    {
-      id: 'anthropic',
-      name: 'Anthropic Claude',
-      type: 'anthropic',
-      apiKey: '',
-      endpoint: 'https://api.anthropic.com/v1',
-      model: 'claude-3-sonnet-20240229',
-      isActive: false,
-      isDefault: false,
-      settings: {
-        temperature: 0.7,
-        maxTokens: 1000,
-        topP: 1,
-      }
-    }
-  ]);
-
+  const {
+    providers,
+    addProvider,
+    updateProvider,
+    deleteProvider,
+    setDefaultProvider,
+    toggleActive,
+  } = useAIProviderStore();
   const [showApiKeys, setShowApiKeys] = useState({});
   const [editingProvider, setEditingProvider] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -56,12 +30,10 @@ const AIProviderSettings = () => {
 
   const handleSaveProvider = (providerData) => {
     if (editingProvider) {
-      setProviders(providers.map(p => 
-        p.id === editingProvider.id ? { ...providerData, id: editingProvider.id } : p
-      ));
+      updateProvider(editingProvider.id, providerData);
       setEditingProvider(null);
     } else {
-      setProviders([...providers, { ...providerData, id: Date.now().toString() }]);
+      addProvider({ ...providerData, id: Date.now().toString() });
       setShowAddForm(false);
     }
     toast.success('Provider settings saved successfully');
@@ -72,16 +44,12 @@ const AIProviderSettings = () => {
       toast.error('Cannot delete the default provider');
       return;
     }
-    setProviders(providers.filter(p => p.id !== id));
+    deleteProvider(id);
     toast.success('Provider deleted successfully');
   };
 
   const handleSetDefault = (id) => {
-    setProviders(providers.map(p => ({
-      ...p,
-      isDefault: p.id === id,
-      isActive: p.id === id ? true : p.isActive
-    })));
+    setDefaultProvider(id);
     toast.success('Default provider updated');
   };
 
@@ -91,9 +59,7 @@ const AIProviderSettings = () => {
       toast.error('Cannot deactivate the default provider');
       return;
     }
-    setProviders(providers.map(p => 
-      p.id === id ? { ...p, isActive: !p.isActive } : p
-    ));
+    toggleActive(id);
   };
 
   const testConnection = async (provider) => {
