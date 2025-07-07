@@ -8,16 +8,28 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+html {
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  /* Improve font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Enable smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   overflow-x: hidden;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior-y: none;
 }
 
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  /* Support for newer browsers with viewport units that account for mobile bars */
+  min-height: 100dvh;
 }
 
 /* Mobile optimizations */
@@ -26,12 +38,43 @@ body {
     font-size: 14px;
   }
   
+  /* Prevent zoom on input focus (iOS Safari) */
   input, textarea, select, button {
-    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    font-size: 16px !important;
+  }
+  
+  /* Improve touch targets */
+  button, .touch-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
-/* Add these utility classes for responsive design */
+/* Safe area support for notched devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-area-insets {
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* Responsive container utilities */
 .responsive-container {
   width: 100%;
   padding-left: 1rem;
@@ -58,18 +101,287 @@ body {
   }
 }
 
+@media (min-width: 1280px) {
+  .responsive-container {
+    max-width: 1280px;
+  }
+}
+
 /* Touch-friendly styles */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Prevent text size adjustment on orientation change */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-/* Improve scrolling on iOS */
+/* Improve scrolling performance */
 .scroll-container {
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Custom scrollbar for webkit browsers */
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-gradient {
+  animation: gradient 15s ease infinite;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/80 {
+    background-color: white;
+  }
+  
+  .text-gray-600 {
+    color: #000000;
+  }
+  
+  .border-gray-200 {
+    border-color: #000000;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles here if needed */
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Utility classes for mobile */
+.mobile-hidden {
+  @media (max-width: 767px) {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  @media (min-width: 768px) {
+    display: none !important;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .landscape-compact .text-4xl {
+    font-size: 2rem;
+  }
+  
+  .landscape-compact .p-8 {
+    padding: 1rem;
+  }
+  
+  .landscape-compact .mb-8 {
+    margin-bottom: 1rem;
+  }
+}
+
+/* PWA and fullscreen support */
+@media (display-mode: standalone) {
+  body {
+    /* Styles for when app is installed as PWA */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Loading skeleton animations */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Input and form improvements for mobile */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  /* Improve appearance on iOS */
+  -webkit-appearance: none;
+  appearance: none;
+  /* Prevent zoom on focus */
+  font-size: 16px;
+  /* Better touch targets */
+  min-height: 44px;
+  /* Improve readability */
+  line-height: 1.5;
+}
+
+/* Button improvements */
+button {
+  /* Remove default button styling */
+  -webkit-appearance: none;
+  appearance: none;
+  /* Better touch targets */
+  min-height: 44px;
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Improve touch feedback */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Link improvements */
+a {
+  /* Improve touch targets for links */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  /* Remove tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Image optimizations */
+img {
+  /* Improve loading performance */
+  loading: lazy;
+  /* Prevent layout shift */
+  height: auto;
+  /* Improve rendering */
+  image-rendering: optimizeQuality;
+}
+
+/* Video optimizations */
+video {
+  /* Improve mobile playback */
+  playsinline: true;
+  /* Prevent fullscreen on iOS */
+  webkit-playsinline: true;
 }
