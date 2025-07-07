@@ -136,7 +136,7 @@ src/
 ### Environment Variables
 ```bash
 # OpenAI
-VITE_OPENAI_API_KEY=your_openai_key
+VITE_OPENAI_API_KEY=your_openai_key_here
 
 # Supabase (optional)
 VITE_SUPABASE_URL=your_supabase_url

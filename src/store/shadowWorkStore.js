@@ -103,58 +103,35 @@ export const useShadowWorkStore = create(
       
       generateInsights: async () => {
         const { answers } = get();
-        
-        // Mock AI-generated insights - in production, this would call the AI service
-        const mockInsights = {
-          shadowPatterns: [
-            "Pattern of perfectionism masking fear of judgment",
-            "Tendency to prioritize others' needs over your own",
-            "Hidden strength in creative expression",
-          ],
-          hiddenStrengths: [
-            "Natural empathy and emotional intelligence",
-            "Resilience through challenging experiences",
-            "Intuitive wisdom and inner knowing",
-          ],
-          transformationAreas: [
-            "Embracing vulnerability as strength",
-            "Setting healthy boundaries",
-            "Expressing authentic emotions",
-          ],
-        };
-        
-        const mockActionPlan = [
-          {
-            category: "Daily Practice",
-            actions: [
-              "Morning self-compassion meditation (5 minutes)",
-              "Evening reflection on authentic moments",
-              "Practice saying 'no' to one thing that doesn't serve you",
-            ],
-          },
-          {
-            category: "Weekly Challenges",
-            actions: [
-              "Express one emotion you usually hide",
-              "Set one boundary in a relationship",
-              "Engage in creative expression without judgment",
-            ],
-          },
-        ];
-        
-        const mockAffirmations = [
-          "I am worthy of love and acceptance exactly as I am",
-          "My sensitivity is a gift, not a weakness",
-          "I trust my inner wisdom to guide me",
-          "I deserve to take up space and be heard",
-          "My authentic self is my greatest strength",
-        ];
-        
-        set({
-          insights: mockInsights,
-          actionPlan: mockActionPlan,
-          affirmations: mockAffirmations,
-        });
+
+        const systemPrompt = `You are Newomen, an AI coach helping users perform shadow work. Based on the following answers, provide a summary of shadow patterns, hidden strengths, areas for transformation and a short action plan with affirmations.`;
+
+        try {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: JSON.stringify(answers) }
+              ],
+              max_tokens: 300,
+              temperature: 0.7
+            })
+          });
+
+          const data = await response.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            set({ insights: { summary: content } });
+          }
+        } catch (error) {
+          console.error('Failed to generate insights:', error);
+        }
       },
       
       resetAssessment: () => {
