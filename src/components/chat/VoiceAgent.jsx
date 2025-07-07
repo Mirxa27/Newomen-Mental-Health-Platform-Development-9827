@@ -55,7 +55,9 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
       const provider = getDefaultProvider();
       const apiKey = await generateEphemeralKey(provider?.apiKey);
       if (!apiKey) {
-        throw new Error('Failed to obtain API key');
+        throw new Error(
+          'Missing API key. Set your OpenAI key in Admin → AI Provider Settings or .env'
+        );
       }
       
       const voiceSession = new NewomenVoiceSession();
