@@ -153,8 +153,11 @@ When running the app locally you can also store your OpenAI API key in the brows
 If you see "Missing API key" errors when starting a voice session, ensure the key is stored in the admin panel or defined as `VITE_OPENAI_API_KEY`.
 
 ### Admin Access
-- **Admin Email**: `rayan.ahmed1822@gmail.com`
-- **Password**: Any password (demo mode)
+- Set the admin email in your `.env` file:
+  ```bash
+  VITE_ADMIN_EMAIL=admin@example.com
+  ```
+- Use any password during development (demo mode)
 
 ## 📱 Mobile Features
 

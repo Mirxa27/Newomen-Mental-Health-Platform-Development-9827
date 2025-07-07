@@ -14,8 +14,9 @@ export const useAuthStore = create(
       },
 
       login: (userData) => {
-        // Check if user is admin based on email
-        const isAdmin = userData.email === 'rayan.ahmed1822@gmail.com';
+        // Determine admin based on env variable
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
+        const isAdmin = userData.email === adminEmail;
         
         set({
           user: {
@@ -69,7 +70,8 @@ export const useAuthStore = create(
       // Admin functions
       isAdmin: () => {
         const { user } = get();
-        return user?.role === 'admin' || user?.email === 'rayan.ahmed1822@gmail.com';
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
+        return user?.role === 'admin' || user?.email === adminEmail;
       },
     }),
     {

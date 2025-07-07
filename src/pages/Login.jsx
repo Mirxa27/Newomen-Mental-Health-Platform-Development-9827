@@ -37,11 +37,12 @@ const Login = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Check if this is the admin email
-      const isAdmin = formData.email === 'rayan.ahmed1822@gmail.com';
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
+      const isAdmin = formData.email === adminEmail;
       
       const userData = {
         id: '1',
-        name: isAdmin ? 'Rayan Ahmed' : 'Sarah Ahmed',
+        name: formData.email.split('@')[0],
         email: formData.email,
         role: isAdmin ? 'admin' : 'user',
         preferences: {
@@ -91,14 +92,16 @@ const Login = () => {
           </p>
           
           {/* Admin Login Hint */}
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-700">
-              <strong>Admin Access:</strong> rayan.ahmed1822@gmail.com
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              Use any password for demo purposes
-            </p>
-          </div>
+          {import.meta.env.VITE_ADMIN_EMAIL && (
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Admin Email:</strong> {import.meta.env.VITE_ADMIN_EMAIL}
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Use any password for demo purposes
+              </p>
+            </div>
+          )}
         </div>
 
         <motion.form
