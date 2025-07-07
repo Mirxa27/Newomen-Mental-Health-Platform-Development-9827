@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, matchPath } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/navigation/Navbar';
@@ -9,6 +9,7 @@ import PWAInstallPrompt from '../components/common/PWAInstallPrompt';
 import NetworkStatus from '../components/common/NetworkStatus';
 import { useAuthStore } from '../store/authStore';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import routes from '../router';
 
 const MainLayout = () => {
   const location = useLocation();
@@ -16,17 +17,32 @@ const MainLayout = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [pageTitle, setPageTitle] = useState('Newomen');
 
-  // Determine page title based on route
+  // Determine page title based on route metadata
   useEffect(() => {
     const path = location.pathname;
     let title = 'Newomen - Your Journey to Authentic Self';
-    
-    if (path === '/') title = 'Newomen - Your Journey to Authentic Self';
-    else if (path === '/chat') title = 'AI Companion Chat - Newomen';
-    else if (path === '/shadow-work') title = 'Shadow Work Journey - Newomen';
-    else if (path === '/profile') title = 'Your Profile - Newomen';
-    else if (path === '/subscription') title = 'Subscription Plans - Newomen';
-    
+
+    const findMeta = (list) => {
+      for (const r of list) {
+        if (r.path && matchPath({ path: r.path, end: false }, path) && r.meta) {
+          return r.meta;
+        }
+        if (r.children) {
+          const child = findMeta(r.children);
+          if (child) return child;
+        }
+      }
+      return null;
+    };
+
+    const meta = findMeta(routes);
+    if (meta?.title) title = `${meta.title} - Newomen`;
+
+    if (path.startsWith('/shadow-work')) {
+      const q = path.split('/')[2];
+      title = q ? `Shadow Work Question ${q} - Newomen` : 'Shadow Work Journey - Newomen';
+    }
+
     setPageTitle(title);
     document.title = title;
   }, [location]);

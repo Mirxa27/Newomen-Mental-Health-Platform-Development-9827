@@ -23,7 +23,7 @@ const Sidebar = () => {
   const navigation = [
     { name: t('home'), href: '/', icon: FiHome },
     { name: t('chat'), href: '/chat', icon: FiMessageCircle },
-    { name: t('shadowWork'), href: '/shadow-work', icon: FiEye },
+    { name: t('shadowWork'), href: '/shadow-work/1', icon: FiEye },
     { name: t('profile'), href: '/profile', icon: FiUser },
     { name: t('subscription'), href: '/subscription', icon: FiCreditCard },
   ];

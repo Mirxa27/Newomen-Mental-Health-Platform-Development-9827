@@ -1,11 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+const getInitialApiKey = () => {
+  if (typeof window !== 'undefined') {
+    const localKey = window.localStorage.getItem('newomen-openai-key');
+    if (localKey) return localKey;
+  }
+  return import.meta.env.VITE_OPENAI_API_KEY || '';
+};
 
 const defaultProviders = [
   {
     id: 'openai',
     name: 'OpenAI',
     type: 'openai',
+    apiKey: getInitialApiKey(),
     apiKey: '',
     endpoint: 'https://api.openai.com/v1',
     model: 'gpt-4',

@@ -57,7 +57,7 @@ const Register = () => {
       
       login(userData);
       toast.success('Welcome to Newomen!');
-      navigate('/shadow-work');
+      navigate('/shadow-work/1');
     } catch (error) {
       toast.error('Registration failed. Please try again.');
     } finally {

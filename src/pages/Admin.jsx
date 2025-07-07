@@ -23,6 +23,7 @@ const {
 
 const Admin = () => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const adminNav = [
     { name: 'Dashboard', href: '/admin', icon: FiHome },
@@ -36,12 +37,25 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+      {/* Mobile header */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 rounded-lg hover:bg-gray-100"
+          aria-label="Open sidebar"
+        >
+          <SafeIcon icon={FiIcons.FiMenu} className="w-5 h-5 text-gray-700" />
+        </button>
+        <h2 className="text-lg font-bold text-gray-900">Admin Panel</h2>
+        <div className="w-10" />
+      </div>
+
       <div className="flex">
-        {/* Admin Sidebar */}
-        <div className="w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200 min-h-screen">
+        {/* Sidebar for desktop */}
+        <div className="hidden md:block w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200 min-h-screen">
           <div className="p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Admin Panel</h2>
-            
+
             <nav className="space-y-2">
               {adminNav.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -51,21 +65,21 @@ const Admin = () => {
                     to={item.href}
                     className={`
                       group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                      ${isActive 
-                        ? 'bg-primary-50 text-primary-600 border-r-2 border-primary-500' 
+                      ${isActive
+                        ? 'bg-primary-50 text-primary-600 border-r-2 border-primary-500'
                         : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
                       }
                     `}
                   >
-                    <SafeIcon 
-                      icon={item.icon} 
+                    <SafeIcon
+                      icon={item.icon}
                       className={`
                         w-5 h-5 mr-3 transition-colors
-                        ${isActive 
-                          ? 'text-primary-600' 
+                        ${isActive
+                          ? 'text-primary-600'
                           : 'text-gray-400 group-hover:text-primary-600'
                         }
-                      `} 
+                      `}
                     />
                     {item.name}
                   </Link>
@@ -75,8 +89,59 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Sidebar overlay for mobile */}
+        {sidebarOpen && (
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            className="fixed inset-0 z-40 flex md:hidden"
+          >
+            <div className="w-64 bg-white shadow-xl p-6 overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Admin Panel</h2>
+                <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100" aria-label="Close sidebar">
+                  <SafeIcon icon={FiIcons.FiX} className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
+              <nav className="space-y-2">
+                {adminNav.map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`
+                        group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
+                        ${isActive
+                          ? 'bg-primary-50 text-primary-600 border-r-2 border-primary-500'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
+                        }
+                      `}
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <SafeIcon
+                        icon={item.icon}
+                        className={`
+                          w-5 h-5 mr-3 transition-colors
+                          ${isActive
+                            ? 'text-primary-600'
+                            : 'text-gray-400 group-hover:text-primary-600'
+                          }
+                        `}
+                      />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+            <div className="flex-1" onClick={() => setSidebarOpen(false)} />
+          </motion.div>
+        )}
+
         {/* Admin Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           <Routes>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />

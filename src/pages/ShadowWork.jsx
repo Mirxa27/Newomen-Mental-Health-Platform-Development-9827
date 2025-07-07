@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
+import { useParams, useNavigate } from 'react-router-dom';
 import SafeIcon from '../components/common/SafeIcon';
 import { useShadowWorkStore } from '../store/shadowWorkStore';
 import QuestionCard from '../components/shadowwork/QuestionCard';
@@ -12,6 +13,8 @@ const { FiArrowLeft, FiArrowRight, FiCheck } = FiIcons;
 
 const ShadowWork = () => {
   const { t } = useTranslation();
+  const { questionId } = useParams();
+  const navigate = useNavigate();
   const {
     currentQuestion,
     questions,
@@ -21,11 +24,22 @@ const ShadowWork = () => {
     nextQuestion,
     previousQuestion,
     completeAssessment,
+    setCurrentQuestion,
   } = useShadowWorkStore();
+
+  // Sync store with route parameter
+  useEffect(() => {
+    const index = questionId ? Number(questionId) - 1 : 0;
+    setCurrentQuestion(index);
+    if (!questionId) {
+      navigate(`/shadow-work/${index + 1}`, { replace: true });
+    }
+  }, [questionId, setCurrentQuestion, navigate]);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       nextQuestion();
+      navigate(`/shadow-work/${currentQuestion + 2}`);
     } else {
       completeAssessment();
     }
@@ -34,6 +48,7 @@ const ShadowWork = () => {
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       previousQuestion();
+      navigate(`/shadow-work/${currentQuestion}`);
     }
   };
 

@@ -159,7 +159,7 @@ const Home = () => {
             </p>
             
             <Link
-              to={isAuthenticated ? "/shadow-work" : "/auth/register"}
+              to={isAuthenticated ? "/shadow-work/1" : "/auth/register"}
               className="bg-white text-primary-600 px-6 md:px-8 py-3 md:py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center space-x-2"
             >
               <span>Start Shadow Work</span>

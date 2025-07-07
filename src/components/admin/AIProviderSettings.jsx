@@ -64,16 +64,24 @@ const AIProviderSettings = () => {
 
   const testConnection = async (provider) => {
     toast.loading('Testing connection...');
-    
-    // Simulate API test
-    setTimeout(() => {
+    try {
+      const response = await fetch(`${provider.endpoint}/models`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${provider.apiKey}`,
+        },
+      });
       toast.dismiss();
-      if (provider.apiKey && provider.apiKey.length > 10) {
+
+      if (response.ok) {
         toast.success('Connection successful');
       } else {
-        toast.error('Connection failed - Invalid API key');
+        toast.error('Connection failed');
       }
-    }, 2000);
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Connection failed');
+    }
   };
 
   const ProviderForm = ({ provider, onSave, onCancel }) => {
@@ -103,13 +111,13 @@ const AIProviderSettings = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-auto"
         onClick={onCancel}
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+          className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-6">
@@ -125,7 +133,7 @@ const AIProviderSettings = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Provider Name
@@ -172,7 +180,7 @@ const AIProviderSettings = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   API Endpoint
@@ -204,7 +212,7 @@ const AIProviderSettings = () => {
 
             <div>
               <h4 className="text-lg font-medium text-gray-900 mb-4">Model Settings</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Temperature: {formData.settings?.temperature}
@@ -303,7 +311,7 @@ const AIProviderSettings = () => {
       </div>
 
       {/* Providers List */}
-      <div className="grid gap-6">
+      <div className="grid gap-6 sm:grid-cols-2">
         {providers.map((provider, index) => (
           <motion.div
             key={provider.id}
@@ -312,7 +320,7 @@ const AIProviderSettings = () => {
             transition={{ delay: index * 0.1 }}
             className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
                   <h3 className="text-lg font-semibold text-gray-900">{provider.name}</h3>
@@ -336,7 +344,7 @@ const AIProviderSettings = () => {
                   </button>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
                   <div>
                     <span className="font-medium">Endpoint:</span> {provider.endpoint}
                   </div>

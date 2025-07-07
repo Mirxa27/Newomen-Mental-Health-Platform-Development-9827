@@ -19,9 +19,11 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 - **Push Notifications**: Real-time engagement features
 
 ### Technical Features
-- **Real-time Voice**: WebRTC and Speech APIs integration
+- **Real-time Voice**: WebRTC and Speech APIs integration powered by the [OpenAI Agents SDK](https://openai.github.io/openai-agents-js/guides/voice-agents/quickstart/)
 - **Secure Authentication**: Role-based access control
 - **Admin Dashboard**: Comprehensive management interface
+
+ - **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`. Provider settings are stored locally so they persist between sessions and all chat and voice interactions automatically use the selected provider, endpoint, model and tuning parameters.
 - **AI Provider Management**: Configure OpenAI, Anthropic and custom models under `/admin/ai-providers`
 - **Analytics**: User engagement and usage tracking
 - **Subscription Management**: Tiered pricing with usage tracking
@@ -147,9 +149,17 @@ VITE_SUPABASE_ANON_KEY=your_supabase_key
 VITE_APP_ENV=development
 ```
 
+Create a `.env` file based on `.env.example` and make sure `VITE_OPENAI_API_KEY` is set to a valid key. The admin panel allows storing provider keys, but the fallback environment value is required for voice chat initialization.
+
+When running the app locally you can also store your OpenAI API key in the browser by navigating to **Admin → AI Provider Settings**, editing the default provider and entering your key. The realtime voice service will read this value automatically if the backend endpoint is unavailable.
+If you see "Missing API key" errors when starting a voice session, ensure the key is stored in the admin panel or defined as `VITE_OPENAI_API_KEY`.
+
 ### Admin Access
-- **Admin Email**: `rayan.ahmed1822@gmail.com`
-- **Password**: Any password (demo mode)
+- Set the admin email in your `.env` file:
+  ```bash
+  VITE_ADMIN_EMAIL=admin@example.com
+  ```
+- Use any password during development (demo mode)
 
 ## 📱 Mobile Features
 
