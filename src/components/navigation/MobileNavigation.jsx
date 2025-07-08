@@ -3,8 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiHome, 
-  FiMessageCircle, 
-  FiMoon,
+  FiSearch,
+  FiPlus,
   FiUser, 
   FiCreditCard,
   FiMenu,
@@ -23,8 +23,8 @@ const MobileNavigation = () => {
   
   const navItems = [
     { path: '/', icon: FiHome, label: 'Home' },
-    { path: '/chat', icon: FiMessageCircle, label: 'Chat' },
-    { path: '/shadow-work', icon: FiMoon, label: 'Shadow' },
+    { path: '/search', icon: FiSearch, label: 'Search' },
+    { path: '/add', icon: FiPlus, label: 'Add' },
     { path: '/profile', icon: FiUser, label: 'Profile' },
   ];
 
