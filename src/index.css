@@ -34,6 +34,23 @@ body {
 
 /* Glassmorphic base styles */
 @layer components {
+  /* Define glass background utilities */
+  .bg-glass-light {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .bg-glass-medium {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .bg-glass-dark {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .bg-glass-heavy {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
   /* Glass card variations */
   .glass {
     @apply bg-glass-light backdrop-blur-xl border border-white/20;
