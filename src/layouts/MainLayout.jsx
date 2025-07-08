@@ -79,6 +79,7 @@ const MainLayout = () => {
         <meta name="apple-mobile-web-app-title" content="Newomen" />
         <link rel="canonical" href={`https://newomen.com${location.pathname}`} />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
       </Helmet>
       
       <div className="min-h-screen bg-gray-900 text-gray-200 relative overflow-x-hidden">

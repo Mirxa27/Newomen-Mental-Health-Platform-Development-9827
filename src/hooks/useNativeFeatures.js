@@ -37,9 +37,11 @@ export const useNativeFeatures = () => {
 
     // Listen for PWA install prompt
     const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setIsInstallable(true);
+      if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+        setDeferredPrompt(e);
+        setIsInstallable(true);
+      }
     };
 
     // Listen for successful PWA installation
@@ -49,25 +51,34 @@ export const useNativeFeatures = () => {
       console.log('PWA was installed');
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    // Safely add event listeners
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.addEventListener('appinstalled', handleAppInstalled);
+    }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      if (typeof window !== 'undefined' && window.removeEventListener) {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+      }
     };
   }, []);
 
   const installPWA = useCallback(async () => {
-    if (!deferredPrompt) return false;
+    if (!deferredPrompt || typeof deferredPrompt.prompt !== 'function') return false;
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-      setIsInstallable(false);
-      return true;
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error installing PWA:', error);
     }
     
     return false;

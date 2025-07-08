@@ -13,10 +13,14 @@ const PWAInstallPrompt = () => {
 
   useEffect(() => {
     // Check if user has already dismissed the prompt
-    const dismissed = localStorage.getItem('pwa-install-dismissed');
-    if (dismissed) {
-      setIsDismissed(true);
-      return;
+    try {
+      const dismissed = localStorage.getItem('pwa-install-dismissed');
+      if (dismissed) {
+        setIsDismissed(true);
+        return;
+      }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
     }
 
     // Show prompt after a delay if installable
@@ -39,7 +43,11 @@ const PWAInstallPrompt = () => {
   const handleDismiss = () => {
     setShowPrompt(false);
     setIsDismissed(true);
-    localStorage.setItem('pwa-install-dismissed', 'true');
+    try {
+      localStorage.setItem('pwa-install-dismissed', 'true');
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
   };
 
   const renderIOSInstructions = () => (

@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'icons/*'],// previously specific icons
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'icons/*'],
       manifest: {
         name: 'Newomen - Your Journey to Authentic Self',
         short_name: 'Newomen',
@@ -73,8 +73,10 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true
-      }
+        enabled: false // Disable PWA in development to avoid issues
+      },
+      injectRegister: 'auto',
+      strategies: 'injectManifest'
     })
   ],
   base: './',
