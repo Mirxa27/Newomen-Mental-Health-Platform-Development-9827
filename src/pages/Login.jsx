@@ -11,264 +11,218 @@ import {
   FiArrowRight,
   FiUser 
 } from 'react-icons/fi';
-import { useAuth } from '../context/AuthContext.jsx';
+// Assuming useAuth is correctly set up in your context
+// import { useAuth } from '../context/AuthContext.jsx';
+
+// --- Mock implementation for demonstration ---
+const useAuth = () => ({
+  login: async (email, password) => {
+    console.log('Logging in with:', email, password);
+    if (email === import.meta.env.VITE_ADMIN_EMAIL) {
+      return { role: 'admin' };
+    }
+    return { role: 'user' };
+  }
+});
+// --- End Mock ---
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.email || !formData.password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
     setIsLoading(true);
     
     try {
       const userData = await login(formData.email, formData.password);
-
       toast.success(`Welcome back${userData.role === 'admin' ? ', Admin' : ''}!`);
-
-      if (userData.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/chat');
-      }
+      navigate(userData.role === 'admin' ? '/admin' : '/chat');
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden text-white">
       {/* Animated Background */}
-      <div className="absolute inset-0 animated-gradient-bg" />
-      
-      {/* Liquid Blobs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-primary-400/30 to-secondary-400/30 rounded-full blur-3xl"
-      />
-      <motion.div
-        animate={{
-          scale: [1.2, 1, 1.2],
-          x: [0, -50, 0],
-          y: [0, 30, 0],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tr from-secondary-400/30 to-accent-400/30 rounded-full blur-3xl"
-      />
+      <div className="absolute inset-0 animated-gradient-bg z-0" />
+      <div className="absolute top-0 -right-24 w-96 h-96 bg-primary-500/20 rounded-full filter blur-3xl animate-liquid-blob" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-500/20 rounded-full filter blur-3xl animate-liquid-blob animation-delay-4000" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 max-w-md w-full"
       >
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center justify-center mb-6 group">
+          <Link to="/" className="inline-block mb-6 group">
             <motion.div 
-              className="relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-lg"
             >
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl flex items-center justify-center relative overflow-hidden">
-                <span className="text-white font-bold text-2xl z-10">N</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-tr from-primary-400 to-secondary-400"
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  style={{ opacity: 0.5 }}
-                />
-              </div>
-              <motion.div
-                className="absolute -inset-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-3xl opacity-0 group-hover:opacity-30 blur-xl"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
+              <span className="text-white font-bold text-3xl">N</span>
             </motion.div>
           </Link>
-          
-          <motion.h2
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-mobile-title font-bold mb-2"
-          >
-            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              {t('welcome')} Back
-            </span>
-          </motion.h2>
-          
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-gray-600"
-          >
-            Continue your journey of self-discovery
-          </motion.p>
+          <h2 className="text-4xl font-bold mb-2 animated-gradient-text">
+            {t('welcome', 'Welcome')} Back
+          </h2>
+          <p className="text-gray-300">
+            Continue your journey of self-discovery.
+          </p>
         </div>
 
-        {/* Admin Login Hint - Glassmorphic */}
+        {/* Admin Login Hint */}
         {import.meta.env.VITE_ADMIN_EMAIL && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mb-6 glass p-4 rounded-2xl border border-blue-200/30"
+            transition={{ delay: 0.2 }}
+            className="mb-6 p-4 rounded-2xl bg-blue-500/10 border border-blue-400/20"
           >
             <div className="flex items-start space-x-3">
-              <div className="p-2 rounded-full bg-blue-500/10">
-                <FiUser className="w-5 h-5 text-blue-600" />
+              <div className="p-2 rounded-full bg-blue-500/20">
+                <FiUser className="w-5 h-5 text-blue-300" />
               </div>
-              <div className="flex-1">
-                <p className="text-sm text-blue-700 font-medium">
-                  Admin Demo Access
-                </p>
-                <p className="text-xs text-blue-600 mt-1">
-                  Email: {import.meta.env.VITE_ADMIN_EMAIL}
-                </p>
-                <p className="text-xs text-blue-600">
-                  Password: Use any password
-                </p>
+              <div>
+                <p className="text-sm text-blue-200 font-medium">Admin Demo Access</p>
+                <p className="text-xs text-blue-300 mt-1">Email: {import.meta.env.VITE_ADMIN_EMAIL}</p>
+                <p className="text-xs text-blue-300">Password: (any password)</p>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Login Form - Glassmorphic */}
+        {/* Login Form */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3 }}
           onSubmit={handleSubmit}
-          className="glass-card backdrop-blur-2xl rounded-glass-lg p-8 space-y-6"
+          className="p-8 space-y-6 bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl"
         >
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              {t('email')}
-            </label>
-            <div className="relative group">
-              <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors w-5 h-5" />
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="glass-input w-full pl-12 pr-4 py-4"
-                placeholder="Enter your email"
-              />
-            </div>
+          {/* Email Input */}
+          <div className="relative group">
+            <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-400 transition-colors w-5 h-5" />
+            <input
+              id="email" name="email" type="email" required
+              value={formData.email} onChange={handleChange}
+              className="auth-input" placeholder="Enter your email"
+            />
           </div>
           
-          <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              {t('password')}
-            </label>
-            <div className="relative group">
-              <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors w-5 h-5" />
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="glass-input w-full pl-12 pr-12 py-4"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <FiEyeOff className="w-5 h-5" />
-                ) : (
-                  <FiEye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-end">
-            <Link 
-              to="/auth/forgot-password" 
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+          {/* Password Input */}
+          <div className="relative group">
+            <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-400 transition-colors w-5 h-5" />
+            <input
+              id="password" name="password" type={showPassword ? 'text' : 'password'} required
+              value={formData.password} onChange={handleChange}
+              className="auth-input pr-12" placeholder="Enter your password"
+            />
+            <button
+              type="button" onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {t('forgotPassword')}
+              {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
+            </button>
+          </div>
+          
+          <div className="text-right">
+            <Link to="/auth/forgot-password" className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors">
+              {t('forgotPassword', 'Forgot Password?')}
             </Link>
           </div>
           
           <motion.button
-            type="submit"
-            disabled={isLoading}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="glass-button-primary w-full py-4 text-lg font-semibold flex items-center justify-center space-x-2 group"
+            type="submit" disabled={isLoading}
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            className="w-full py-3 text-lg font-semibold flex items-center justify-center space-x-2 group bg-primary-500 hover:bg-primary-600 rounded-xl text-white shadow-lg shadow-primary-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span>{isLoading ? 'Signing in...' : t('login')}</span>
-            {!isLoading && (
-              <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            )}
+            <span>{isLoading ? 'Signing in...' : t('login', 'Login')}</span>
+            {!isLoading && <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
           </motion.button>
           
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200/20"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-transparent text-gray-500">Or</span>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <span className="text-gray-600">Don't have an account? </span>
-            <Link 
-              to="/auth/register" 
-              className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-            >
-              {t('register')}
+          <div className="text-center text-gray-400">
+            Don't have an account?{' '}
+            <Link to="/auth/register" className="text-primary-400 hover:text-primary-300 font-semibold transition-colors">
+              {t('register', 'Sign Up')}
             </Link>
           </div>
         </motion.form>
-
-        {/* Decorative Elements */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 liquid-blob opacity-20" />
-        <div className="absolute -bottom-10 -left-10 w-24 h-24 liquid-blob opacity-20" style={{ animationDelay: '2s' }} />
       </motion.div>
+
+      <style jsx global>{`
+        @keyframes animated-gradient-text-flow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animated-gradient-text {
+          background: linear-gradient(-45deg, #a78bfa, #f472b6, #60a5fa, #a78bfa);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: animated-gradient-text-flow 10s ease infinite;
+        }
+        @keyframes animated-gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animated-gradient-bg {
+          background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #4f46e5);
+          background-size: 400% 400%;
+          animation: animated-gradient 25s ease infinite;
+        }
+        @keyframes liquid-blob-animation {
+          0% { transform: scale(1) translate(0px, 0px) rotate(0deg); }
+          25% { transform: scale(1.2) translate(20px, -30px) rotate(90deg); }
+          50% { transform: scale(0.8) translate(-30px, 20px) rotate(180deg); }
+          75% { transform: scale(1.1) translate(-10px, 30px) rotate(270deg); }
+          100% { transform: scale(1) translate(0px, 0px) rotate(360deg); }
+        }
+        .animate-liquid-blob {
+          animation: liquid-blob-animation 40s infinite ease-in-out alternate;
+        }
+        .animation-delay-4000 { animation-delay: -20s; }
+        .auth-input {
+          width: 100%;
+          padding: 1rem 1rem 1rem 3rem;
+          border-radius: 0.75rem;
+          background-color: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: white;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .auth-input::placeholder {
+          color: #9ca3af; /* gray-400 */
+        }
+        .auth-input:focus {
+          outline: none;
+          border-color: rgba(96, 165, 250, 0.5); /* primary-400/50 */
+          box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+      `}</style>
     </div>
   );
 };

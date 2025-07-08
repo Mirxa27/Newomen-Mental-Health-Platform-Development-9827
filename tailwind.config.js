@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import plugin from 'tailwindcss/plugin';
+
 export default {
   content: [
     "./index.html",
@@ -6,133 +8,87 @@ export default {
   ],
   theme: {
     extend: {
+      // CORE COLORS: A vibrant and modern palette
       colors: {
         primary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa', // A nice, accessible violet
+          500: '#8b5cf6', // Main primary color
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
         },
         secondary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6', // A vibrant pink
+          500: '#ec4899', // Main secondary color
+          600: '#db2777',
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
         },
-        accent: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+        // DARK THEME: Essential for the glassmorphic look
+        dark: {
+          950: '#0c0a09', // Near black for deep backgrounds
+          900: '#111827', // Main background color (slate-900)
+          800: '#1f2937', // Lighter background (slate-800)
+          700: '#374151', // Borders and dividers (slate-700)
         },
-        neutral: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
-        },
+        // GLASS: Simplified for clarity and consistency
         glass: {
-          light: 'rgba(255, 255, 255, 0.1)',
-          medium: 'rgba(255, 255, 255, 0.2)',
-          heavy: 'rgba(255, 255, 255, 0.3)',
-          dark: 'rgba(0, 0, 0, 0.1)',
-          darkMedium: 'rgba(0, 0, 0, 0.2)',
-          darkHeavy: 'rgba(0, 0, 0, 0.3)',
-        }
+          10: 'rgba(255, 255, 255, 0.1)',
+          20: 'rgba(255, 255, 255, 0.2)',
+        },
       },
+      
+      // TYPOGRAPHY
       fontFamily: {
-        'arabic': ['Noto Sans Arabic', 'Arial', 'sans-serif'],
-        'english': ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        arabic: ['Noto Sans Arabic', 'Arial', 'sans-serif'],
       },
+
+      // ANIMATIONS & KEYFRAMES: The heart of the liquid glassmorphic design
       animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'gradient': 'gradient 15s ease infinite',
-        'liquid': 'liquid 8s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite',
-        'morph': 'morph 8s ease-in-out infinite',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'fade-in': 'fadeIn 0.5s ease-out',
+        'gradient-flow': 'gradient-flow 15s ease infinite',
+        'liquid-blob': 'liquid-blob 20s infinite ease-in-out alternate',
+        'glow': 'glow 3s ease-in-out infinite alternate',
+        'fade-in': 'fade-in 0.5s ease-out forwards',
+        'slide-up': 'slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+        'gradient-flow': {
+          '0%, 100%': { background-position: '0% 50%' },
+          '50%': { background-position: '100% 50%' },
         },
-        gradient: {
-          '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center'
-          },
-          '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center'
-          },
+        'liquid-blob': {
+          '0%': { transform: 'scale(1) translate(0px, 0px) rotate(0deg)' },
+          '25%': { transform: 'scale(1.2) translate(20px, -30px) rotate(90deg)' },
+          '50%': { transform: 'scale(0.8) translate(-30px, 20px) rotate(180deg)' },
+          '75%': { transform: 'scale(1.1) translate(-10px, 30px) rotate(270deg)' },
+          '100%': { transform: 'scale(1) translate(0px, 0px) rotate(360deg)' },
         },
-        liquid: {
-          '0%, 100%': {
-            'border-radius': '60% 40% 30% 70% / 60% 30% 70% 40%',
-          },
-          '50%': {
-            'border-radius': '30% 60% 70% 40% / 50% 60% 30% 60%',
-          },
+        'glow': {
+          'from': { 'text-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ec4899, 0 0 20px #ec4899' },
+          'to': { 'text-shadow': '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ec4899, 0 0 40px #ec4899' },
         },
-        glow: {
-          '0%, 100%': {
-            'box-shadow': '0 0 30px rgba(217, 70, 239, 0.5)',
-          },
-          '50%': {
-            'box-shadow': '0 0 60px rgba(217, 70, 239, 0.8)',
-          },
+        'fade-in': {
+          'from': { opacity: 0 },
+          'to': { opacity: 1 },
         },
-        morph: {
-          '0%, 100%': {
-            'border-radius': '40% 60% 60% 40% / 60% 40% 60% 40%',
-            transform: 'rotate(0deg)',
-          },
-          '50%': {
-            'border-radius': '60% 40% 40% 60% / 40% 60% 40% 60%',
-            transform: 'rotate(180deg)',
-          },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(100%)', opacity: 0 },
-          '100%': { transform: 'translateY(0)', opacity: 1 },
-        },
-        slideDown: {
-          '0%': { transform: 'translateY(-100%)', opacity: 0 },
-          '100%': { transform: 'translateY(0)', opacity: 1 },
-        },
-        fadeIn: {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
+        'slide-up': {
+          'from': { opacity: 0, transform: 'translateY(20px)' },
+          'to': { opacity: 1, transform: 'translateY(0)' },
         },
       },
+
+      // GLASSMORPHISM HELPERS
       backdropBlur: {
         xs: '2px',
         sm: '4px',
@@ -142,20 +98,53 @@ export default {
         '2xl': '24px',
         '3xl': '40px',
       },
-      screens: {
-        'xs': '375px',
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1536px',
-      },
       borderRadius: {
         'glass': '24px',
-        'glass-sm': '16px',
         'glass-lg': '32px',
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'glow-primary': '0 0 20px rgba(139, 92, 246, 0.4)', // primary-500
+        'glow-secondary': '0 0 20px rgba(236, 72, 153, 0.4)', // secondary-500
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Custom plugin for text utilities and additional animations
+    plugin(function({ addBase, addUtilities, theme }) {
+      addBase({
+        // Base styles for a dark theme
+        'body': {
+          backgroundColor: theme('colors.dark.900'),
+          color: theme('colors.gray.200'),
+          fontFamily: theme('fontFamily.sans'),
+        },
+      });
+      
+      // Responsive text size utilities
+      addUtilities({
+        '.text-hero': {
+          fontSize: '2.5rem', // 40px
+          lineHeight: '1.1',
+          '@screen md': {
+            fontSize: '4rem', // 64px
+          },
+        },
+        '.text-title': {
+          fontSize: '2rem', // 32px
+          lineHeight: '1.2',
+          '@screen md': {
+            fontSize: '2.5rem', // 40px
+          },
+        },
+        '.text-body': {
+          fontSize: '1.125rem', // 18px
+          lineHeight: '1.6',
+          '@screen md': {
+            fontSize: '1.25rem', // 20px
+          },
+        },
+      });
+    }),
+  ],
 }
