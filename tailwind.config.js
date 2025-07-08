@@ -64,8 +64,8 @@ export default {
       },
       keyframes: {
         'gradient-flow': {
-          '0%, 100%': { background-position: '0% 50%' },
-          '50%': { background-position: '100% 50%' },
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
         },
         'liquid-blob': {
           '0%': { transform: 'scale(1) translate(0px, 0px) rotate(0deg)' },
