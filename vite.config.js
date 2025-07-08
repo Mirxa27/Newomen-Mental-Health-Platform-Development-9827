@@ -116,7 +116,13 @@ export default defineConfig({
     strictPort: false,
     hmr: {
       port: 5174
-    }
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     host: true,
