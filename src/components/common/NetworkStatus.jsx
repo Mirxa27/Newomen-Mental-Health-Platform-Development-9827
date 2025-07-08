@@ -6,10 +6,12 @@ import SafeIcon from './SafeIcon';
 const { FiWifiOff, FiWifi } = FiIcons;
 
 const NetworkStatus = () => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [showOfflineNotice, setShowOfflineNotice] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
+
     const handleOnline = () => {
       setIsOnline(true);
       setShowOfflineNotice(false);
