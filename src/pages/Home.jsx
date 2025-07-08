@@ -12,6 +12,7 @@ import { FiShield } from 'react-icons/fi';
 import { FiCompass } from 'react-icons/fi';
 import { FiFeather } from 'react-icons/fi';
 import { FiAward } from 'react-icons/fi';
+import { FiUsers } from 'react-icons/fi';
 import { FiTarget } from 'react-icons/fi';
 import { FiTrendingUp } from 'react-icons/fi';
 import { useAuthStore } from '../store/authStore';

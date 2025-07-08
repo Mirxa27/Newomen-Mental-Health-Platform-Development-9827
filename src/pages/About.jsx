@@ -15,8 +15,7 @@ import { FiCompass } from 'react-icons/fi';
 import { FiTarget } from 'react-icons/fi';
 import { FiTrendingUp } from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
-
-const { FiArrowRight, FiBookOpen, FiGlobe } = FiIcons;
+import { FiArrowRight, FiBookOpen, FiGlobe } from 'react-icons/fi';
 
 const About = () => {
   const { t } = useTranslation();
