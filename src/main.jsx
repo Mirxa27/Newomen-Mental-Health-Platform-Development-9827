@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './App.jsx';
 import './index.css';
 import './i18n/config';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,9 @@ createRoot(document.getElementById('root')).render(
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <HashRouter>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </HashRouter>
       </QueryClientProvider>
     </HelmetProvider>

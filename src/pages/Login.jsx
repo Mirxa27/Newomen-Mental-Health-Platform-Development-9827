@@ -11,12 +11,12 @@ import {
   FiArrowRight,
   FiUser 
 } from 'react-icons/fi';
-import { useAuthStore } from '../store/authStore';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { login } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -37,31 +37,13 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Mock login - in production, this would call your API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check if this is the admin email
-      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || '';
-      const isAdmin = formData.email === adminEmail;
-      
-      const userData = {
-        id: '1',
-        name: formData.email.split('@')[0],
-        email: formData.email,
-        role: isAdmin ? 'admin' : 'user',
-        preferences: {
-          language: 'en',
-          culturalContext: 'mena',
-        },
-      };
-      
-      login(userData);
-      
-      if (isAdmin) {
-        toast.success('Welcome back, Admin!');
+      const userData = await login(formData.email, formData.password);
+
+      toast.success(`Welcome back${userData.role === 'admin' ? ', Admin' : ''}!`);
+
+      if (userData.role === 'admin') {
         navigate('/admin');
       } else {
-        toast.success('Welcome back!');
         navigate('/chat');
       }
     } catch (error) {
