@@ -2,10 +2,20 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as FiIcons from 'react-icons/fi';
+import { FiUsers } from 'react-icons/fi';
+import { FiAward } from 'react-icons/fi';
+import { FiHeart } from 'react-icons/fi';
+import { FiFeather } from 'react-icons/fi';
+import { FiSun } from 'react-icons/fi';
+import { FiMoon } from 'react-icons/fi';
+import { FiStar } from 'react-icons/fi';
+import { FiZap } from 'react-icons/fi';
+import { FiShield } from 'react-icons/fi';
+import { FiCompass } from 'react-icons/fi';
+import { FiTarget } from 'react-icons/fi';
+import { FiTrendingUp } from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
-
-const { FiHeart, FiTarget, FiUsers, FiStar, FiArrowRight, FiCompass, FiAward, FiBookOpen, FiGlobe } = FiIcons;
+import { FiArrowRight, FiBookOpen, FiGlobe } from 'react-icons/fi';
 
 const About = () => {
   const { t } = useTranslation();

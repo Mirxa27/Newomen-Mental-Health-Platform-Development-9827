@@ -99,4 +99,42 @@ const AppRouter = () => {
   );
 };
 
+// Static route definitions for metadata (used by MainLayout)
+export const routes = [
+  {
+    path: '/',
+    meta: { title: 'Home', description: 'AI-powered platform for women\'s mental health and personal growth.' },
+    children: [
+      { path: '', meta: { title: 'Home' } },
+      { path: 'about', meta: { title: 'About' } },
+      { path: 'chat', meta: { title: 'Chat' } },
+      { path: 'shadow-work/:questionId?', meta: { title: 'Shadow Work' } },
+      { path: 'profile', meta: { title: 'Profile' } },
+      { path: 'subscription', meta: { title: 'Subscription' } },
+    ]
+  },
+  {
+    path: '/auth',
+    meta: { title: 'Auth' },
+    children: [
+      { path: 'login', meta: { title: 'Login' } },
+      { path: 'register', meta: { title: 'Register' } },
+      { path: 'forgot-password', meta: { title: 'Forgot Password' } },
+    ]
+  },
+  {
+    path: '/admin',
+    meta: { title: 'Admin' },
+    children: [
+      { path: '', meta: { title: 'Admin Dashboard' } },
+      { path: 'users', meta: { title: 'User Management' } },
+      { path: 'conversations', meta: { title: 'Conversation Monitor' } },
+      { path: 'prompts', meta: { title: 'Prompt Management' } },
+      { path: 'analytics', meta: { title: 'Analytics' } },
+      { path: 'ai-providers', meta: { title: 'AI Providers' } },
+      { path: 'settings', meta: { title: 'System Settings' } },
+    ]
+  },
+];
+
 export default AppRouter;
