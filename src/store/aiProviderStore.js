@@ -14,7 +14,6 @@ const defaultProviders = [
     name: 'OpenAI',
     type: 'openai',
     apiKey: getInitialApiKey(),
-    apiKey: '',
     endpoint: 'https://api.openai.com/v1',
     model: 'gpt-4',
     isActive: true,
