@@ -2,18 +2,9 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as FiIcons from 'react-icons/fi';
+import { Home, MessageSquare, Eye, User, CreditCard, Settings } from 'lucide-react';
 import SafeIcon from '../common/SafeIcon';
 import { useAuthStore } from '../../store/authStore';
-
-const { 
-  FiHome, 
-  FiMessageCircle, 
-  FiEye, 
-  FiUser, 
-  FiCreditCard, 
-  FiSettings 
-} = FiIcons;
 
 const Sidebar = () => {
   const { t } = useTranslation();
@@ -21,19 +12,19 @@ const Sidebar = () => {
   const { user, subscription } = useAuthStore();
 
   const navigation = [
-    { name: t('home'), href: '/', icon: FiHome },
-    { name: t('chat'), href: '/chat', icon: FiMessageCircle },
-    { name: t('shadowWork'), href: '/shadow-work/1', icon: FiEye },
-    { name: t('profile'), href: '/profile', icon: FiUser },
-    { name: t('subscription'), href: '/subscription', icon: FiCreditCard },
+    { name: t('home'), href: '/', icon: Home },
+    { name: t('chat'), href: '/chat', icon: MessageSquare },
+    { name: t('shadowWork'), href: '/shadow-work/1', icon: Eye },
+    { name: t('profile'), href: '/profile', icon: User },
+    { name: t('subscription'), href: '/subscription', icon: CreditCard },
   ];
 
   if (user?.role === 'admin') {
-    navigation.push({ name: t('admin'), href: '/admin', icon: FiSettings });
+    navigation.push({ name: t('admin'), href: '/admin', icon: Settings });
   }
 
   return (
-    <aside className="hidden md:block fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white/80 backdrop-blur-lg border-r border-gray-200 z-40">
+    <aside className="hidden md:block fixed left-0 top-16 h-[calc(100vh-64px)] w-64 liquid-glass border-r border-white/20 z-40">
       <div className="h-full flex flex-col justify-between p-4">
         <div>
           {/* Subscription Status */}

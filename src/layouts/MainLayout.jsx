@@ -64,7 +64,7 @@ const MainLayout = () => {
         <link rel="manifest" href="/manifest.json" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+      <div className="min-h-screen bg-neutral-50">
         <Navbar />
         <NetworkStatus />
         

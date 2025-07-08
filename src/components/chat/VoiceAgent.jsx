@@ -6,6 +6,7 @@ import SafeIcon from '../common/SafeIcon';
 import { NewomenVoiceSession, generateEphemeralKey } from '../../services/realtimeAgent';
 import { useAuthStore } from '../../store/authStore';
 import { useAIProviderStore } from '../../store/aiProviderStore';
+import { usePromptStore } from '../../store/promptStore';
 import toast from 'react-hot-toast';
 
 const { FiMic, FiMicOff, FiPhone, FiPhoneOff, FiVolume2, FiVolumeX } = FiIcons;
@@ -59,8 +60,40 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
           'Missing API key. Set your OpenAI key in Admin → AI Provider Settings or .env'
         );
       }
+
+      // CRITICAL: Get admin-defined system prompt - MANDATORY
+      const { getSystemPrompt, getPromptsByCategory } = usePromptStore.getState();
+      const adminSystemPrompt = getSystemPrompt();
       
-      const voiceSession = new NewomenVoiceSession();
+      if (!adminSystemPrompt) {
+        throw new Error('Admin system prompt not configured. Configure prompts in Admin Panel.');
+      }
+      
+      const voiceSession = new NewomenVoiceSession({
+        // MANDATORY: Use admin-defined system prompt
+        instructions: adminSystemPrompt,
+        voice: provider?.settings?.voice || 'nova',
+        model: provider?.model || 'gpt-4o-realtime-preview-2024-10-01',
+        modalities: ['text', 'audio'],
+        temperature: provider?.settings?.temperature || 0.8,
+        // Add strict admin protocol enforcement
+        tools: [
+          {
+            type: 'function',
+            name: 'apply_admin_protocols',
+            description: 'Apply admin-defined behavioral protocols',
+            parameters: {
+              type: 'object',
+              properties: {
+                protocol_type: { type: 'string', enum: ['crisis', 'cultural', 'therapeutic', 'voice'] },
+                context: { type: 'string' }
+              },
+              required: ['protocol_type']
+            }
+          }
+        ],
+        tool_choice: 'auto',
+      });
       sessionRef.current = voiceSession;
 
       // Set up event listeners

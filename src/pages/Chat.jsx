@@ -6,6 +6,7 @@ import SafeIcon from '../components/common/SafeIcon';
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/authStore';
 import { useAIProviderStore } from '../store/aiProviderStore';
+import { usePromptStore } from '../store/promptStore';
 import VoiceInput from '../components/chat/VoiceInput';
 import MessageBubble from '../components/chat/MessageBubble';
 import TypingIndicator from '../components/chat/TypingIndicator';
@@ -97,7 +98,10 @@ const Chat = () => {
   };
 
   const generateAIResponse = async (userMessage) => {
-    const systemPrompt = `You are Newomen, a compassionate AI companion for women's mental health and personal growth. Speak with warmth and cultural awareness using Arabic phrases like حبيبتي when appropriate.`;
+    // CRITICAL: Use admin-defined system prompt for ALL AI responses
+    const { getSystemPrompt } = usePromptStore.getState();
+    const systemPrompt = getSystemPrompt() || `You are Newomen, a compassionate AI companion for women's mental health and personal growth. Speak with warmth and cultural awareness using Arabic phrases like حبيبتي when appropriate.`;
+    
     const provider = getDefaultProvider();
     const apiKey = provider?.apiKey || import.meta.env.VITE_OPENAI_API_KEY;
     const endpoint = provider?.endpoint || 'https://api.openai.com/v1';
@@ -118,31 +122,16 @@ const Chat = () => {
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage },
-          ],
-          max_tokens: settings.maxTokens || 150,
-          temperature: settings.temperature ?? 0.7,
-          top_p: settings.topP ?? 1,
-          frequency_penalty: settings.frequencyPenalty ?? 0,
-          presence_penalty: settings.presencePenalty ?? 0,
-        }),
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            { role: 'system', content: systemPrompt },
+            { role: 'system', content: systemPrompt }, // MUST use admin-defined prompt
+            ...currentConversation.messages.slice(-10).map(msg => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.content
+            })),
             { role: 'user', content: userMessage }
           ],
-          max_tokens: 150,
-          temperature: 0.7
-        })
+          temperature: settings.temperature || 0.8,
+          max_tokens: settings.maxTokens || 1000,
+        }),
       });
 
       const data = await response.json();

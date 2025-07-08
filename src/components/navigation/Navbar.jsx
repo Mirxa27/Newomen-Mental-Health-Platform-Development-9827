@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as FiIcons from 'react-icons/fi';
+import { Menu, X, Globe, User, LogOut, Bell, Settings } from 'lucide-react';
 import SafeIcon from '../common/SafeIcon';
 import { useAuthStore } from '../../store/authStore';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-
-const { FiMenu, FiX, FiGlobe, FiUser, FiLogOut, FiBell, FiSettings } = FiIcons;
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -66,8 +64,8 @@ const Navbar = () => {
       <nav 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled 
-            ? 'bg-white/90 backdrop-blur-lg shadow-md' 
-            : 'bg-white/80 backdrop-blur-lg'
+            ? 'liquid-glass shadow-md' 
+            : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,7 +88,7 @@ const Navbar = () => {
                       onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
                       aria-label="Notifications"
                     >
-                      <SafeIcon icon={FiBell} className="w-5 h-5 text-gray-600" />
+                      <SafeIcon icon={Bell} className="w-5 h-5 text-gray-600" />
                       {notifications.some(n => !n.read) && (
                         <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                       )}
@@ -104,7 +102,7 @@ const Navbar = () => {
                 className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Change language"
               >
-                <SafeIcon icon={FiGlobe} className="w-4 h-4" />
+                <SafeIcon icon={Globe} className="w-4 h-4" />
                 <span className="text-sm font-medium">
                   {i18n.language === 'en' ? 'العربية' : 'English'}
                 </span>
@@ -193,7 +191,7 @@ const Navbar = () => {
                 aria-expanded={isMenuOpen}
                 aria-label="Toggle navigation menu"
               >
-                <SafeIcon icon={isMenuOpen ? FiX : FiMenu} className="w-5 h-5" />
+                <SafeIcon icon={isMenuOpen ? X : Menu} className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -213,7 +211,7 @@ const Navbar = () => {
                   onClick={toggleLanguage}
                   className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <SafeIcon icon={FiGlobe} className="w-4 h-4" />
+                  <SafeIcon icon={Globe} className="w-4 h-4" />
                   <span className="text-sm font-medium">
                     {i18n.language === 'en' ? 'العربية' : 'English'}
                   </span>
@@ -226,7 +224,7 @@ const Navbar = () => {
                       className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <SafeIcon icon={FiUser} className="w-4 h-4" />
+                      <SafeIcon icon={User} className="w-4 h-4" />
                       <span className="text-sm font-medium">{user?.name}</span>
                     </Link>
                     {user?.role === 'admin' && (
@@ -235,7 +233,7 @@ const Navbar = () => {
                         className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <SafeIcon icon={FiSettings} className="w-4 h-4" />
+                        <SafeIcon icon={Settings} className="w-4 h-4" />
                         <span className="text-sm font-medium">{t('admin')}</span>
                       </Link>
                     )}
@@ -243,7 +241,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
-                      <SafeIcon icon={FiLogOut} className="w-4 h-4" />
+                      <SafeIcon icon={LogOut} className="w-4 h-4" />
                       <span className="text-sm font-medium">{t('logout')}</span>
                     </button>
                   </>
