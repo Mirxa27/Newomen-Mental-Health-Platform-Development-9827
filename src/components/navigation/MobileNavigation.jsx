@@ -29,7 +29,7 @@ const MobileNavigation = () => {
     <motion.div
       initial={{ y: 100 }}
       animate={{ y: 0 }}
-      className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 shadow-lg z-50 md:hidden"
+      className="glass-effect fixed bottom-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-t border-gray-200 shadow-2xl z-50 md:hidden"
     >
       <div className="flex justify-around items-center h-16">
         {navigation.map((item) => {
