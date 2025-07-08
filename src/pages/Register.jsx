@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
-import { useAuthStore } from '../store/authStore';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const { FiMail, FiLock, FiUser, FiEye, FiEyeOff } = FiIcons;
 
 const Register = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { register: registerUser } = useAuth();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -41,21 +41,7 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      // Mock registration - in production, this would call your API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const userData = {
-        id: Date.now().toString(),
-        name: formData.name,
-        email: formData.email,
-        role: 'user',
-        preferences: {
-          language: 'en',
-          culturalContext: 'mena',
-        },
-      };
-      
-      login(userData);
+      const userData = await registerUser(formData.name, formData.email, formData.password);
       toast.success('Welcome to Newomen!');
       navigate('/shadow-work/1');
     } catch (error) {
