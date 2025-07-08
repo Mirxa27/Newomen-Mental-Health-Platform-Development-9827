@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
@@ -36,95 +36,67 @@ const PageLoader = ({ children }) => (
   </Suspense>
 );
 
-// Routing configuration
-const routes = [
-  {
-    path: '/',
-    element: <MainLayout />,
-    children: [
-      { 
-        index: true, 
-        element: <PageLoader><Home /></PageLoader>, 
-        meta: { title: 'Your Journey to Authentic Self' } 
-      },
-      { 
-        path: 'about',
-        element: <PageLoader><About /></PageLoader>, 
-        meta: { title: 'About Newomen' } 
-      },
-      { 
-        path: 'chat',
-        element: (
+// Router component
+const AppRouter = () => {
+  return (
+    <Routes>
+      {/* Main layout routes */}
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<PageLoader><Home /></PageLoader>} />
+        <Route path="about" element={<PageLoader><About /></PageLoader>} />
+        <Route path="chat" element={
           <ProtectedRoute>
             <PageLoader><Chat /></PageLoader>
           </ProtectedRoute>
-        ),
-        meta: { title: 'AI Companion Chat' }
-      },
-      {
-        path: 'shadow-work/:questionId?',
-        element: (
+        } />
+        <Route path="shadow-work/:questionId?" element={
           <ProtectedRoute>
             <PageLoader><ShadowWork /></PageLoader>
           </ProtectedRoute>
-        ),
-        meta: { title: 'Shadow Work Journey' }
-      },
-      {
-        path: 'profile',
-        element: (
+        } />
+        <Route path="profile" element={
           <ProtectedRoute>
             <PageLoader><Profile /></PageLoader>
           </ProtectedRoute>
-        ),
-        meta: { title: 'Your Profile' }
-      },
-      {
-        path: 'subscription',
-        element: (
+        } />
+        <Route path="subscription" element={
           <ProtectedRoute>
             <PageLoader><Subscription /></PageLoader>
           </ProtectedRoute>
-        ),
-        meta: { title: 'Subscription Plans' }
-      },
-      { 
-        path: '*', 
-        element: <PageLoader><NotFound /></PageLoader>,
-        meta: { title: 'Page Not Found' }
-      }
-    ]
-  },
-  {
-    path: '/auth',
-    element: <AuthLayout />,
-    children: [
-      { path: 'login', element: <PageLoader><Login /></PageLoader>, meta: { title: 'Login' } },
-      { path: 'register', element: <PageLoader><Register /></PageLoader>, meta: { title: 'Register' } },
-      { path: 'forgot-password', element: <PageLoader><ForgotPassword /></PageLoader>, meta: { title: 'Forgot Password' } },
-      { path: '', element: <Navigate to="/auth/login" replace /> }
-    ]
-  },
-  {
-    path: '/admin',
-    element: (
-      <ProtectedRoute adminOnly>
-        <AdminLayout />
-      </ProtectedRoute>
-    ),
-    children: [
-      { index: true, element: <PageLoader><AdminDashboard /></PageLoader>, meta: { title: 'Admin Dashboard' } },
-      { path: 'users', element: <PageLoader><AdminUsers /></PageLoader>, meta: { title: 'User Management' } },
-      { path: 'conversations', element: <PageLoader><AdminConversations /></PageLoader>, meta: { title: 'Conversation Monitor' } },
-      { path: 'prompts', element: <PageLoader><AdminPrompts /></PageLoader>, meta: { title: 'Prompt Management' } },
-      { path: 'analytics', element: <PageLoader><AdminAnalytics /></PageLoader>, meta: { title: 'Analytics' } },
-      { path: 'ai-providers', element: <PageLoader><AdminAIProviders /></PageLoader>, meta: { title: 'AI Provider Settings' } },
-      { path: 'settings', element: <PageLoader><AdminSystemSettings /></PageLoader>, meta: { title: 'System Settings' } },
-    ]
-  },
-  // Redirect legacy routes
-  { path: '/login', element: <Navigate to="/auth/login" replace /> },
-  { path: '/register', element: <Navigate to="/auth/register" replace /> }
-];
+        } />
+      </Route>
 
-export default routes;
+      {/* Auth layout routes */}
+      <Route path="/auth" element={<AuthLayout />}>
+        <Route path="login" element={<PageLoader><Login /></PageLoader>} />
+        <Route path="register" element={<PageLoader><Register /></PageLoader>} />
+        <Route path="forgot-password" element={<PageLoader><ForgotPassword /></PageLoader>} />
+        <Route path="" element={<Navigate to="/auth/login" replace />} />
+      </Route>
+
+      {/* Admin layout routes */}
+      <Route path="/admin" element={
+        <ProtectedRoute adminOnly>
+          <AdminLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<PageLoader><AdminDashboard /></PageLoader>} />
+        <Route path="users" element={<PageLoader><AdminUsers /></PageLoader>} />
+        <Route path="conversations" element={<PageLoader><AdminConversations /></PageLoader>} />
+        <Route path="prompts" element={<PageLoader><AdminPrompts /></PageLoader>} />
+        <Route path="analytics" element={<PageLoader><AdminAnalytics /></PageLoader>} />
+        <Route path="ai-providers" element={<PageLoader><AdminAIProviders /></PageLoader>} />
+        <Route path="settings" element={<PageLoader><AdminSystemSettings /></PageLoader>} />
+      </Route>
+
+      {/* Legacy route redirects */}
+      <Route path="/login" element={<Navigate to="/auth/login" replace />} />
+      <Route path="/register" element={<Navigate to="/auth/register" replace />} />
+      
+      {/* 404 route */}
+      <Route path="*" element={<PageLoader><NotFound /></PageLoader>} />
+    </Routes>
+  );
+};
+
+export default AppRouter;

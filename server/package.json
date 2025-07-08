@@ -1,24 +1,34 @@
 {
-  "name": "newomen-auth-service",
-  "private": true,
+  "name": "newomen-server",
   "version": "1.0.0",
+  "description": "Newomen Mental Health Platform Backend",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "prisma": "prisma"
+    "dev": "nodemon src/index.js",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "node prisma/seed.js",
+    "setup": "npm run db:generate && npm run db:deploy && npm run db:seed"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "@prisma/client": "^5.0.0",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.1",
-    "express": "^4.19.2",
-    "cookie-parser": "^1.4.7",
-    "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.10.2",
-    "@prisma/client": "^5.10.2"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "prisma": "^5.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
-  }
+    "nodemon": "^2.0.22"
+  },
+  "keywords": ["mental-health", "ai", "backend", "express", "prisma"],
+  "author": "Newomen Team",
+  "license": "MIT"
 }

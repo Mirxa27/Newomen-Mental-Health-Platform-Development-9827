@@ -8,6 +8,10 @@ export default {
   ],
   theme: {
     extend: {
+      // RESPONSIVE BREAKPOINTS: Adding custom xs breakpoint
+      screens: {
+        'xs': '475px',
+      },
       // CORE COLORS: A vibrant and modern palette
       colors: {
         primary: {
