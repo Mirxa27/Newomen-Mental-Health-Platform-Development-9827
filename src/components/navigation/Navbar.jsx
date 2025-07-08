@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as FiIcons from 'react-icons/fi';
-import SafeIcon from '../common/SafeIcon';
+import { 
+  FiMenu, 
+  FiX, 
+  FiGlobe, 
+  FiUser, 
+  FiLogOut, 
+  FiBell, 
+  FiSettings,
+  FiChevronDown
+} from 'react-icons/fi';
 import { useAuthStore } from '../../store/authStore';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-
-const { FiMenu, FiX, FiGlobe, FiUser, FiLogOut, FiBell, FiSettings } = FiIcons;
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -19,38 +25,25 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications] = useState([
+    { id: 1, message: "Welcome to the new glassmorphic design!", read: false },
+    { id: 2, message: "Your journey continues...", read: true }
+  ]);
 
-  // Handle scroll effect for navbar
+  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      setScrolled(window.scrollY > 10);
     };
-
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [scrolled]);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Close menu when route changes
+  // Close menus on route change
   useEffect(() => {
     setIsMenuOpen(false);
     setUserMenuOpen(false);
   }, [location.pathname]);
-
-  // Mock notifications
-  useEffect(() => {
-    if (isAuthenticated) {
-      setNotifications([
-        { id: 1, message: "New feature: Voice Chat is now available", read: false },
-        { id: 2, message: "Shadow Work session completed", read: true }
-      ]);
-    }
-  }, [isAuthenticated]);
 
   const toggleLanguage = () => {
     i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en');
@@ -63,105 +56,137 @@ const Navbar = () => {
 
   return (
     <>
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled 
-            ? 'bg-white/90 backdrop-blur-lg shadow-md' 
-            : 'bg-white/80 backdrop-blur-lg'
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={`glass-nav fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled ? 'py-2' : 'py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">N</span>
-              </div>
-              <span className="text-xl font-bold gradient-text">Newomen</span>
+          <div className="flex justify-between items-center">
+            {/* Logo with liquid animation */}
+            <Link to="/" className="flex items-center space-x-3 group">
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                  <span className="text-white font-bold text-lg z-10">N</span>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-tr from-primary-400 to-secondary-400"
+                    animate={{
+                      rotate: [0, 360],
+                    }}
+                    transition={{
+                      duration: 20,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
+                    style={{ opacity: 0.5 }}
+                  />
+                </div>
+                <motion.div
+                  className="absolute -inset-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-2xl opacity-0 group-hover:opacity-50 blur-xl"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
+              <span className="text-mobile-heading font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Newomen
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
               {isAuthenticated && (
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <button 
-                      className="p-2 rounded-full hover:bg-gray-100 relative"
-                      onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
-                      aria-label="Notifications"
-                    >
-                      <SafeIcon icon={FiBell} className="w-5 h-5 text-gray-600" />
-                      {notifications.some(n => !n.read) && (
-                        <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                      )}
-                    </button>
-                  </div>
-                </div>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative p-3 rounded-2xl glass hover:bg-glass-medium transition-all duration-300"
+                >
+                  <FiBell className="w-5 h-5 text-gray-700" />
+                  {notifications.some(n => !n.read) && (
+                    <motion.span 
+                      className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                </motion.button>
               )}
               
-              <button 
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={toggleLanguage} 
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                aria-label="Change language"
+                className="glass-button flex items-center space-x-2"
               >
-                <SafeIcon icon={FiGlobe} className="w-4 h-4" />
+                <FiGlobe className="w-4 h-4" />
                 <span className="text-sm font-medium">
                   {i18n.language === 'en' ? 'العربية' : 'English'}
                 </span>
-              </button>
+              </motion.button>
 
               {isAuthenticated ? (
                 <div className="relative">
-                  <button 
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    aria-expanded={userMenuOpen}
-                    aria-haspopup="true"
+                    className="glass-button flex items-center space-x-2"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">{user?.name?.charAt(0) || 'U'}</span>
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">
+                        {user?.name?.charAt(0) || 'U'}
+                      </span>
                     </div>
                     <span className="text-sm font-medium">{user?.name}</span>
-                  </button>
+                    <FiChevronDown className={`w-4 h-4 transition-transform duration-300 ${
+                      userMenuOpen ? 'rotate-180' : ''
+                    }`} />
+                  </motion.button>
                   
-                  {/* User Dropdown Menu */}
                   <AnimatePresence>
                     {userMenuOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute right-0 mt-2 w-56 glass-modal rounded-glass py-2 overflow-hidden"
                       >
                         <Link
                           to="/profile"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center space-x-3 px-4 py-3 hover:bg-glass-medium transition-all duration-300"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          {t('profile')}
-                        </Link>
-                        <Link
-                          to="/subscription"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          {t('subscription')}
+                          <FiUser className="w-4 h-4 text-primary-600" />
+                          <span className="text-sm font-medium">{t('profile')}</span>
                         </Link>
                         {user?.role === 'admin' && (
                           <Link
                             to="/admin"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="flex items-center space-x-3 px-4 py-3 hover:bg-glass-medium transition-all duration-300"
                             onClick={() => setUserMenuOpen(false)}
                           >
-                            {t('admin')}
+                            <FiSettings className="w-4 h-4 text-primary-600" />
+                            <span className="text-sm font-medium">{t('admin')}</span>
                           </Link>
                         )}
-                        <hr className="my-1 border-gray-200" />
+                        <hr className="my-2 border-gray-200/20" />
                         <button
                           onClick={handleLogout}
-                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                          className="flex items-center space-x-3 px-4 py-3 w-full hover:bg-red-50/10 transition-all duration-300 text-red-600"
                         >
-                          {t('logout')}
+                          <FiLogOut className="w-4 h-4" />
+                          <span className="text-sm font-medium">{t('logout')}</span>
                         </button>
                       </motion.div>
                     )}
@@ -171,13 +196,13 @@ const Navbar = () => {
                 <div className="flex items-center space-x-4">
                   <Link 
                     to="/auth/login" 
-                    className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+                    className="glass-button text-gray-700"
                   >
                     {t('login')}
                   </Link>
                   <Link 
                     to="/auth/register" 
-                    className="bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                    className="glass-button-primary"
                   >
                     {t('register')}
                   </Link>
@@ -186,93 +211,112 @@ const Navbar = () => {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                aria-expanded={isMenuOpen}
-                aria-label="Toggle navigation menu"
-              >
-                <SafeIcon icon={isMenuOpen ? FiX : FiMenu} className="w-5 h-5" />
-              </button>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-3 rounded-2xl glass hover:bg-glass-medium transition-all duration-300"
+            >
+              {isMenuOpen ? (
+                <FiX className="w-5 h-5" />
+              ) : (
+                <FiMenu className="w-5 h-5" />
+              )}
+            </motion.button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Menu */}
         <AnimatePresence>
-          {isMenuOpen && (
+          {isMenuOpen && isMobile && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white border-t border-gray-200"
+              className="md:hidden border-t border-white/10 mt-4"
             >
-              <div className="px-4 py-4 space-y-4">
-                <button
+              <div className="px-4 py-4 space-y-3">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   onClick={toggleLanguage}
-                  className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="w-full glass-button justify-start"
                 >
-                  <SafeIcon icon={FiGlobe} className="w-4 h-4" />
+                  <FiGlobe className="w-4 h-4 mr-3" />
                   <span className="text-sm font-medium">
                     {i18n.language === 'en' ? 'العربية' : 'English'}
                   </span>
-                </button>
+                </motion.button>
 
                 {isAuthenticated ? (
                   <>
-                    <Link
-                      to="/profile"
-                      className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <SafeIcon icon={FiUser} className="w-4 h-4" />
-                      <span className="text-sm font-medium">{user?.name}</span>
-                    </Link>
-                    {user?.role === 'admin' && (
-                      <Link
-                        to="/admin"
-                        className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
+                    <div className="glass rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-lg">
+                            {user?.name?.charAt(0) || 'U'}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">{user?.name}</p>
+                          <p className="text-sm text-gray-600">{user?.email}</p>
+                        </div>
+                      </div>
+                      
+                      {user?.role === 'admin' && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center space-x-3 p-3 rounded-xl hover:bg-glass-medium transition-all duration-300"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <FiSettings className="w-5 h-5 text-primary-600" />
+                          <span className="font-medium">{t('admin')}</span>
+                        </Link>
+                      )}
+                      
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-3 p-3 w-full rounded-xl hover:bg-red-50/10 transition-all duration-300 text-red-600"
                       >
-                        <SafeIcon icon={FiSettings} className="w-4 h-4" />
-                        <span className="text-sm font-medium">{t('admin')}</span>
-                      </Link>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <SafeIcon icon={FiLogOut} className="w-4 h-4" />
-                      <span className="text-sm font-medium">{t('logout')}</span>
-                    </button>
+                        <FiLogOut className="w-5 h-5" />
+                        <span className="font-medium">{t('logout')}</span>
+                      </button>
+                    </div>
                   </>
                 ) : (
-                  <>
+                  <div className="space-y-3">
                     <Link
                       to="/auth/login"
-                      className="w-full text-left px-3 py-2 text-gray-700 hover:text-primary-600 text-sm font-medium"
+                      className="block w-full glass-button text-center"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('login')}
                     </Link>
                     <Link
                       to="/auth/register"
-                      className="w-full bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors text-center"
+                      className="block w-full glass-button-primary text-center"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('register')}
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+      </motion.nav>
       
-      {/* Spacer for fixed navbar */}
-      <div className="h-16"></div>
+      {/* Spacer with liquid decoration */}
+      <div className="relative h-20 md:h-24">
+        <div className="absolute top-0 left-1/4 w-64 h-64 liquid-blob opacity-30" />
+        <div className="absolute top-0 right-1/4 w-48 h-48 liquid-blob opacity-20 animation-delay-2000" />
+      </div>
+      
+      <style jsx>{`
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+      `}</style>
     </>
   );
 };

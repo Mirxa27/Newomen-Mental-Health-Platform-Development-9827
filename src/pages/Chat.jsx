@@ -1,8 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import * as FiIcons from 'react-icons/fi';
-import SafeIcon from '../components/common/SafeIcon';
+import { 
+  FiSend, 
+  FiMic, 
+  FiPlus, 
+  FiMoreHorizontal, 
+  FiPhone,
+  FiSmile,
+  FiPaperclip
+} from 'react-icons/fi';
 import { useChatStore } from '../store/chatStore';
 import { useAuthStore } from '../store/authStore';
 import { useAIProviderStore } from '../store/aiProviderStore';
@@ -12,8 +19,6 @@ import TypingIndicator from '../components/chat/TypingIndicator';
 import EmotionIndicator from '../components/chat/EmotionIndicator';
 import RealtimeVoiceChat from '../components/chat/RealtimeVoiceChat';
 import toast from 'react-hot-toast';
-
-const { FiSend, FiMic, FiPlus, FiMoreHorizontal, FiPhone } = FiIcons;
 
 const Chat = () => {
   const { t } = useTranslation();
@@ -127,26 +132,10 @@ const Chat = () => {
           frequency_penalty: settings.frequencyPenalty ?? 0,
           presence_penalty: settings.presencePenalty ?? 0,
         }),
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage }
-          ],
-          max_tokens: 150,
-          temperature: 0.7
-        })
       });
 
       const data = await response.json();
-      return data.choices?.[0]?.message?.content?.trim() || '';
+      return data.choices?.[0]?.message?.content?.trim() || 'Sorry, I had trouble responding right now.';
     } catch (error) {
       console.error('OpenAI request failed:', error);
       return 'Sorry, I had trouble responding right now.';
@@ -181,47 +170,74 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] md:h-screen flex flex-col bg-gradient-to-br from-primary-50 via-white to-secondary-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4">
+    <div className="h-[calc(100dvh-5rem)] md:h-[calc(100vh-4rem)] flex flex-col relative">
+      {/* Liquid decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 liquid-blob opacity-10" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 liquid-blob opacity-10" style={{ animationDelay: '2s' }} />
+      
+      {/* Header - Glassmorphic */}
+      <div className="glass-nav border-b border-white/20 p-4 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">N</span>
-            </div>
+          <div className="flex items-center space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">N</span>
+              </div>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl blur-xl opacity-50"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+            </motion.div>
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Newomen AI</h1>
               <p className="text-sm text-gray-600">Your compassionate companion</p>
             </div>
           </div>
+          
           <div className="flex items-center space-x-2 md:space-x-4">
             <EmotionIndicator emotion={emotionState} />
-            <div className="text-xs md:text-sm text-gray-600">
-              {subscription.minutesRemaining} min left
+            <div className="glass px-3 py-1.5 rounded-full">
+              <p className="text-xs md:text-sm font-medium bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                {subscription.minutesRemaining} min
+              </p>
             </div>
-            <button 
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleStartRealtimeVoice}
-              className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all"
+              className="p-2.5 glass-button-primary rounded-xl"
               title="Start Voice Chat"
-              aria-label="Start Voice Chat"
             >
-              <SafeIcon icon={FiPhone} className="w-5 h-5" />
-            </button>
-            <button 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="More options"
+              <FiPhone className="w-5 h-5" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-2.5 glass rounded-xl hover:bg-glass-medium transition-all duration-300"
             >
-              <SafeIcon icon={FiMoreHorizontal} className="w-5 h-5" />
-            </button>
+              <FiMoreHorizontal className="w-5 h-5" />
+            </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4">
+      {/* Messages Container - Glassmorphic */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
         <AnimatePresence>
-          {currentConversation?.messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+          {currentConversation?.messages.map((message, index) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <MessageBubble message={message} />
+            </motion.div>
           ))}
         </AnimatePresence>
         
@@ -229,52 +245,73 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-3 md:p-4">
-        <div className="flex items-end space-x-2 md:space-x-4">
-          <button 
+      {/* Input Area - Glassmorphic */}
+      <div className="glass-nav border-t border-white/20 p-4 safe-area-bottom">
+        <div className="flex items-end gap-2 md:gap-3">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => createConversation()}
-            className="p-2 md:p-3 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-            aria-label="New conversation"
+            className="p-3 glass rounded-xl hover:bg-glass-medium transition-all duration-300"
           >
-            <SafeIcon icon={FiPlus} className="w-5 h-5" />
-          </button>
+            <FiPlus className="w-5 h-5 text-gray-700" />
+          </motion.button>
           
           <div className="flex-1 relative">
-            <textarea
-              ref={inputRef}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                autoResizeTextarea(e);
-              }}
-              onKeyPress={handleKeyPress}
-              placeholder={t('chatPlaceholder')}
-              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none transition-all"
-              rows="1"
-              style={{ minHeight: '48px', maxHeight: '120px' }}
-              aria-label="Message input"
-            />
-            <button 
-              onClick={() => setIsVoiceMode(!isVoiceMode)}
-              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${
-                isVoiceMode ? 'text-primary-600 bg-primary-50' : 'text-gray-500 hover:text-primary-600'
-              }`}
-              aria-label="Toggle voice input"
-              aria-pressed={isVoiceMode}
-            >
-              <SafeIcon icon={FiMic} className="w-4 h-4" />
-            </button>
+            <div className="glass rounded-2xl p-1">
+              <textarea
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  autoResizeTextarea(e);
+                }}
+                onKeyPress={handleKeyPress}
+                placeholder={t('chatPlaceholder')}
+                className="w-full bg-transparent px-4 py-3 pr-24 outline-none resize-none text-gray-800 placeholder:text-gray-500"
+                rows="1"
+                style={{ minHeight: '48px', maxHeight: '120px' }}
+              />
+              <div className="absolute right-2 bottom-2 flex items-center space-x-1">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-lg hover:bg-glass-medium transition-all duration-300"
+                >
+                  <FiPaperclip className="w-4 h-4 text-gray-500" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-lg hover:bg-glass-medium transition-all duration-300"
+                >
+                  <FiSmile className="w-4 h-4 text-gray-500" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setIsVoiceMode(!isVoiceMode)}
+                  className={`p-2 rounded-lg transition-all duration-300 ${
+                    isVoiceMode 
+                      ? 'bg-primary-500/20 text-primary-600' 
+                      : 'hover:bg-glass-medium text-gray-500'
+                  }`}
+                >
+                  <FiMic className="w-4 h-4" />
+                </motion.button>
+              </div>
+            </div>
           </div>
           
-          <button 
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleSendMessage(inputValue)}
             disabled={!inputValue.trim() || isLoading}
-            className="p-2 md:p-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Send message"
+            className="p-3 glass-button-primary rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <SafeIcon icon={FiSend} className="w-5 h-5" />
-          </button>
+            <FiSend className="w-5 h-5" />
+          </motion.button>
         </div>
         
         <AnimatePresence>
@@ -285,7 +322,9 @@ const Chat = () => {
               exit={{ opacity: 0, height: 0 }}
               className="mt-4"
             >
-              <VoiceInput onTranscript={handleVoiceInput} />
+              <div className="glass rounded-2xl p-4">
+                <VoiceInput onTranscript={handleVoiceInput} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

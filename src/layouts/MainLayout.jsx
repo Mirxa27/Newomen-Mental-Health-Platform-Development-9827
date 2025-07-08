@@ -64,33 +64,50 @@ const MainLayout = () => {
         <link rel="manifest" href="/manifest.json" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
-        <Navbar />
-        <NetworkStatus />
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Animated Gradient Background */}
+        <div className="fixed inset-0 animated-gradient-bg" />
         
-        <div className="flex">
-          {isAuthenticated && !isMobile && <Sidebar />}
+        {/* Liquid Blob Decorations */}
+        <div className="fixed top-0 left-0 w-96 h-96 liquid-blob opacity-20 -translate-x-1/2 -translate-y-1/2" />
+        <div className="fixed bottom-0 right-0 w-80 h-80 liquid-blob opacity-20 translate-x-1/2 translate-y-1/2" 
+             style={{ animationDelay: '4s' }} />
+        <div className="fixed top-1/2 left-1/2 w-64 h-64 liquid-blob opacity-10 -translate-x-1/2 -translate-y-1/2" 
+             style={{ animationDelay: '2s' }} />
+        
+        {/* Content Container */}
+        <div className="relative z-10">
+          <Navbar />
+          <NetworkStatus />
           
-          <main 
-            className={`flex-1 transition-all duration-300 pb-20 md:pb-0 ${
-              isAuthenticated && !isMobile ? 'md:ml-64' : ''
-            }`}
-          >
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="min-h-screen"
+          <div className="flex">
+            {isAuthenticated && !isMobile && <Sidebar />}
+            
+            <main 
+              className={`flex-1 transition-all duration-300 ${
+                isMobile ? 'pb-24' : 'pb-8'
+              } ${
+                isAuthenticated && !isMobile ? 'md:ml-64' : ''
+              }`}
             >
-              <Outlet />
-            </motion.div>
-          </main>
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="min-h-screen"
+              >
+                <div className="mobile-p-safe md:p-8 max-w-7xl mx-auto">
+                  <Outlet />
+                </div>
+              </motion.div>
+            </main>
+          </div>
+          
+          {isMobile && isAuthenticated && <MobileNavigation />}
+          <PWAInstallPrompt />
         </div>
-        
-        {isMobile && isAuthenticated && <MobileNavigation />}
-        <PWAInstallPrompt />
       </div>
     </>
   );
