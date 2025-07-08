@@ -39,14 +39,18 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {/* Glassmorphic Mobile Footer Navigation */}
+      {/* Glassmorphic Mobile Footer Navigation – pill shaped */}
       <motion.nav 
-        initial={{ y: 100 }}
+        initial={{ y: 80 }}
         animate={{ y: 0 }}
-        className="glass-mobile-nav fixed bottom-0 left-0 right-0 z-40 safe-area-bottom"
+        className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 pointer-events-auto"
       >
-        <div className="flex items-center justify-around px-2 py-2">
-          {navItems.map((item) => (
+        {/* Pill container */}
+        <div
+          className="flex items-center justify-between gap-1 bg-black/50 backdrop-blur-2xl border border-white/10 rounded-full px-3 py-2 shadow-lg safe-area-bottom w-[90vw] max-w-md mx-auto"
+        >
+          {/* Navigation items */}
+          {navItems.map((item, idx) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -54,32 +58,32 @@ const MobileNavigation = () => {
             >
               <motion.div
                 whileTap={{ scale: 0.9 }}
-                className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-300 ${
-                  isActive(item.path) 
-                    ? 'bg-gradient-to-br from-primary-500/20 to-primary-600/20' 
-                    : 'hover:bg-glass-medium'
-                }`}
+                className={`relative flex flex-col items-center justify-center p-2 rounded-full transition-all duration-300 ${
+                  isActive(item.path)
+                    ? 'bg-gradient-to-br from-primary-500/15 to-primary-600/20'
+                    : 'hover:bg-glass-darkMedium'
+                } ${idx !== 0 ? 'border-l border-white/10 pl-3' : ''}`}
               >
                 <div className="relative">
                   <item.icon 
-                    className={`w-6 h-6 transition-all duration-300 ${
+                    className={`relative z-10 w-6 h-6 transition-all duration-300 ${
                       isActive(item.path) 
-                        ? 'text-primary-600' 
-                        : 'text-gray-600'
+                        ? 'text-white' 
+                        : 'text-gray-300'
                     }`}
                   />
                   {isActive(item.path) && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 w-full h-full rounded-full bg-primary-500/20 blur-xl"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      className="absolute inset-0 w-full h-full rounded-full bg-primary-600/70 blur-md animate-glow"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     />
                   )}
                 </div>
-                <span className={`text-xs mt-1 font-medium transition-all duration-300 ${
+                <span className={`text-[10px] mt-1 font-medium transition-all duration-300 ${
                   isActive(item.path) 
-                    ? 'text-primary-600' 
-                    : 'text-gray-600'
+                    ? 'text-white' 
+                    : 'text-gray-300'
                 }`}>
                   {item.label}
                 </span>
@@ -107,11 +111,11 @@ const MobileNavigation = () => {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsMenuOpen(true)}
-            className="flex-1 max-w-[80px]"
+            className="flex-1 max-w-[64px] border-l border-white/10 ml-1"
           >
-            <div className="flex flex-col items-center p-2 rounded-2xl hover:bg-glass-medium transition-all duration-300">
-              <FiMenu className="w-6 h-6 text-gray-600" />
-              <span className="text-xs mt-1 font-medium text-gray-600">More</span>
+            <div className="flex flex-col items-center p-2 rounded-full hover:bg-glass-darkMedium transition-all duration-300">
+              <FiMenu className="w-6 h-6 text-gray-300" />
+              <span className="text-[10px] mt-1 font-medium text-gray-300">More</span>
             </div>
           </motion.button>
         </div>
