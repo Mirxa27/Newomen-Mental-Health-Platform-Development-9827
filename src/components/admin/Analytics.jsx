@@ -5,7 +5,7 @@ import {
   FiUsers, 
   FiMessageCircle, 
   FiDollarSign,
-  FiBarChart3,
+  FiBarChart,
   FiPieChart,
   FiActivity,
   FiDownload,
