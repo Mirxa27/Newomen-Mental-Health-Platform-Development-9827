@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.7);
+  --glass-blur: 15px;
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --glass-radius: 16px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -638,4 +647,30 @@ video {
 .glass-modal {
   @apply glass-heavy rounded-glass-lg p-8 max-w-lg mx-auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Override glassmorphic elements to leverage CSS variables for easy theming */
+.glass-effect,
+.glass-card,
+.glass-navbar,
+.glass-footer,
+.glass-button,
+.glass-input,
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--glass-radius);
+}
+
+.glass-navbar,
+.glass-footer {
+  background: var(--glass-bg-strong);
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, .interactive {
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }

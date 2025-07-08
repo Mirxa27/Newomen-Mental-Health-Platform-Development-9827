@@ -3,8 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiHome, 
-  FiMessageCircle, 
-  FiMoon,
+  FiSearch,
+  FiPlus,
   FiUser, 
   FiCreditCard,
   FiMenu,
@@ -23,8 +23,8 @@ const MobileNavigation = () => {
   
   const navItems = [
     { path: '/', icon: FiHome, label: 'Home' },
-    { path: '/chat', icon: FiMessageCircle, label: 'Chat' },
-    { path: '/shadow-work', icon: FiMoon, label: 'Shadow' },
+    { path: '/search', icon: FiSearch, label: 'Search' },
+    { path: '/add', icon: FiPlus, label: 'Add' },
     { path: '/profile', icon: FiUser, label: 'Profile' },
   ];
 
@@ -44,8 +44,9 @@ const MobileNavigation = () => {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 30, delay: 0.2 }}
-        // Hides the navigation on non-mobile screens
-        className="md:hidden fixed bottom-4 left-0 right-0 z-50 flex justify-center pointer-events-auto"
+        // Hides the navigation on non-mobile screens and ensures safe area padding
+        className="md:hidden fixed left-0 right-0 z-50 flex justify-center pointer-events-auto"
+        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
       >
         {/* Pill-shaped container with glassmorphic effect */}
         <div

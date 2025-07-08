@@ -86,7 +86,7 @@ const MainLayout = () => {
         
         {/* Content Container: Positioned above the background */}
         <div className="relative z-10 flex flex-col min-h-screen">
-          <Navbar />
+          {!isMobile && <Navbar />}
           <NetworkStatus />
           
           <div className="flex flex-1">
