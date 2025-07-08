@@ -96,7 +96,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 md:py-20 px-4 bg-white/50">
+      <section className="py-12 md:py-20 px-4 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -121,13 +121,14 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="liquid-glass rounded-xl md:rounded-2xl p-6 md:p-8 hover:shadow-glow transition-all duration-300 group"
+                whileHover={{ scale: 1.02 }}
               >
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-6">
+                <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 group-hover:animate-glow">
                   <SafeIcon icon={feature.icon} className="w-7 h-7 md:w-8 md:h-8 text-white" />
                 </div>
                 
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
                   {feature.title}
                 </h3>
                 
@@ -138,35 +139,55 @@ const Home = () => {
             ))}
           </div>
         </div>
+        
+        {/* Background floating elements */}
+        <div className="absolute top-10 left-10 w-20 h-20 bg-primary-200/10 rounded-full animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-16 h-16 bg-secondary-200/10 rounded-full float-delayed"></div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 md:py-20 px-4">
+      <section className="py-12 md:py-20 px-4 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-2xl md:rounded-3xl p-8 md:p-12 text-white"
+            className="liquid-glass rounded-2xl md:rounded-3xl p-8 md:p-12 text-white relative overflow-hidden"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Begin Your Transformation?
-            </h2>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-500/80 to-secondary-500/80 rounded-2xl md:rounded-3xl"></div>
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to Begin Your Transformation?
+              </h2>
+              
+              <p className="text-lg md:text-xl mb-8 opacity-90">
+                Join thousands of women who have discovered their authentic selves through Newomen
+              </p>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  to={isAuthenticated ? "/shadow-work/1" : "/auth/register"}
+                  className="glass-button bg-white/20 text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg font-semibold hover:bg-white/30 transition-all duration-300 inline-flex items-center space-x-2 border border-white/30"
+                >
+                  <span>Start Shadow Work</span>
+                  <SafeIcon icon={FiArrowRight} className="w-5 h-5" />
+                </Link>
+              </motion.div>
+            </div>
             
-            <p className="text-lg md:text-xl mb-8 opacity-90">
-              Join thousands of women who have discovered their authentic selves through Newomen
-            </p>
-            
-            <Link
-              to={isAuthenticated ? "/shadow-work/1" : "/auth/register"}
-              className="bg-white text-primary-600 px-6 md:px-8 py-3 md:py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center space-x-2"
-            >
-              <span>Start Shadow Work</span>
-              <SafeIcon icon={FiArrowRight} className="w-5 h-5" />
-            </Link>
+            {/* Floating elements inside CTA */}
+            <div className="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full animate-float"></div>
+            <div className="absolute bottom-4 left-4 w-6 h-6 bg-white/10 rounded-full float-delayed"></div>
           </motion.div>
         </div>
+        
+        {/* Background elements */}
+        <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-primary-200/5 rounded-full animate-float"></div>
+        <div className="absolute bottom-10 right-1/4 w-24 h-24 bg-secondary-200/5 rounded-full float-slow"></div>
       </section>
     </div>
   );

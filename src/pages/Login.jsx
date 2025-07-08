@@ -68,12 +68,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background floating elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-primary-200/10 rounded-full animate-float"></div>
+        <div className="absolute bottom-20 right-20 w-24 h-24 bg-secondary-200/10 rounded-full float-delayed"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-accent-200/10 rounded-full float-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-20 h-20 bg-primary-200/5 rounded-full animate-float"></div>
+      </div>
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="max-w-md w-full space-y-6 md:space-y-8"
+        className="max-w-md w-full space-y-6 md:space-y-8 relative z-10"
       >
         <div className="text-center">
           <Link to="/" className="inline-flex items-center space-x-2 mb-6 md:mb-8">
@@ -109,7 +117,7 @@ const Login = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           onSubmit={handleSubmit}
-          className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 shadow-xl space-y-5 md:space-y-6"
+          className="liquid-glass rounded-xl md:rounded-2xl p-6 md:p-8 shadow-glass space-y-5 md:space-y-6 relative"
         >
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -124,7 +132,7 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="glass-input w-full pl-10 pr-4 py-2 md:py-3 rounded-lg transition-all duration-300 text-gray-900 placeholder-gray-500"
                 placeholder="Enter your email"
               />
             </div>
@@ -143,7 +151,7 @@ const Login = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-12 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="glass-input w-full pl-10 pr-12 py-2 md:py-3 rounded-lg transition-all duration-300 text-gray-900 placeholder-gray-500"
                 placeholder="Enter your password"
               />
               <button
@@ -163,13 +171,15 @@ const Login = () => {
             </Link>
           </div>
           
-          <button
+          <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-2 md:py-3 px-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="liquid-glass w-full bg-gradient-to-r from-primary-500/80 to-secondary-500/80 text-white py-2 md:py-3 px-4 rounded-lg font-semibold hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-primary-200/50"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {isLoading ? 'Signing in...' : t('login')}
-          </button>
+          </motion.button>
           
           <div className="text-center">
             <span className="text-gray-600">Don't have an account? </span>

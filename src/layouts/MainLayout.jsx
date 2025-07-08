@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/navigation/Navbar';
 import Sidebar from '../components/navigation/Sidebar';
 import MobileNavigation from '../components/navigation/MobileNavigation';
+import Footer from '../components/layout/Footer';
 import PWAInstallPrompt from '../components/common/PWAInstallPrompt';
 import NetworkStatus from '../components/common/NetworkStatus';
 import { useAuthStore } from '../store/authStore';
@@ -64,11 +65,11 @@ const MainLayout = () => {
         <link rel="manifest" href="/manifest.json" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex flex-col">
         <Navbar />
         <NetworkStatus />
         
-        <div className="flex">
+        <div className="flex flex-1">
           {isAuthenticated && !isMobile && <Sidebar />}
           
           <main 
@@ -82,14 +83,18 @@ const MainLayout = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="min-h-screen"
+              className="min-h-[calc(100vh-64px)] flex flex-col"
             >
-              <Outlet />
+              <div className="flex-1">
+                <Outlet />
+              </div>
+              {!isMobile && <Footer />}
             </motion.div>
           </main>
         </div>
         
         {isMobile && isAuthenticated && <MobileNavigation />}
+        {isMobile && !isAuthenticated && <Footer />}
         <PWAInstallPrompt />
       </div>
     </>

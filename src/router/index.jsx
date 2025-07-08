@@ -10,6 +10,7 @@ import AuthLayout from '../layouts/AuthLayout';
 
 // Lazy-loaded page components
 const Home = lazy(() => import('../pages/Home'));
+const About = lazy(() => import('../pages/About'));
 const Login = lazy(() => import('../pages/Login'));
 const Register = lazy(() => import('../pages/Register'));
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
@@ -45,6 +46,11 @@ const routes = [
         index: true, 
         element: <PageLoader><Home /></PageLoader>, 
         meta: { title: 'Your Journey to Authentic Self' } 
+      },
+      { 
+        path: 'about',
+        element: <PageLoader><About /></PageLoader>, 
+        meta: { title: 'About Newomen' } 
       },
       { 
         path: 'chat',

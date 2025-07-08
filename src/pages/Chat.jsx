@@ -127,22 +127,6 @@ const Chat = () => {
           frequency_penalty: settings.frequencyPenalty ?? 0,
           presence_penalty: settings.presencePenalty ?? 0,
         }),
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage }
-          ],
-          max_tokens: 150,
-          temperature: 0.7
-        })
       });
 
       const data = await response.json();
@@ -181,12 +165,19 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] md:h-screen flex flex-col bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+    <div className="h-[calc(100vh-4rem)] md:h-screen flex flex-col bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+      {/* Background floating elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary-200/5 rounded-full animate-float"></div>
+        <div className="absolute bottom-20 right-10 w-24 h-24 bg-secondary-200/5 rounded-full float-delayed"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-accent-200/5 rounded-full float-slow"></div>
+      </div>
+      
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4">
+      <div className="glass-navbar border-b border-white/20 p-4 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center animate-glow">
               <span className="text-white font-bold">N</span>
             </div>
             <div>
@@ -196,23 +187,27 @@ const Chat = () => {
           </div>
           <div className="flex items-center space-x-2 md:space-x-4">
             <EmotionIndicator emotion={emotionState} />
-            <div className="text-xs md:text-sm text-gray-600">
+            <div className="liquid-glass px-3 py-1 rounded-full text-xs md:text-sm text-gray-600 border border-white/20">
               {subscription.minutesRemaining} min left
             </div>
-            <button 
+            <motion.button 
               onClick={handleStartRealtimeVoice}
-              className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all"
+              className="liquid-glass p-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-600 rounded-lg hover:shadow-glow transition-all duration-300 border border-purple-200/50"
               title="Start Voice Chat"
               aria-label="Start Voice Chat"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <SafeIcon icon={FiPhone} className="w-5 h-5" />
-            </button>
-            <button 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            </motion.button>
+            <motion.button 
+              className="liquid-glass p-2 hover:bg-white/20 rounded-lg transition-all duration-300 border border-white/20"
               aria-label="More options"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               <SafeIcon icon={FiMoreHorizontal} className="w-5 h-5" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -230,15 +225,17 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-3 md:p-4">
+      <div className="glass-footer border-t border-white/20 p-3 md:p-4 relative z-10">
         <div className="flex items-end space-x-2 md:space-x-4">
-          <button 
+          <motion.button 
             onClick={() => createConversation()}
-            className="p-2 md:p-3 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="liquid-glass p-2 md:p-3 text-gray-500 hover:text-primary-600 hover:bg-primary-50/50 rounded-lg transition-all duration-300 border border-white/20"
             aria-label="New conversation"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <SafeIcon icon={FiPlus} className="w-5 h-5" />
-          </button>
+          </motion.button>
           
           <div className="flex-1 relative">
             <textarea
@@ -250,31 +247,35 @@ const Chat = () => {
               }}
               onKeyPress={handleKeyPress}
               placeholder={t('chatPlaceholder')}
-              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none transition-all"
+              className="glass-input w-full px-3 py-2 pr-10 rounded-xl md:rounded-2xl resize-none transition-all duration-300 text-gray-900 placeholder-gray-500"
               rows="1"
               style={{ minHeight: '48px', maxHeight: '120px' }}
               aria-label="Message input"
             />
-            <button 
+            <motion.button 
               onClick={() => setIsVoiceMode(!isVoiceMode)}
-              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${
-                isVoiceMode ? 'text-primary-600 bg-primary-50' : 'text-gray-500 hover:text-primary-600'
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-all duration-300 ${
+                isVoiceMode ? 'text-primary-600 bg-primary-50/50' : 'text-gray-500 hover:text-primary-600'
               }`}
               aria-label="Toggle voice input"
               aria-pressed={isVoiceMode}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               <SafeIcon icon={FiMic} className="w-4 h-4" />
-            </button>
+            </motion.button>
           </div>
           
-          <button 
+          <motion.button 
             onClick={() => handleSendMessage(inputValue)}
             disabled={!inputValue.trim() || isLoading}
-            className="p-2 md:p-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="liquid-glass p-2 md:p-3 bg-gradient-to-r from-primary-500/80 to-secondary-500/80 text-white rounded-lg hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-primary-200/50"
             aria-label="Send message"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <SafeIcon icon={FiSend} className="w-5 h-5" />
-          </button>
+          </motion.button>
         </div>
         
         <AnimatePresence>
