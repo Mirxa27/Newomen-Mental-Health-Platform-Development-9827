@@ -10,7 +10,7 @@ import PWAInstallPrompt from '../components/common/PWAInstallPrompt';
 import NetworkStatus from '../components/common/NetworkStatus';
 import { useAuthStore } from '../store/authStore';
 import { useMediaQuery } from '../hooks/useMediaQuery';
-import routes from '../router'; // Assuming this exports your route configuration
+import { routes } from '../router';
 
 const MainLayout = () => {
   const location = useLocation();
@@ -25,6 +25,7 @@ const MainLayout = () => {
 
     // Recursive function to find matching route metadata
     const findMeta = (routeList) => {
+      if (!Array.isArray(routeList)) return null;
       for (const route of routeList) {
         // Check for a direct match with metadata
         if (route.path && matchPath({ path: route.path, end: route.path === '/' }, path) && route.meta) {
@@ -39,7 +40,12 @@ const MainLayout = () => {
       return null;
     };
 
-    const meta = findMeta(routes);
+    let meta = null;
+    try {
+      meta = findMeta(routes);
+    } catch (e) {
+      meta = null;
+    }
     if (meta?.title) {
       title = `${meta.title} - Newomen`;
     }
