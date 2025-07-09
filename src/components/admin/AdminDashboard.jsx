@@ -14,7 +14,10 @@ const {
   FiCpu,
   FiSettings,
   FiShield,
-  FiDatabase
+  FiDatabase,
+  FiMic,
+  FiVolume2,
+  FiWifi
 } = FiIcons;
 
 const AdminDashboard = () => {

@@ -1,9 +1,64 @@
-import { RealtimeAgent, RealtimeSession } from '@openai/agents/realtime';
+// Mock implementation for @openai/agents/realtime
+class MockRealtimeAgent {
+  constructor(config) {
+    this.name = config.name;
+    this.instructions = config.instructions;
+  }
+}
 
-// New voice session built with OpenAI Agents SDK
+class MockRealtimeSession {
+  constructor(agent, config) {
+    this.agent = agent;
+    this.config = config;
+    this.connected = false;
+    this.muted = false;
+    this.eventHandlers = {};
+  }
+
+  async connect({ apiKey }) {
+    console.log('Mock RealtimeSession connecting with API key:', apiKey ? 'provided' : 'not provided');
+    this.connected = true;
+    setTimeout(() => {
+      this.emit('connection_change', 'connected');
+    }, 500);
+  }
+
+  on(event, handler) {
+    this.eventHandlers[event] = handler;
+  }
+
+  emit(event, payload) {
+    if (this.eventHandlers[event]) {
+      this.eventHandlers[event](payload);
+    }
+  }
+
+  mute(muted) {
+    this.muted = muted;
+  }
+
+  sendMessage(message) {
+    console.log('Mock sending message:', message);
+    // Mock response after a delay
+    setTimeout(() => {
+      this.emit('history_added', {
+        type: 'message',
+        role: 'assistant',
+        content: [{ text: 'This is a mock response. The real-time voice feature is not yet implemented.' }]
+      });
+    }, 1000);
+  }
+
+  close() {
+    this.connected = false;
+    this.emit('connection_change', 'disconnected');
+  }
+}
+
+// New voice session built with OpenAI Agents SDK (Mock)
 export class NewomenVoiceSession {
   constructor(agentConfig = {}) {
-    this.agent = new RealtimeAgent({
+    this.agent = new MockRealtimeAgent({
       name: 'Newomen Voice',
       instructions: this.buildSystemPrompt(agentConfig.userContext),
       ...agentConfig,
@@ -22,7 +77,7 @@ export class NewomenVoiceSession {
   async connect({ apiKey, model = 'gpt-4o-realtime-preview-2025-06-03', endpoint = 'https://api.openai.com/v1/realtime', voice = 'nova', userContext = {} }) {
     try {
       this.agent.instructions = this.buildSystemPrompt(userContext);
-      this.session = new RealtimeSession(this.agent, {
+      this.session = new MockRealtimeSession(this.agent, {
         model,
         voice,
         transport: 'webrtc',

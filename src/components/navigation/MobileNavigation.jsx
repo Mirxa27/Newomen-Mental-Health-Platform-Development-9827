@@ -10,11 +10,7 @@ import {
   FiMenu,
   FiX
 } from 'react-icons/fi';
-// Assuming useAuthStore is correctly set up with Zustand
-// import { useAuthStore } from '../../store/authStore';
-
-// Mock store for demonstration purposes
-const useAuthStore = () => ({ user: { role: 'admin' } });
+import { useAuthStore } from '../../store/authStore';
 
 const MobileNavigation = () => {
   const location = useLocation();

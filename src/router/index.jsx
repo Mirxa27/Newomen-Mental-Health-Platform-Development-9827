@@ -26,7 +26,7 @@ const AdminUsers = lazy(() => import('../components/admin/UserManagement'));
 const AdminConversations = lazy(() => import('../components/admin/ConversationMonitor'));
 const AdminPrompts = lazy(() => import('../components/admin/PromptManagement'));
 const AdminAnalytics = lazy(() => import('../components/admin/Analytics'));
-const AdminAIProviders = lazy(() => import('../components/admin/AIProviderSettings'));
+const AdminAIProviders = lazy(() => import('../components/admin/AIProviderManagement'));
 const AdminSystemSettings = lazy(() => import('../components/admin/SystemSettings'));
 
 // Route loader component

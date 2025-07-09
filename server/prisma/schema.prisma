@@ -1,4 +1,4 @@
-// Prisma schema for Newomen authentication service
+// Prisma schema for Newomen Mental Health Platform
 
 generator client {
   provider = "prisma-client-js"
@@ -17,11 +17,131 @@ enum Role {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
+  id                  String                @id @default(uuid())
+  email               String                @unique
+  name                String
+  password            String                // hashed
+  role                Role                  @default(user)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  conversations       Conversation[]
+  shadowWorkSessions  ShadowWorkSession[]
+  voiceProfiles       VoiceProfile[]
+  voiceSessions       VoiceSession[]
+}
+
+model Conversation {
+  id            String         @id @default(uuid())
+  title         String
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  voiceSessions VoiceSession[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  content        String
+  role           String       // 'user' or 'assistant'
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  timestamp      DateTime     @default(now())
+}
+
+model ShadowWorkSession {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String
+  response   String
+  insights   String?
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([userId, questionId])
+}
+
+enum ProviderType {
+  CHAT
+  SPEECH_TO_TEXT
+  TEXT_TO_SPEECH
+  REALTIME_VOICE
+}
+
+enum ProviderStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model AIProvider {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  type        ProviderType
+  status      ProviderStatus @default(INACTIVE)
+  apiKey      String?        // Encrypted
+  apiUrl      String?
+  model       String?
+  voice       String?
+  settings    Json?          // Additional provider-specific settings
+  isDefault   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  // Usage tracking
+  usageCount  Int            @default(0)
+  lastUsed    DateTime?
+  
+  // Relations
+  voiceProfiles VoiceProfile[]
+  voiceSessions VoiceSession[]
+  
+  @@index([type, status])
+}
+
+model VoiceProfile {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
-  password    String   // hashed
-  role        Role     @default(user)
+  voiceId     String     // Provider-specific voice ID
+  providerId  String
+  provider    AIProvider @relation(fields: [providerId], references: [id])
+  settings    Json?      // Voice-specific settings (speed, pitch, etc.)
+  isDefault   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  @@unique([userId, name])
+}
+
+model VoiceSession {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId  String?
+  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  providerId      String
+  provider        AIProvider    @relation(fields: [providerId], references: [id])
+  sessionId       String?       // Provider-specific session ID
+  status          String        @default("active") // active, ended, error
+  duration        Int?          // Duration in seconds
+  audioUrl        String?       // Recording URL if saved
+  transcript      String?       // Full session transcript
+  createdAt       DateTime      @default(now())
+  endedAt         DateTime?
+}
+
+model SystemSettings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       Json
+  description String?
+  category    String   @default("general")
+  isPublic    Boolean  @default(false) // Whether frontend can access this setting
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

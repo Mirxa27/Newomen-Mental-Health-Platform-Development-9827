@@ -12,31 +12,8 @@ import {
   FiSettings,
   FiChevronDown
 } from 'react-icons/fi';
-// Assuming these are correctly set up
-// import { useAuthStore } from '../../store/authStore';
-// import { useMediaQuery } from '../../hooks/useMediaQuery';
-
-// --- Mock implementations for demonstration ---
-const useAuthStore = () => ({
-  user: { name: 'Aisha', email: 'aisha@example.com', role: 'admin' },
-  isAuthenticated: true,
-  logout: () => console.log('Logged out'),
-});
-const useMediaQuery = (query) => {
-  // A simple hook mock for server-side rendering compatibility
-  const [matches, setMatches] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
-    window.addEventListener('resize', listener);
-    return () => window.removeEventListener('resize', listener);
-  }, [matches, query]);
-  return matches;
-};
-// --- End Mocks ---
+import { useAuthStore } from '../../store/authStore';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 
 const Navbar = () => {

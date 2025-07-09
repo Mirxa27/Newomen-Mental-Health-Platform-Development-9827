@@ -18,6 +18,7 @@ import MessageBubble from '../components/chat/MessageBubble';
 import TypingIndicator from '../components/chat/TypingIndicator';
 import EmotionIndicator from '../components/chat/EmotionIndicator';
 import RealtimeVoiceChat from '../components/chat/RealtimeVoiceChat';
+import AdvancedVoiceChat from '../components/chat/AdvancedVoiceChat';
 import toast from 'react-hot-toast';
 
 const Chat = () => {
@@ -25,6 +26,7 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [showRealtimeVoice, setShowRealtimeVoice] = useState(false);
+  const [showAdvancedVoice, setShowAdvancedVoice] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -167,6 +169,14 @@ const Chat = () => {
     setShowRealtimeVoice(true);
   };
 
+  const handleStartAdvancedVoice = () => {
+    if (subscription.minutesRemaining <= 0) {
+      toast.error('No minutes remaining. Please upgrade your subscription.');
+      return;
+    }
+    setShowAdvancedVoice(true);
+  };
+
   const autoResizeTextarea = (e) => {
     const textarea = e.target;
     textarea.style.height = 'auto';
@@ -198,6 +208,9 @@ const Chat = () => {
             </div>
             <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartRealtimeVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="Start Voice Chat">
               <FiPhone className="w-5 h-5" />
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartAdvancedVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="Advanced Voice Chat">
+              <FiMic className="w-5 h-5" />
             </motion.button>
             <motion.button whileTap={{ scale: 0.9 }} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
               <FiMoreHorizontal className="w-5 h-5" />
@@ -284,6 +297,16 @@ const Chat = () => {
       </div>
 
       <RealtimeVoiceChat isOpen={showRealtimeVoice} onClose={() => setShowRealtimeVoice(false)} />
+      
+      {/* Advanced Voice Chat Modal */}
+      <AnimatePresence>
+        {showAdvancedVoice && (
+          <AdvancedVoiceChat 
+            conversationId={currentConversation?.id}
+            onClose={() => setShowAdvancedVoice(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
