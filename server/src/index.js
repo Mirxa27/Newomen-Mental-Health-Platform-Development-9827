@@ -17,6 +17,7 @@ import adminRouter from './routes/admin.js';
 import aiProvidersRouter from './routes/aiProviders.js';
 import voiceChatRouter from './routes/voiceChat.js';
 import paymentsRouter from './routes/payments.js';
+import myFatoorahRouter from './routes/myFatoorah.js';
 import socketService from './services/socketService.js';
 import {
   generalLimiter,
@@ -63,6 +64,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/ai-providers', aiProvidersRouter);
 app.use('/api/voice', voiceChatRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/myfatoorah', myFatoorahRouter);
 
 // Error handling middleware (must be last)
 app.use(sanitizeErrors);

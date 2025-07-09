@@ -14,6 +14,7 @@ import SystemSettings from '../components/admin/SystemSettings';
 import BrandingSettings from '../components/admin/BrandingSettings';
 import RealTimeDashboard from '../components/admin/RealTimeDashboard';
 import FeatureCompletionDashboard from '../components/dashboard/FeatureCompletionDashboard';
+import OpenAISettings from '../components/admin/OpenAISettings';
 
 const Admin = () => {
   const location = useLocation();
@@ -43,15 +44,15 @@ const Admin = () => {
         >
           <SafeIcon icon={FiIcons.FiMenu} className="w-5 h-5 text-gray-700" />
         </button>
-          <img src="/vite.svg" alt="Logo" className="w-8 h-8" />
-          <div className="w-10" />
+        <img src="/vite.svg" alt="Logo" className="w-8 h-8" />
+        <div className="w-10" />
       </div>
 
       <div className="flex">
         {/* Sidebar for desktop */}
         <div className="hidden md:block w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200 min-h-screen">
-            <div className="p-6">
-              <img src="/vite.svg" alt="Logo" className="w-10 h-10 mb-6" />
+          <div className="p-6">
+            <img src="/vite.svg" alt="Logo" className="w-10 h-10 mb-6" />
 
             <nav className="space-y-2">
               {adminNav.map((item) => {
@@ -95,9 +96,9 @@ const Admin = () => {
             className="fixed inset-0 z-40 flex md:hidden"
           >
             <div className="w-64 bg-white shadow-xl p-6 overflow-y-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <img src="/vite.svg" alt="Logo" className="w-8 h-8" />
-                  <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100" aria-label="Close sidebar">
+              <div className="flex items-center justify-between mb-6">
+                <img src="/vite.svg" alt="Logo" className="w-8 h-8" />
+                <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg hover:bg-gray-100" aria-label="Close sidebar">
                   <SafeIcon icon={FiIcons.FiX} className="w-5 h-5 text-gray-700" />
                 </button>
               </div>
@@ -147,6 +148,7 @@ const Admin = () => {
             <Route path="prompts" element={<PromptManagement />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="ai-providers" element={<AIProviderManagement />} />
+            <Route path="openai-settings" element={<OpenAISettings />} />
             <Route path="branding" element={<BrandingSettings />} />
             <Route path="settings" element={<SystemSettings />} />
             <Route path="feature-completion" element={<FeatureCompletionDashboard />} />

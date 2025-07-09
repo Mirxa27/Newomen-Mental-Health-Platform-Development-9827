@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  createConversation,
+  getConversations,
+  getConversation,
+  postMessage,
+} from '../services/chat';
+import { getOpenAICompletion } from '../services/openaiService';
 
 export const useChatStore = create(
   persist(
@@ -121,6 +128,35 @@ export const useChatStore = create(
           const currentConversation = state.currentConversation?.id === conversationId ? conv : state.currentConversation;
           return { conversations, currentConversation };
         });
+      },
+
+      sendMessage: async (conversationId, text) => {
+        set({ loading: true, error: null });
+        try {
+          const fullMessage = { role: 'user', content: text };
+          // Optimistic update
+          set((state) => ({
+            conversations: state.conversations.map((c) =>
+              c.id === conversationId ? { ...c, messages: [...c.messages, fullMessage] } : c
+            ),
+          }));
+
+          await postMessage(conversationId, text);
+          const currentConversation = get().conversations.find(c => c.id === conversationId);
+          const aiResponse = await getOpenAICompletion(currentConversation.messages);
+
+          const aiMessage = { role: 'assistant', content: aiResponse };
+          await postMessage(conversationId, aiResponse, 'assistant');
+
+          set((state) => ({
+            conversations: state.conversations.map((c) =>
+              c.id === conversationId ? { ...c, messages: [...c.messages, aiMessage] } : c
+            ),
+            loading: false,
+          }));
+        } catch (error) {
+          set({ error: 'Failed to send message', loading: false });
+        }
       },
     }),
     { name: 'newomen-chat' }
