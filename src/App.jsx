@@ -1,13 +1,20 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+import useSocket from './hooks/useSocket';
 import AppRouter from './router';
-import { useSocket } from './hooks/useSocket';
+import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './store/authStore';
+import NetworkStatus from './components/common/NetworkStatus';
+import PWAInstallPrompt from './components/common/PWAInstallPrompt';
 import errorService from './services/errorService';
 import './index.css';
 
 function App() {
-  // Initialize socket connection
-  const { isConnected, connectionStatus } = useSocket();
+  const { token } = useAuthStore();
+
+  // Initialize socket connection if authenticated
+  useSocket();
 
   // Initialize error service
   useEffect(() => {
@@ -15,17 +22,14 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <AppRouter />
-      {/* Connection status indicator for development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className={`fixed bottom-4 right-4 px-2 py-1 rounded text-xs font-mono z-50 ${
-          isConnected ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-        }`}>
-          Socket: {connectionStatus}
-        </div>
-      )}
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <NetworkStatus />
+        <PWAInstallPrompt />
+        <Toaster position="top-center" reverseOrder={false} />
+        <AppRouter />
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 
