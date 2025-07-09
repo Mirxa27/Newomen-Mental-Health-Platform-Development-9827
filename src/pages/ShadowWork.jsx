@@ -5,9 +5,11 @@ import * as FiIcons from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
 import SafeIcon from '../components/common/SafeIcon';
 import { useShadowWorkStore } from '../store/shadowWorkStore';
+import { useGamificationStore } from '../store/gamificationStore';
 import QuestionCard from '../components/shadowwork/QuestionCard';
 import ProgressBar from '../components/shadowwork/ProgressBar';
 import InsightsPanel from '../components/shadowwork/InsightsPanel';
+import toast from 'react-hot-toast';
 
 const { FiArrowLeft, FiArrowRight, FiCheck } = FiIcons;
 
@@ -15,6 +17,7 @@ const ShadowWork = () => {
   const { t } = useTranslation();
   const { questionId } = useParams();
   const navigate = useNavigate();
+  const { awardCrystals, addAchievement } = useGamificationStore();
   const {
     currentQuestion,
     questions,
@@ -38,9 +41,26 @@ const ShadowWork = () => {
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
+      // Award crystals for answering a question
+      awardCrystals(10, 'Answered shadow work question');
+      
       nextQuestion();
       navigate(`/shadow-work/${currentQuestion + 2}`);
     } else {
+      // Award crystals for completing the entire assessment
+      const reward = awardCrystals(100, 'Completed shadow work assessment');
+      addAchievement(
+        'shadow-work-complete',
+        'Shadow Work Master',
+        'Completed the full shadow work journey'
+      );
+      
+      if (reward.leveledUp) {
+        toast.success(`Congratulations! You've reached level ${reward.level}!`);
+      } else {
+        toast.success('Amazing work! You earned 100 crystals for completing shadow work!');
+      }
+      
       completeAssessment();
     }
   };
@@ -70,11 +90,16 @@ const ShadowWork = () => {
           className="text-center mb-6 md:mb-8"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-            {t('shadowWorkTitle')}
+            Shadow Work Journey
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
-            {t('shadowWorkSubtitle')}
-          </p>
+          <div className="max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-600 mb-4">
+              Shadow work is the practice of exploring the hidden parts of yourself—the emotions, traits, and aspects you might have pushed away or denied. 
+            </p>
+            <p className="text-base md:text-lg text-gray-500 mb-6">
+              By bringing these aspects into the light with compassion, you can heal old wounds, reclaim your power, and become more whole and authentic. This journey helps you understand why certain patterns repeat in your life and how to transform them.
+            </p>
+          </div>
           <ProgressBar current={currentQuestion + 1} total={questions.length} />
         </motion.div>
 

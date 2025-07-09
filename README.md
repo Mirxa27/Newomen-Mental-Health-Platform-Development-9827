@@ -19,7 +19,7 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 - **Push Notifications**: Real-time engagement features
 
 ### Technical Features
-- **Real-time Voice**: WebRTC and Speech APIs integration powered by the [OpenAI Agents SDK](https://openai.github.io/openai-agents-js/guides/voice-agents/quickstart/)
+- **Real-time Voice**: Custom WebSocket implementation for real-time, low-latency voice conversations
 - **Secure Authentication**: Role-based access control
 - **Admin Dashboard**: Comprehensive management interface
 
@@ -153,6 +153,8 @@ Create a `.env` file based on `.env.example` and make sure `VITE_OPENAI_API_KEY`
 
 When running the app locally you can also store your OpenAI API key in the browser by navigating to **Admin → AI Provider Settings**, editing the default provider and entering your key. The realtime voice service will read this value automatically if the backend endpoint is unavailable.
 If you see "Missing API key" errors when starting a voice session, ensure the key is stored in the admin panel or defined as `VITE_OPENAI_API_KEY`.
+
+**IMPORTANT**: The Admin Panel is the central hub for configuring the AI's behavior. Before using the voice chat, ensure that all prompts, especially for crisis support and cultural context, are properly configured in **Admin → Prompt Management**.
 
 ### Admin Access
 - Set the admin email in your `.env` file:

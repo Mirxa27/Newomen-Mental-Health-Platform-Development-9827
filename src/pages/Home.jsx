@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -6,11 +6,61 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useAuthStore } from '../store/authStore';
 
-const { FiArrowRight, FiHeart, FiSun, FiMoon } = FiIcons;
+const { FiArrowRight, FiHeart, FiSun, FiMoon, FiStar } = FiIcons;
 
 const Home = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const [dailyAffirmation, setDailyAffirmation] = useState('');
+
+  // Generate daily affirmation based on user's personality
+  useEffect(() => {
+    generateDailyAffirmation();
+  }, [user]);
+
+  const generateDailyAffirmation = async () => {
+    try {
+      if (!user?.personality) {
+        setDailyAffirmation("You are exactly where you need to be in your journey, حبيبتي.");
+        return;
+      }
+
+      const personalityType = user.personality.type;
+      const growthZone = user.personality.growthZone;
+
+      // Create personalized affirmation prompt
+      const prompt = `Create a personalized, empowering daily affirmation for a ${personalityType} personality type who is working on: ${growthZone}. The affirmation should be warm, culturally sensitive for MENA women, include an Arabic term of endearment, and be under 25 words.`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: 'You are Newomen, creating personalized affirmations for women.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 50,
+          temperature: 0.8
+        })
+      });
+
+      const data = await response.json();
+      const affirmation = data.choices?.[0]?.message?.content?.trim();
+      
+      if (affirmation) {
+        setDailyAffirmation(affirmation);
+      } else {
+        setDailyAffirmation("You are exactly where you need to be in your journey, حبيبتي.");
+      }
+    } catch (error) {
+      console.error('Failed to generate affirmation:', error);
+      setDailyAffirmation("You are exactly where you need to be in your journey, حبيبتي.");
+    }
+  };
 
   const features = [
     {
@@ -51,10 +101,34 @@ const Home = () => {
               <span className="gradient-text">{t('homeTitle')}</span>
             </motion.h1>
             
+            {/* Daily Affirmation Section */}
+            {isAuthenticated && dailyAffirmation && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="max-w-2xl mx-auto mb-8"
+              >
+                <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-2xl p-6 shadow-lg">
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <SafeIcon icon={FiStar} className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Your Daily Affirmation
+                  </h3>
+                  <p className="text-gray-700 italic text-lg leading-relaxed">
+                    "{dailyAffirmation}"
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.8, delay: isAuthenticated ? 0.4 : 0.2 }}
               className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto px-4"
             >
               {t('homeSubtitle')}

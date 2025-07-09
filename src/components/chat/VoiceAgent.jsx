@@ -14,7 +14,7 @@ const { FiMic, FiMicOff, FiPhone, FiPhoneOff, FiVolume2, FiVolumeX } = FiIcons;
 const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
   const { t } = useTranslation();
   const { user, deductMinutes } = useAuthStore();
-  const { getDefaultProvider } = useAIProviderStore();
+  const defaultProvider = useAIProviderStore((state) => state.providers.find(p => p.isDefault));
   const [session, setSession] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -53,8 +53,7 @@ const VoiceAgent = ({ onTranscript, onResponse, onClose }) => {
         throw new Error('Speech synthesis not supported in this browser');
       }
       
-      const provider = getDefaultProvider();
-      const apiKey = await generateEphemeralKey(provider?.apiKey);
+      const apiKey = await generateEphemeralKey(defaultProvider?.apiKey);
       if (!apiKey) {
         throw new Error(
           'Missing API key. Set your OpenAI key in Admin → AI Provider Settings or .env'

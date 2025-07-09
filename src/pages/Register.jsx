@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useAuthStore } from '../store/authStore';
+import PersonalityTest from '../components/onboarding/PersonalityTest';
 
 const { FiMail, FiLock, FiUser, FiEye, FiEyeOff } = FiIcons;
 
@@ -22,6 +23,7 @@ const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPersonalityTest, setShowPersonalityTest] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -53,17 +55,36 @@ const Register = () => {
           language: 'en',
           culturalContext: 'mena',
         },
+        personality: null,
       };
       
       login(userData);
       toast.success('Welcome to Newomen!');
-      navigate('/shadow-work/1');
+      setShowPersonalityTest(true);
     } catch (error) {
       toast.error('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleTestComplete = (personalityData) => {
+    navigate('/onboarding/balance-wheel');
+  };
+
+  if (showPersonalityTest) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <PersonalityTest onComplete={handleTestComplete} />
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">

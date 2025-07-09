@@ -4,13 +4,15 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import toast from 'react-hot-toast';
 
-const { FiSave, FiRefreshCw, FiShield, FiDatabase, FiMail, FiGlobe } = FiIcons;
+const { FiSave, FiRefreshCw, FiShield, FiDatabase, FiMail, FiGlobe, FiUpload, FiImage } = FiIcons;
 
 const SystemSettings = () => {
   const [settings, setSettings] = useState({
     // General Settings
     siteName: 'Newomen',
     siteDescription: 'AI-powered platform for women\'s mental health and personal growth',
+    logo: null,
+    favicon: null,
     maintenanceMode: false,
     registrationEnabled: true,
     
@@ -98,7 +100,7 @@ const SystemSettings = () => {
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Site Name
@@ -106,58 +108,170 @@ const SystemSettings = () => {
           <input
             type="text"
             value={settings.siteName}
-            onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            onChange={(e) => setSettings({...settings, siteName: e.target.value})}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
           />
         </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Default Language
+            Site Description
           </label>
-          <select
-            value={settings.defaultLanguage}
-            onChange={(e) => setSettings({ ...settings, defaultLanguage: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="en">English</option>
-            <option value="ar">Arabic</option>
-          </select>
+          <textarea
+            value={settings.siteDescription}
+            onChange={(e) => setSettings({...settings, siteDescription: e.target.value})}
+            rows="3"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+          />
         </div>
       </div>
       
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Site Description
-        </label>
-        <textarea
-          value={settings.siteDescription}
-          onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
-          rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        />
+      {/* Logo Upload Section */}
+      <div className="bg-gray-50 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <SafeIcon icon={FiImage} className="w-5 h-5 mr-2" />
+          Branding Assets
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Logo
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
+              {settings.logo ? (
+                <div className="space-y-4">
+                  <img 
+                    src={settings.logo} 
+                    alt="Current logo" 
+                    className="max-h-20 mx-auto"
+                  />
+                  <button
+                    onClick={() => setSettings({...settings, logo: null})}
+                    className="text-red-600 hover:text-red-700 text-sm"
+                  >
+                    Remove Logo
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <SafeIcon icon={FiUpload} className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">
+                    Click to upload logo or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    SVG, PNG, JPG up to 2MB
+                  </p>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      setSettings({...settings, logo: event.target.result});
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Favicon
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
+              {settings.favicon ? (
+                <div className="space-y-4">
+                  <img 
+                    src={settings.favicon} 
+                    alt="Current favicon" 
+                    className="w-8 h-8 mx-auto"
+                  />
+                  <button
+                    onClick={() => setSettings({...settings, favicon: null})}
+                    className="text-red-600 hover:text-red-700 text-sm"
+                  >
+                    Remove Favicon
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <SafeIcon icon={FiUpload} className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upload favicon
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    ICO, PNG 32x32px
+                  </p>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      setSettings({...settings, favicon: event.target.result});
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
       </div>
       
-      <div className="space-y-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            checked={settings.maintenanceMode}
-            onChange={(e) => setSettings({ ...settings, maintenanceMode: e.target.checked })}
-            className="mr-3"
-          />
-          <span className="text-sm font-medium text-gray-700">Maintenance Mode</span>
-        </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Maintenance Mode
+            </label>
+            <p className="text-xs text-gray-500">
+              Temporarily disable the site for maintenance
+            </p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.maintenanceMode}
+              onChange={(e) => setSettings({...settings, maintenanceMode: e.target.checked})}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+          </label>
+        </div>
         
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            checked={settings.registrationEnabled}
-            onChange={(e) => setSettings({ ...settings, registrationEnabled: e.target.checked })}
-            className="mr-3"
-          />
-          <span className="text-sm font-medium text-gray-700">Enable User Registration</span>
-        </label>
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Registration Enabled
+            </label>
+            <p className="text-xs text-gray-500">
+              Allow new users to register
+            </p>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.registrationEnabled}
+              onChange={(e) => setSettings({...settings, registrationEnabled: e.target.checked})}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+          </label>
+        </div>
       </div>
     </div>
   );

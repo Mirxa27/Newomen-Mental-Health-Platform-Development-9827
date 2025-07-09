@@ -18,6 +18,11 @@ const ShadowWork = lazy(() => import('../pages/ShadowWork'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Subscription = lazy(() => import('../pages/Subscription'));
 const NotFound = lazy(() => import('../pages/NotFound'));
+const OnboardingPage = lazy(() => import('../pages/OnboardingPage'));
+const BalanceWheelOnboarding = lazy(() => import('../pages/BalanceWheelOnboarding'));
+const DiagnosticTest = lazy(() => import('../pages/DiagnosticTest'));
+const Breathing = lazy(() => import('../pages/Breathing'));
+const Community = lazy(() => import('../pages/Community'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/Admin'));
@@ -81,6 +86,51 @@ const routes = [
           </ProtectedRoute>
         ),
         meta: { title: 'Subscription Plans' }
+      },
+      {
+        path: 'onboarding',
+        element: (
+          <ProtectedRoute>
+            <PageLoader><OnboardingPage /></PageLoader>
+          </ProtectedRoute>
+        ),
+        meta: { title: 'Welcome to Newomen' }
+      },
+      {
+        path: 'onboarding/balance-wheel',
+        element: (
+          <ProtectedRoute>
+            <PageLoader><BalanceWheelOnboarding /></PageLoader>
+          </ProtectedRoute>
+        ),
+        meta: { title: 'Choose Your Focus Area' }
+      },
+      {
+        path: 'diagnostic-test/:topic',
+        element: (
+          <ProtectedRoute>
+            <PageLoader><DiagnosticTest /></PageLoader>
+          </ProtectedRoute>
+        ),
+        meta: { title: 'Diagnostic Assessment' }
+      },
+      {
+        path: 'breathing',
+        element: (
+          <ProtectedRoute>
+            <PageLoader><Breathing /></PageLoader>
+          </ProtectedRoute>
+        ),
+        meta: { title: 'Breathing Practices' }
+      },
+      {
+        path: 'community',
+        element: (
+          <ProtectedRoute>
+            <PageLoader><Community /></PageLoader>
+          </ProtectedRoute>
+        ),
+        meta: { title: 'Community Search' }
       },
       { 
         path: '*', 

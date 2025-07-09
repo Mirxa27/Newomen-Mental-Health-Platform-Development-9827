@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Home, MessageSquare, Eye, User, CreditCard, Settings } from 'lucide-react';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../common/SafeIcon.jsx';
 import { useAuthStore } from '../../store/authStore';
 
 const MobileNavigation = () => {

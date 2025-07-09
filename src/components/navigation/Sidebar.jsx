@@ -2,19 +2,40 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Home, MessageSquare, Eye, User, CreditCard, Settings } from 'lucide-react';
-import SafeIcon from '../common/SafeIcon';
+import { Home, MessageSquare, Eye, User, CreditCard, Settings, Wind, Target, Users } from 'lucide-react';
+import SafeIcon from '../common/SafeIcon.jsx';
 import { useAuthStore } from '../../store/authStore';
+import { useGamificationStore } from '../../store/gamificationStore';
+import GamificationProgress from '../gamification/GamificationProgress';
 
 const Sidebar = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { user, subscription } = useAuthStore();
+  const { isFeatureUnlocked } = useGamificationStore();
 
   const navigation = [
     { name: t('home'), href: '/', icon: Home },
     { name: t('chat'), href: '/chat', icon: MessageSquare },
     { name: t('shadowWork'), href: '/shadow-work/1', icon: Eye },
+    { 
+      name: 'Breathing Library', 
+      href: '/breathing', 
+      icon: Wind,
+      locked: !isFeatureUnlocked('breathing-library')
+    },
+    { 
+      name: 'Diagnostic Tests', 
+      href: '/onboarding/balance-wheel', 
+      icon: Target,
+      locked: !isFeatureUnlocked('diagnostic-tests')
+    },
+    { 
+      name: 'Community', 
+      href: '/community', 
+      icon: Users,
+      locked: !isFeatureUnlocked('community-search')
+    },
     { name: t('profile'), href: '/profile', icon: User },
     { name: t('subscription'), href: '/subscription', icon: CreditCard },
   ];
@@ -27,6 +48,11 @@ const Sidebar = () => {
     <aside className="hidden md:block fixed left-0 top-16 h-[calc(100vh-64px)] w-64 liquid-glass border-r border-white/20 z-40">
       <div className="h-full flex flex-col justify-between p-4">
         <div>
+          {/* Gamification Progress */}
+          <div className="mb-6">
+            <GamificationProgress />
+          </div>
+
           {/* Subscription Status */}
           <div className="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg p-4 mb-6 text-white">
             <div className="text-sm font-medium capitalize">{subscription.tier} Tier</div>
@@ -45,27 +71,35 @@ const Sidebar = () => {
               return (
                 <Link
                   key={item.name}
-                  to={item.href}
+                  to={item.locked ? '#' : item.href}
                   className={`
-                    group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                    ${isActive 
-                      ? 'bg-primary-50 text-primary-600' 
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
+                    group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors relative
+                    ${item.locked 
+                      ? 'text-gray-400 cursor-not-allowed opacity-60'
+                      : isActive 
+                        ? 'bg-primary-50 text-primary-600' 
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
                     }
                   `}
+                  onClick={(e) => item.locked && e.preventDefault()}
                 >
                   <SafeIcon
                     icon={item.icon}
                     className={`
                       w-5 h-5 mr-3 transition-colors
-                      ${isActive 
-                        ? 'text-primary-600' 
-                        : 'text-gray-400 group-hover:text-primary-600'
+                      ${item.locked
+                        ? 'text-gray-400'
+                        : isActive 
+                          ? 'text-primary-600' 
+                          : 'text-gray-400 group-hover:text-primary-600'
                       }
                     `}
                   />
                   {item.name}
-                  {isActive && (
+                  {item.locked && (
+                    <span className="ml-auto text-xs text-yellow-600">🔒</span>
+                  )}
+                  {!item.locked && isActive && (
                     <motion.div
                       layoutId="activeTab"
                       className="absolute left-0 w-1 h-8 bg-primary-500 rounded-r-full"

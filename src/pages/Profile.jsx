@@ -1,17 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useAuthStore } from '../store/authStore';
 import { useShadowWorkStore } from '../store/shadowWorkStore';
+import toast from 'react-hot-toast';
 
-const { FiUser, FiHeart, FiTarget, FiStar, FiEdit } = FiIcons;
+const { FiUser, FiHeart, FiTarget, FiStar, FiEdit, FiCamera, FiUpload } = FiIcons;
 
 const Profile = () => {
   const { t } = useTranslation();
-  const { user, subscription } = useAuthStore();
+  const { user, subscription, updateUserProfile } = useAuthStore();
   const { affirmations, actionPlan, insights } = useShadowWorkStore();
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      let avatarUrl = user?.avatar;
+      
+      if (avatarFile) {
+        // In a real app, upload to cloud storage (AWS S3, Cloudinary, etc.)
+        // For demo, we'll use the base64 preview
+        avatarUrl = avatarPreview;
+      }
+
+      await updateUserProfile({
+        ...user,
+        avatar: avatarUrl,
+      });
+      
+      setIsEditingProfile(false);
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 p-4">
@@ -22,8 +60,30 @@ const Profile = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="w-24 h-24 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <SafeIcon icon={FiUser} className="w-12 h-12 text-white" />
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            ) : (
+              <div className="w-24 h-24 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                <SafeIcon icon={FiUser} className="w-12 h-12 text-white" />
+              </div>
+            )}
+            
+            {isEditingProfile && (
+              <label className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-600 transition-colors">
+                <SafeIcon icon={FiCamera} className="w-4 h-4 text-white" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
           
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -45,7 +105,10 @@ const Profile = () => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Profile</h3>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button 
+                  onClick={() => setIsEditingProfile(!isEditingProfile)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <SafeIcon icon={FiEdit} className="w-4 h-4 text-gray-600" />
                 </button>
               </div>
@@ -67,6 +130,17 @@ const Profile = () => {
                   <label className="text-sm text-gray-600">Minutes Remaining</label>
                   <p className="font-medium text-gray-900">{subscription.minutesRemaining}</p>
                 </div>
+                
+                {isEditingProfile && (
+                  <div className="pt-4 border-t">
+                    <button
+                      onClick={handleSaveProfile}
+                      className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
 

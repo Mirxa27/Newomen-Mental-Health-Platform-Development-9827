@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Globe, User, LogOut, Bell, Settings } from 'lucide-react';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../common/SafeIcon.jsx';
 import { useAuthStore } from '../../store/authStore';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 

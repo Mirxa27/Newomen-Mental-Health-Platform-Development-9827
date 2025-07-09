@@ -21,6 +21,7 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [showRealtimeVoice, setShowRealtimeVoice] = useState(false);
+  const [pageTitle, setPageTitle] = useState("Your compassionate companion");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const { 
@@ -36,12 +37,13 @@ const Chat = () => {
     setTyping,
   } = useChatStore();
   const { subscription, deductMinutes } = useAuthStore();
-  const { getDefaultProvider } = useAIProviderStore();
+  const defaultProvider = useAIProviderStore((state) => state.providers.find(p => p.isDefault));
 
   useEffect(() => {
     if (!currentConversation && conversations.length === 0) {
       createConversation();
     }
+    generateNewTitle();
   }, [currentConversation, conversations, createConversation]);
 
   useEffect(() => {
@@ -50,6 +52,41 @@ const Chat = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const generateNewTitle = async () => {
+    try {
+      const apiKey = defaultProvider?.apiKey || import.meta.env.VITE_OPENAI_API_KEY;
+      const endpoint = provider?.endpoint || 'https://api.openai.com/v1';
+      const model = provider?.model || 'gpt-3.5-turbo';
+
+      if (!apiKey) return;
+
+      const response = await fetch(`${endpoint}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'You are a title generator. Create a short, engaging, and uplifting title for a mental health chat page. It should be 3-5 words long.' },
+            { role: 'user', content: 'Generate a new title.' }
+          ],
+          temperature: 0.9,
+          max_tokens: 15,
+        }),
+      });
+
+      const data = await response.json();
+      const newTitle = data.choices?.[0]?.message?.content?.trim().replace(/"/g, '');
+      if (newTitle) {
+        setPageTitle(newTitle);
+      }
+    } catch (error) {
+      console.error('Failed to generate new title:', error);
+    }
   };
 
   const handleSendMessage = async (message) => {
@@ -180,7 +217,7 @@ const Chat = () => {
             </div>
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Newomen AI</h1>
-              <p className="text-sm text-gray-600">Your compassionate companion</p>
+              <p className="text-sm text-gray-600">{pageTitle}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2 md:space-x-4">
@@ -190,11 +227,14 @@ const Chat = () => {
             </div>
             <button 
               onClick={handleStartRealtimeVoice}
-              className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all font-bold py-3"
               title="Start Voice Chat"
               aria-label="Start Voice Chat"
             >
-              <SafeIcon icon={FiPhone} className="w-5 h-5" />
+              <div className="flex items-center justify-center space-x-2">
+                <SafeIcon icon={FiPhone} className="w-5 h-5" />
+                <span>{t('startVoiceChat')}</span>
+              </div>
             </button>
             <button 
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -220,6 +260,19 @@ const Chat = () => {
 
       {/* Input */}
       <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 p-3 md:p-4">
+        <div className="mb-4">
+          <button 
+            onClick={handleStartRealtimeVoice}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all font-bold py-3"
+            title="Start Voice Chat"
+            aria-label="Start Voice Chat"
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <SafeIcon icon={FiPhone} className="w-6 h-6" />
+              <span className="text-lg">{t('startVoiceChat')}</span>
+            </div>
+          </button>
+        </div>
         <div className="flex items-end space-x-2 md:space-x-4">
           <button 
             onClick={() => createConversation()}
