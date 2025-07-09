@@ -192,22 +192,6 @@ model SubscriptionPlan {
   subscriptions Subscription[]
 }
 
-model Payment {
-  id               String        @id @default(uuid())
-  userId           String
-  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscriptionId   String?
-  subscription     Subscription? @relation(fields: [subscriptionId], references: [id])
-  stripePaymentId  String?       @unique
-  amount           Float         // Amount in cents
-  currency         String        @default("usd")
-  status           PaymentStatus @default(PENDING)
-  description      String?
-  failureReason    String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-}
-
 // Notification Models
 enum NotificationType {
   SYSTEM

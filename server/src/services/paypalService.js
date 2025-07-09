@@ -1,4 +1,4 @@
-import paypal from '@paypal/paypal-server-sdk';
+import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -7,13 +7,33 @@ class PayPalService {
     constructor() {
         const clientId = process.env.PAYPAL_CLIENT_ID;
         const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-        const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
-        this.client = new paypal.core.PayPalHttpClient(environment);
+        
+        if (!clientId || !clientSecret) {
+            console.warn('PayPal credentials not configured');
+            this.client = null;
+            return;
+        }
+        
+        this.client = new Client({
+            clientCredentialsAuthCredentials: {
+                oAuthClientId: clientId,
+                oAuthClientSecret: clientSecret,
+            },
+            environment: Environment.Sandbox,
+            logging: {
+                logLevel: LogLevel.INFO,
+                logRequest: { logBody: true },
+                logResponse: { logHeaders: true },
+            },
+        });
     }
 
     async createOrder(plan) {
-        const request = new paypal.orders.OrdersCreateRequest();
-        request.requestBody({
+        if (!this.client) {
+            throw new Error('PayPal client not initialized');
+        }
+        
+        const request = {
             intent: 'CAPTURE',
             purchase_units: [{
                 amount: {
@@ -21,16 +41,24 @@ class PayPalService {
                     value: plan.price.toString(),
                 },
             }],
-        });
+        };
 
-        const response = await this.client.execute(request);
+        const response = await this.client.ordersController.ordersCreate({
+            body: request,
+        });
+        
         return response.result;
     }
 
     async captureOrder(orderId) {
-        const request = new paypal.orders.OrdersCaptureRequest(orderId);
-        request.requestBody({});
-        const response = await this.client.execute(request);
+        if (!this.client) {
+            throw new Error('PayPal client not initialized');
+        }
+        
+        const response = await this.client.ordersController.ordersCapture({
+            id: orderId,
+        });
+        
         return response.result;
     }
 

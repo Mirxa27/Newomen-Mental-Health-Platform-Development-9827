@@ -26,6 +26,7 @@ const Subscription = lazy(() => import('../pages/Subscription'));
 const Settings = lazy(() => import('../pages/Settings'));
 const NewMe = lazy(() => import('../pages/NewMe'));
 const NotFound = lazy(() => import('../pages/NotFound'));
+const Onboarding = lazy(() => import('../pages/Onboarding'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/Admin'));
@@ -168,6 +169,16 @@ const createDynamicRoutes = () => {
         description: 'Take on daily challenges to transform yourself and build better habits.',
         keywords: 'daily challenges, personal growth, habits, self-improvement'
       }
+    },
+    {
+      path: 'onboarding',
+      element: Onboarding,
+      protected: true,
+      meta: {
+        title: 'Onboarding',
+        description: 'Complete your onboarding process to get the most out of Newomen.',
+        keywords: 'onboarding, welcome, newomen, mental health'
+      }
     }
   ];
 
@@ -302,89 +313,92 @@ const AppRouter = () => {
   const { mainRoutes, authRoutes, adminRoutes } = createDynamicRoutes();
 
   return (
-    <Routes>
-      {/* Main layout routes */}
-      <Route path="/" element={<MainLayout />}>
-        {mainRoutes.map((route, index) => {
-          const RouteComponent = route.element;
-          const element = route.protected ? (
-            <ProtectedRoute>
-              <PageLoader {...route.meta}>
-                <RouteComponent />
-              </PageLoader>
-            </ProtectedRoute>
-          ) : (
-            <PageLoader {...route.meta}>
-              <RouteComponent />
-            </PageLoader>
-          );
-
-          return route.path === '' ? (
-            <Route key={index} index element={element} />
-          ) : (
-            <Route key={index} path={route.path} element={element} />
-          );
-        })}
-        <Route path="/connection-journey" element={<ProtectedRoute><ConnectionJourney /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      </Route>
-
-      {/* Auth layout routes */}
-      <Route path="/auth" element={<AuthLayout />}>
-        {authRoutes.map((route, index) => {
-          const RouteComponent = route.element;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
+    <Suspense fallback={<LoadingSpinner />}>
+      <Routes>
+        {/* Main layout routes */}
+        <Route path="/" element={<MainLayout />}>
+          {mainRoutes.map((route, index) => {
+            const RouteComponent = route.element;
+            const element = route.protected ? (
+              <ProtectedRoute>
                 <PageLoader {...route.meta}>
                   <RouteComponent />
                 </PageLoader>
-              }
-            />
-          );
-        })}
-        <Route path="" element={<Navigate to="/auth/login" replace />} />
-      </Route>
+              </ProtectedRoute>
+            ) : (
+              <PageLoader {...route.meta}>
+                <RouteComponent />
+              </PageLoader>
+            );
 
-      {/* Admin layout routes */}
-      <Route path="/admin" element={
-        <ProtectedRoute adminOnly>
-          <AdminLayout />
-        </ProtectedRoute>
-      }>
-        {adminRoutes.map((route, index) => {
-          const RouteComponent = route.element;
-          const element = (
-            <PageLoader {...route.meta}>
-              <RouteComponent />
-            </PageLoader>
-          );
+            return route.path === '' ? (
+              <Route key={index} index element={element} />
+            ) : (
+              <Route key={index} path={route.path} element={element} />
+            );
+          })}
+          <Route path="/connection-journey" element={<ProtectedRoute><ConnectionJourney /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+        </Route>
 
-          return route.path === '' ? (
-            <Route key={index} index element={element} />
-          ) : (
-            <Route key={index} path={route.path} element={element} />
-          );
-        })}
-      </Route>
+        {/* Auth layout routes */}
+        <Route path="/auth" element={<AuthLayout />}>
+          {authRoutes.map((route, index) => {
+            const RouteComponent = route.element;
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <PageLoader {...route.meta}>
+                    <RouteComponent />
+                  </PageLoader>
+                }
+              />
+            );
+          })}
+          <Route path="" element={<Navigate to="/auth/login" replace />} />
+        </Route>
 
-      {/* Legacy route redirects */}
-      <Route path="/login" element={<Navigate to="/auth/login" replace />} />
-      <Route path="/register" element={<Navigate to="/auth/register" replace />} />
+        {/* Admin layout routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute adminOnly>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          {adminRoutes.map((route, index) => {
+            const RouteComponent = route.element;
+            const element = (
+              <PageLoader {...route.meta}>
+                <RouteComponent />
+              </PageLoader>
+            );
 
-      {/* 404 route */}
-      <Route path="*" element={
-        <PageLoader
-          title="Page Not Found"
-          description="The page you're looking for doesn't exist."
-          keywords="404, not found, error"
-        >
-          <NotFound />
-        </PageLoader>
-      } />
-    </Routes>
+            return route.path === '' ? (
+              <Route key={index} index element={element} />
+            ) : (
+              <Route key={index} path={route.path} element={element} />
+            );
+          })}
+        </Route>
+
+        {/* Legacy route redirects */}
+        <Route path="/login" element={<Navigate to="/auth/login" replace />} />
+        <Route path="/register" element={<Navigate to="/auth/register" replace />} />
+
+        {/* 404 route */}
+        <Route path="*" element={
+          <PageLoader
+            title="Page Not Found"
+            description="The page you're looking for doesn't exist."
+            keywords="404, not found, error"
+          >
+            <NotFound />
+          </PageLoader>
+        } />
+      </Routes>
+    </Suspense>
   );
 };
 

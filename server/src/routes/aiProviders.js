@@ -261,10 +261,6 @@ router.post('/:id/test', authenticateAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Provider not found' });
     }
 
-    // Decrypt API key
-    const encryptedApiKey = JSON.parse(provider.apiKey);
-    const apiKey = encryptionService.decryptApiKey(encryptedApiKey, provider.name);
-
     // For now, just return success for all providers
     // This would need to be implemented based on actual provider testing logic
     const isConnected = true;

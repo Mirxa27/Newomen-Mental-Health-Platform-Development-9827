@@ -1,5 +1,5 @@
 import { Room, RoomEvent, Participant, Track, RemoteParticipant } from 'livekit-client';
-import { Deepgram } from '@deepgram/sdk';
+import { createClient } from '@deepgram/sdk';
 import { ElevenLabsClient } from 'elevenlabs';
 import openaiService from './openaiService.js';
 
@@ -8,8 +8,8 @@ const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel's voice ID as a de
 class VoiceAgentService {
   constructor() {
     this.room = null;
-    this.deepgram = new Deepgram(process.env.DEEPGRAM_API_KEY);
-    this.elevenlabs = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
+    this.deepgram = process.env.DEEPGRAM_API_KEY ? createClient(process.env.DEEPGRAM_API_KEY) : null;
+    this.elevenlabs = process.env.ELEVENLABS_API_KEY ? new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY }) : null;
     this.remoteParticipant = null;
     this.isSpeaking = false;
   }
