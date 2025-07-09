@@ -17,6 +17,7 @@ import adminRouter from './routes/admin.js';
 import aiProvidersRouter from './routes/aiProviders.js';
 import voiceChatRouter from './routes/voiceChat.js';
 import paymentsRouter from './routes/payments.js';
+import socketService from './services/socketService.js';
 import {
   generalLimiter,
   speedLimiter,
@@ -27,6 +28,7 @@ import {
 } from './middleware/security.js';
 
 const app = express();
+const server = createServer(app);
 const PORT = process.env.PORT || 4000;
 
 // Create public/uploads directory if it doesn't exist
@@ -65,4 +67,15 @@ app.use('/api/payments', paymentsRouter);
 // Error handling middleware (must be last)
 app.use(sanitizeErrors);
 
-app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
+// Initialize Socket.IO
+socketService.initialize(server);
+
+// Start periodic cleanup of inactive sessions
+setInterval(() => {
+  socketService.cleanupInactiveSessions();
+}, 15 * 60 * 1000); // Every 15 minutes
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Socket.IO enabled for real-time features`);
+});
