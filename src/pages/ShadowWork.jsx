@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
@@ -8,6 +8,8 @@ import { useShadowWorkStore } from '../store/shadowWorkStore';
 import QuestionCard from '../components/shadowwork/QuestionCard';
 import ProgressBar from '../components/shadowwork/ProgressBar';
 import InsightsPanel from '../components/shadowwork/InsightsPanel';
+import BalanceWheel from '../components/shadowwork/BalanceWheel';
+import DiagnosticTest from '../components/shadowwork/DiagnosticTest';
 
 const { FiArrowLeft, FiArrowRight, FiCheck } = FiIcons;
 
@@ -17,7 +19,6 @@ const ShadowWork = () => {
   const navigate = useNavigate();
   const {
     currentQuestion,
-    questions,
     answers,
     isCompleted,
     insights,
@@ -25,21 +26,31 @@ const ShadowWork = () => {
     previousQuestion,
     completeAssessment,
     setCurrentQuestion,
+    selectedTopic,
+    setTopic,
+    getFilteredQuestions,
   } = useShadowWorkStore();
+
+  const questions = useMemo(() => getFilteredQuestions(), [selectedTopic, getFilteredQuestions]);
 
   // Sync store with route parameter
   useEffect(() => {
-    const index = questionId ? Number(questionId) - 1 : 0;
-    setCurrentQuestion(index);
-    if (!questionId) {
-      navigate(`/shadow-work/${index + 1}`, { replace: true });
+    if (selectedTopic && questions.length > 0) {
+      const index = questionId ? Number(questionId) - 1 : 0;
+      if (index !== currentQuestion) {
+        setCurrentQuestion(index);
+      }
+      if (!questionId) {
+        navigate(`/shadow-work/${index + 1}`, { replace: true });
+      }
     }
-  }, [questionId, setCurrentQuestion, navigate]);
+  }, [questionId, selectedTopic, questions.length, setCurrentQuestion, navigate, currentQuestion]);
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
+      const nextQ = currentQuestion + 2;
       nextQuestion();
-      navigate(`/shadow-work/${currentQuestion + 2}`);
+      navigate(`/shadow-work/${nextQ}`);
     } else {
       completeAssessment();
     }
@@ -47,17 +58,46 @@ const ShadowWork = () => {
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
+      const prevQ = currentQuestion;
       previousQuestion();
-      navigate(`/shadow-work/${currentQuestion}`);
+      navigate(`/shadow-work/${prevQ}`);
+    }
+  };
+
+  const handleSelectTopic = (topic) => {
+    setTopic(topic);
+    if (topic === 'diagnostic') {
+      navigate('/shadow-work/diagnostic');
+    } else {
+      navigate('/shadow-work/1');
     }
   };
 
   const currentQuestionData = questions[currentQuestion];
-  const hasAnswer = answers[currentQuestionData?.id];
+  const hasAnswer = currentQuestionData && answers[currentQuestionData.id];
   const isLastQuestion = currentQuestion === questions.length - 1;
+
+  if (!selectedTopic) {
+    return <BalanceWheel onSelectTopic={handleSelectTopic} />;
+  }
+  
+  if (selectedTopic === 'diagnostic') {
+    return <DiagnosticTest />;
+  }
 
   if (isCompleted && insights) {
     return <InsightsPanel insights={insights} />;
+  }
+  
+  if (questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 p-4">
+        <h2 className="text-2xl font-bold text-gray-700 mb-4">No questions available for this topic yet.</h2>
+        <button onClick={() => setTopic(null)} className="px-4 py-2 bg-primary-500 text-white rounded-lg">
+          Choose another topic
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -70,10 +110,10 @@ const ShadowWork = () => {
           className="text-center mb-6 md:mb-8"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-            Shadow Work Journey
+            Your Journey to Self-Discovery
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
-            Embrace your whole self through deep introspection
+            Uncover the hidden parts of yourself to grow stronger and more authentic.
           </p>
           <ProgressBar current={currentQuestion + 1} total={questions.length} />
         </motion.div>

@@ -51,17 +51,50 @@ const Chat = () => {
     if (!currentConversation && conversations.length === 0) {
       createConversation();
     }
+    generateHeadline();
   }, [currentConversation, conversations, createConversation]);
 
-  useEffect(() => {
-    const headlines = [
-      'Share your feelings freely',
-      'Let your journey unfold',
-      'Speak your truth today'
+  const generateHeadline = async () => {
+    // First, set a random optimistic headline
+    const optimisticHeadlines = [
+      'A safe space for your thoughts.',
+      'Your journey to clarity starts here.',
+      'Unlock your inner strength.',
+      'Connect with your authentic self.',
     ];
-    const index = Math.floor(Math.random() * headlines.length);
-    setHeadline(headlines[index]);
-  }, []);
+    setHeadline(optimisticHeadlines[Math.floor(Math.random() * optimisticHeadlines.length)]);
+
+    try {
+      const provider = getDefaultProvider();
+      const apiKey = provider?.apiKey || import.meta.env.VITE_OPENAI_API_KEY;
+      if (!apiKey) return; // Silently fail if no key
+
+      const response = await fetch(provider.endpoint || 'https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: provider.model || 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: "Generate a short, welcoming, and inspiring headline (under 40 characters) for a mental health chat app for women. It should feel personal and empowering. Examples: 'Speak your truth today', 'A new chapter awaits', 'Your safe space to grow'." }],
+          max_tokens: 20,
+          temperature: 0.8,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const generatedHeadline = data.choices?.[0]?.message?.content?.trim().replace(/"/g, '');
+        if (generatedHeadline) {
+          setHeadline(generatedHeadline);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to generate AI headline:", error);
+      // The optimistic headline will remain
+    }
+  };
 
   useEffect(() => {
     // Automatically scroll to the latest message.
@@ -212,7 +245,7 @@ const Chat = () => {
           
           <div className="flex items-center space-x-2 md:space-x-3">
             <EmotionIndicator emotion={emotionState} />
-            <div className="px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
+            <div className="hidden md:flex px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
               <p className="text-xs md:text-sm font-medium text-white">
                 {subscription.minutesRemaining} min
               </p>
@@ -220,10 +253,10 @@ const Chat = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={handleStartRealtimeVoice}
-              className="w-full px-4 py-2 bg-primary-500 hover:bg-primary-600 rounded-full text-white font-medium transition-colors"
+              className="hidden md:inline-flex items-center justify-center px-4 py-2 bg-primary-500 hover:bg-primary-600 rounded-full text-white font-medium transition-colors"
               title="Start Voice Chat"
             >
-              <FiPhone className="w-5 h-5 mr-2 inline" /> Start Call
+              <FiPhone className="w-5 h-5 mr-2" /> Start Call
             </motion.button>
             <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartAdvancedVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="Advanced Voice Chat">
               <FiMic className="w-5 h-5" />
@@ -255,8 +288,21 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
+      {/* Call To Action / Input Area */}
       <div className="p-4 bg-slate-900/50 backdrop-blur-lg border-t border-white/10" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+        {/* Full-width Call Button for Mobile */}
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={handleStartRealtimeVoice}
+          className="md:hidden w-full flex items-center justify-center gap-3 px-4 py-3 mb-3 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 rounded-xl text-white font-semibold text-lg transition-all shadow-lg"
+          title="Start Voice Chat"
+        >
+          <FiPhone className="w-6 h-6" />
+          <span>Start Voice Call</span>
+          <span className="text-sm opacity-80">({subscription.minutesRemaining} min left)</span>
+        </motion.button>
+
+        {/* Text Input Area */}
         <div className="flex items-end gap-2 md:gap-3">
           <motion.button whileTap={{ scale: 0.9 }} onClick={() => createConversation()} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors self-end mb-1">
             <FiPlus className="w-5 h-5" />

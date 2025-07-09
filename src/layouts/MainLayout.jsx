@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
-import MobileNavigation from '../components/navigation/MobileNavigation';
+import StickyNavbar from '../components/navigation/StickyNavbar';
+import RoleBasedMobileFooter from '../components/navigation/RoleBasedMobileFooter';
+import Breadcrumb from '../components/navigation/Breadcrumb';
 import Footer from '../components/layout/Footer';
 import PWAInstallPrompt from '../components/common/PWAInstallPrompt';
 import NetworkStatus from '../components/common/NetworkStatus';
@@ -92,6 +94,7 @@ const MainLayout = () => {
         </div>
         
         <Navbar />
+        <StickyNavbar />
         
         {/* Content Container: Positioned above the background */}
         <div className="relative z-10 flex min-h-screen">
@@ -102,24 +105,33 @@ const MainLayout = () => {
           <main 
             className={`flex-1 transition-all duration-300 pt-20 ${isAuthenticated && !isMobile ? 'ml-64' : ''}`}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="flex-grow w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 pb-32 md:pb-8"
-              >
-                <Outlet />
-              </motion.div>
-            </AnimatePresence>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Breadcrumb Navigation */}
+              {isAuthenticated && (
+                <div className="py-4">
+                  <Breadcrumb />
+                </div>
+              )}
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="flex-grow w-full pb-32 md:pb-8"
+                >
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
+            </div>
             
             {!isMobile && <Footer />}
           </main>
         </div>
         
-        {isMobile && <MobileNavigation />}
+        <RoleBasedMobileFooter />
 
         {/* Mobile-specific UI elements, also on top layer */}
         <div className="relative z-20">

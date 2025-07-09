@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
       launchShowDuration: 2000,
       launchAutoHide: true,
       launchFadeOutDuration: 500,
-      backgroundColor: "#667eea",
+      backgroundColor: "#8b5cf6",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       style: 'LIGHT_CONTENT',
-      backgroundColor: '#667eea'
+      backgroundColor: '#8b5cf6'
     },
     Keyboard: {
       resize: 'body',

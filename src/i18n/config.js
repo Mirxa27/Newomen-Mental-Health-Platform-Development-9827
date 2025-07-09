@@ -6,6 +6,80 @@ const resources = {
   en: {
     translation: {
       // Navigation
+      nav: {
+        home: "Home",
+        chat: "Chat",
+        shadowWork: "Shadow Work",
+        breathing: "Breathing Practices",
+        personalityTest: "Personality Test",
+        search: "Search",
+        profile: "Profile",
+        subscription: "Subscription",
+        settings: "Settings",
+        admin: "Admin",
+        more: "More",
+        quickActions: "Quick Actions",
+        user: "User",
+        newMe: "New Me",
+        navigation: "Navigation",
+        growth: "Growth",
+        wellness: "Wellness",
+        tools: "Tools",
+        analytics: "Analytics",
+        menu: "Menu",
+        exploreFeatures: "Explore Features",
+        growthDevelopment: "Growth & Development",
+        quickTools: "Quick Tools",
+        usageTip: "Tap and hold for quick actions, swipe for shortcuts",
+        
+        // Descriptions
+        homeDesc: "Your journey starts here",
+        chatDesc: "Talk with your AI companion",
+        profileDesc: "Your personal space",
+        shadowWorkDesc: "Explore your inner self",
+        newMeDesc: "Daily growth challenges",
+        breathingDesc: "Mindful breathing exercises",
+        personalityTestDesc: "Discover your type",
+        searchDesc: "Find and connect",
+        subscriptionDesc: "Unlock premium features",
+        settingsDesc: "Customize your experience"
+      },
+      
+      // Breadcrumb
+      breadcrumb: {
+        home: "Home",
+        about: "About",
+        chat: "Chat",
+        shadowWork: "Shadow Work",
+        profile: "Profile",
+        breathing: "Breathing Practices",
+        search: "Search",
+        personalityTest: "Personality Test",
+        subscription: "Subscription",
+        settings: "Settings",
+        newMe: "New Me",
+        auth: "Authentication",
+        login: "Login",
+        register: "Register",
+        forgotPassword: "Forgot Password",
+        admin: "Admin",
+        realtime: "Real-Time",
+        users: "Users",
+        conversations: "Conversations",
+        prompts: "Prompts",
+        analytics: "Analytics",
+        aiProviders: "AI Providers",
+        branding: "Branding",
+        therapeuticAgents: "Therapeutic Agents",
+        navigation: "Navigation"
+      },
+      
+      // Brand
+      brand: {
+        name: "Newomen"
+      },
+      
+      // Legacy navigation (for backward compatibility)
       home: "Home",
       chat: "Chat",
       shadowWork: "Shadow Work",
@@ -15,6 +89,7 @@ const resources = {
       search: "Search",
       profile: "Profile",
       subscription: "Subscription",
+      settings: "Settings",
       admin: "Admin",
       more: "More",
       
@@ -107,6 +182,80 @@ const resources = {
   ar: {
     translation: {
       // Navigation
+      nav: {
+        home: "الرئيسية",
+        chat: "المحادثة",
+        shadowWork: "عمل الظل",
+        breathing: "تمارين التنفس",
+        personalityTest: "اختبار الشخصية",
+        search: "البحث",
+        profile: "الملف الشخصي",
+        subscription: "الاشتراك",
+        settings: "الإعدادات",
+        admin: "الإدارة",
+        more: "المزيد",
+        quickActions: "الإجراءات السريعة",
+        user: "المستخدم",
+        newMe: "أنا الجديدة",
+        navigation: "التنقل",
+        growth: "النمو",
+        wellness: "العافية",
+        tools: "الأدوات",
+        analytics: "التحليلات",
+        menu: "القائمة",
+        exploreFeatures: "استكشف الميزات",
+        growthDevelopment: "النمو والتطوير",
+        quickTools: "الأدوات السريعة",
+        usageTip: "اضغط مع الاستمرار للإجراءات السريعة، اسحب للاختصارات",
+        
+        // Descriptions
+        homeDesc: "رحلتك تبدأ هنا",
+        chatDesc: "تحدث مع رفيقك الذكي",
+        profileDesc: "مساحتك الشخصية",
+        shadowWorkDesc: "اكتشف ذاتك الداخلية",
+        newMeDesc: "تحديات النمو اليومية",
+        breathingDesc: "تمارين التنفس الواعي",
+        personalityTestDesc: "اكتشف نوع شخصيتك",
+        searchDesc: "اعثر وتواصل",
+        subscriptionDesc: "فتح الميزات المميزة",
+        settingsDesc: "خصص تجربتك"
+      },
+      
+      // Breadcrumb
+      breadcrumb: {
+        home: "الرئيسية",
+        about: "حول",
+        chat: "المحادثة",
+        shadowWork: "عمل الظل",
+        profile: "الملف الشخصي",
+        breathing: "تمارين التنفس",
+        search: "البحث",
+        personalityTest: "اختبار الشخصية",
+        subscription: "الاشتراك",
+        settings: "الإعدادات",
+        newMe: "أنا الجديدة",
+        auth: "المصادقة",
+        login: "تسجيل الدخول",
+        register: "إنشاء حساب",
+        forgotPassword: "نسيت كلمة المرور",
+        admin: "الإدارة",
+        realtime: "الوقت الفعلي",
+        users: "المستخدمون",
+        conversations: "المحادثات",
+        prompts: "الاستفسارات",
+        analytics: "التحليلات",
+        aiProviders: "مقدمي الذكاء الاصطناعي",
+        branding: "العلامة التجارية",
+        therapeuticAgents: "الوكلاء العلاجيون",
+        navigation: "التنقل"
+      },
+      
+      // Brand
+      brand: {
+        name: "نيوومن"
+      },
+      
+      // Legacy navigation (for backward compatibility)
       home: "الرئيسية",
       chat: "المحادثة",
       shadowWork: "عمل الظل",
@@ -116,6 +265,7 @@ const resources = {
       search: "البحث",
       profile: "الملف الشخصي",
       subscription: "الاشتراك",
+      settings: "الإعدادات",
       admin: "الإدارة",
       more: "المزيد",
       

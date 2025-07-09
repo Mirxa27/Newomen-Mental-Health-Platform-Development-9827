@@ -64,7 +64,7 @@ const Navbar = () => {
   const navItems = [
     { id: 'home', label: t('home'), path: '/', icon: FiHome },
     { id: 'chat', label: t('chat'), path: '/chat', icon: FiMessageCircle, requiresAuth: true, badge: conversations?.length || 0 },
-    { id: 'shadowWork', label: t('shadowWork'), path: '/self-discovery/1', icon: FiHeart, requiresAuth: true },
+    { id: 'shadowWork', label: t('shadowWork'), path: '/shadow-work/1', icon: FiHeart, requiresAuth: true },
     { id: 'breathing', label: t('breathing'), path: '/breathing', icon: FiWind, requiresAuth: true },
     { id: 'personalityTest', label: t('personalityTest'), path: '/personality-test', icon: FiCheckSquare },
     { id: 'about', label: t('about'), path: '/about', icon: FiInfo },

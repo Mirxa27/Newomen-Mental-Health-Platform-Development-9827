@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import { Helmet } from 'react-helmet-async';
 
 // Layouts
 import MainLayout from '../layouts/MainLayout';
@@ -22,6 +23,7 @@ const ShadowWork = lazy(() => import('../pages/ShadowWork'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Subscription = lazy(() => import('../pages/Subscription'));
 const Settings = lazy(() => import('../pages/Settings'));
+const NewMe = lazy(() => import('../pages/NewMe'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Admin pages
@@ -34,65 +36,312 @@ const AdminAnalytics = lazy(() => import('../components/admin/Analytics'));
 const AdminAIProviders = lazy(() => import('../components/admin/AIProviderManagement'));
 const AdminBranding = lazy(() => import('../components/admin/BrandingSettings'));
 const AdminSystemSettings = lazy(() => import('../components/admin/SystemSettings'));
+const AdminTherapeuticAgents = lazy(() => import('../components/admin/TherapeuticAgentConfig'));
 
-// Route loader component
-const PageLoader = ({ children }) => (
+// Enhanced route loader component with SEO metadata
+const PageLoader = ({ children, title, description, keywords }) => (
   <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingSpinner size="lg" /></div>}>
+    {title && (
+      <Helmet>
+        <title>{title} | Newomen Mental Health Platform</title>
+        {description && <meta name="description" content={description} />}
+        {keywords && <meta name="keywords" content={keywords} />}
+        <meta property="og:title" content={`${title} | Newomen Mental Health Platform`} />
+        {description && <meta property="og:description" content={description} />}
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${title} | Newomen Mental Health Platform`} />
+        {description && <meta name="twitter:description" content={description} />}
+      </Helmet>
+    )}
     {children}
   </Suspense>
 );
 
+// Dynamic route configuration for better maintainability
+const createDynamicRoutes = () => {
+  const mainRoutes = [
+    {
+      path: '',
+      element: Home,
+      meta: {
+        title: 'Home',
+        description: 'AI-powered platform for women\'s mental health and personal growth.',
+        keywords: 'mental health, women, AI, personal growth, therapy'
+      }
+    },
+    {
+      path: 'about',
+      element: About,
+      meta: {
+        title: 'About Us',
+        description: 'Learn about our mission to empower women through AI-powered mental health support.',
+        keywords: 'about, mission, women mental health, AI therapy'
+      }
+    },
+    {
+      path: 'chat',
+      element: Chat,
+      protected: true,
+      meta: {
+        title: 'AI Chat',
+        description: 'Chat with our AI therapist for personalized mental health support.',
+        keywords: 'AI chat, therapy, mental health support, counseling'
+      }
+    },
+    {
+      path: 'shadow-work/:questionId?',
+      element: ShadowWork,
+      protected: true,
+      meta: {
+        title: 'Shadow Work',
+        description: 'Explore your inner self through guided shadow work exercises.',
+        keywords: 'shadow work, self-discovery, psychology, inner growth'
+      }
+    },
+    {
+      path: 'profile',
+      element: Profile,
+      protected: true,
+      meta: {
+        title: 'Profile',
+        description: 'Manage your profile and track your mental health journey.',
+        keywords: 'profile, settings, mental health progress, personal data'
+      }
+    },
+    {
+      path: 'breathing',
+      element: BreathingPractices,
+      protected: true,
+      meta: {
+        title: 'Breathing Practices',
+        description: 'Learn and practice breathing techniques for relaxation and stress relief.',
+        keywords: 'breathing exercises, meditation, stress relief, relaxation'
+      }
+    },
+    {
+      path: 'search',
+      element: NicknameSearch,
+      protected: true,
+      meta: {
+        title: 'Search',
+        description: 'Search for users and connect with the community.',
+        keywords: 'search, community, users, social'
+      }
+    },
+    {
+      path: 'personality-test',
+      element: PersonalityTest,
+      meta: {
+        title: 'Personality Test',
+        description: 'Discover your personality type with our comprehensive assessment.',
+        keywords: 'personality test, psychology, self-assessment, personality type'
+      }
+    },
+    {
+      path: 'subscription',
+      element: Subscription,
+      protected: true,
+      meta: {
+        title: 'Subscription',
+        description: 'Choose your subscription plan for premium features.',
+        keywords: 'subscription, premium, pricing, mental health services'
+      }
+    },
+    {
+      path: 'settings',
+      element: Settings,
+      protected: true,
+      meta: {
+        title: 'Settings',
+        description: 'Customize your experience and manage your account settings.',
+        keywords: 'settings, account, preferences, customization'
+      }
+    },
+    {
+      path: 'new-me',
+      element: NewMe,
+      protected: true,
+      meta: {
+        title: 'New Me - Daily Challenges',
+        description: 'Take on daily challenges to transform yourself and build better habits.',
+        keywords: 'daily challenges, personal growth, habits, self-improvement'
+      }
+    }
+  ];
+
+  const authRoutes = [
+    {
+      path: 'login',
+      element: Login,
+      meta: {
+        title: 'Login',
+        description: 'Sign in to your account to access personalized mental health support.',
+        keywords: 'login, sign in, account, authentication'
+      }
+    },
+    {
+      path: 'register',
+      element: Register,
+      meta: {
+        title: 'Register',
+        description: 'Create your account to start your mental health journey.',
+        keywords: 'register, sign up, create account, join'
+      }
+    },
+    {
+      path: 'forgot-password',
+      element: ForgotPassword,
+      meta: {
+        title: 'Forgot Password',
+        description: 'Reset your password to regain access to your account.',
+        keywords: 'forgot password, reset password, account recovery'
+      }
+    }
+  ];
+
+  const adminRoutes = [
+    {
+      path: '',
+      element: AdminDashboard,
+      meta: {
+        title: 'Admin Dashboard',
+        description: 'Administrative dashboard for managing the platform.',
+        keywords: 'admin, dashboard, management, analytics'
+      }
+    },
+    {
+      path: 'realtime',
+      element: AdminRealTime,
+      meta: {
+        title: 'Real-Time Metrics',
+        description: 'Monitor platform metrics and user activity in real-time.',
+        keywords: 'real-time, metrics, monitoring, analytics'
+      }
+    },
+    {
+      path: 'users',
+      element: AdminUsers,
+      meta: {
+        title: 'User Management',
+        description: 'Manage user accounts and permissions.',
+        keywords: 'user management, accounts, permissions, administration'
+      }
+    },
+    {
+      path: 'conversations',
+      element: AdminConversations,
+      meta: {
+        title: 'Conversation Monitor',
+        description: 'Monitor and analyze user conversations.',
+        keywords: 'conversations, monitoring, chat analysis, moderation'
+      }
+    },
+    {
+      path: 'prompts',
+      element: AdminPrompts,
+      meta: {
+        title: 'Prompt Management',
+        description: 'Manage AI prompts and responses.',
+        keywords: 'prompts, AI management, responses, configuration'
+      }
+    },
+    {
+      path: 'analytics',
+      element: AdminAnalytics,
+      meta: {
+        title: 'Analytics',
+        description: 'View detailed analytics and reports.',
+        keywords: 'analytics, reports, statistics, insights'
+      }
+    },
+    {
+      path: 'ai-providers',
+      element: AdminAIProviders,
+      meta: {
+        title: 'AI Providers',
+        description: 'Manage AI service providers and configurations.',
+        keywords: 'AI providers, configuration, services, management'
+      }
+    },
+    {
+      path: 'branding',
+      element: AdminBranding,
+      meta: {
+        title: 'Branding Settings',
+        description: 'Customize platform branding and appearance.',
+        keywords: 'branding, customization, appearance, settings'
+      }
+    },
+    {
+      path: 'settings',
+      element: AdminSystemSettings,
+      meta: {
+        title: 'System Settings',
+        description: 'Configure system-wide settings and preferences.',
+        keywords: 'system settings, configuration, preferences, admin'
+      }
+    },
+    {
+      path: 'therapeutic-agents',
+      element: AdminTherapeuticAgents,
+      meta: {
+        title: 'Therapeutic Agents',
+        description: 'Configure therapeutic AI agents and their behaviors.',
+        keywords: 'therapeutic agents, AI configuration, therapy, mental health'
+      }
+    }
+  ];
+
+  return { mainRoutes, authRoutes, adminRoutes };
+};
+
 // Router component
 const AppRouter = () => {
+  const { mainRoutes, authRoutes, adminRoutes } = createDynamicRoutes();
+
   return (
     <Routes>
       {/* Main layout routes */}
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<PageLoader><Home /></PageLoader>} />
-        <Route path="about" element={<PageLoader><About /></PageLoader>} />
-        <Route path="chat" element={
-          <ProtectedRoute>
-            <PageLoader><Chat /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="shadow-work/:questionId?" element={
-          <ProtectedRoute>
-            <PageLoader><ShadowWork /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="profile" element={
-          <ProtectedRoute>
-            <PageLoader><Profile /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="breathing" element={
-          <ProtectedRoute>
-            <PageLoader><BreathingPractices /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="search" element={
-          <ProtectedRoute>
-            <PageLoader><NicknameSearch /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="personality-test" element={<PageLoader><PersonalityTest /></PageLoader>} />
-        <Route path="subscription" element={
-          <ProtectedRoute>
-            <PageLoader><Subscription /></PageLoader>
-          </ProtectedRoute>
-        } />
-        <Route path="settings" element={
-          <ProtectedRoute>
-            <PageLoader><Settings /></PageLoader>
-          </ProtectedRoute>
-        } />
+        {mainRoutes.map((route, index) => {
+          const RouteComponent = route.element;
+          const element = route.protected ? (
+            <ProtectedRoute>
+              <PageLoader {...route.meta}>
+                <RouteComponent />
+              </PageLoader>
+            </ProtectedRoute>
+          ) : (
+            <PageLoader {...route.meta}>
+              <RouteComponent />
+            </PageLoader>
+          );
+
+          return route.path === '' ? (
+            <Route key={index} index element={element} />
+          ) : (
+            <Route key={index} path={route.path} element={element} />
+          );
+        })}
       </Route>
 
       {/* Auth layout routes */}
       <Route path="/auth" element={<AuthLayout />}>
-        <Route path="login" element={<PageLoader><Login /></PageLoader>} />
-        <Route path="register" element={<PageLoader><Register /></PageLoader>} />
-        <Route path="forgot-password" element={<PageLoader><ForgotPassword /></PageLoader>} />
+        {authRoutes.map((route, index) => {
+          const RouteComponent = route.element;
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <PageLoader {...route.meta}>
+                  <RouteComponent />
+                </PageLoader>
+              }
+            />
+          );
+        })}
         <Route path="" element={<Navigate to="/auth/login" replace />} />
       </Route>
 
@@ -102,15 +351,20 @@ const AppRouter = () => {
           <AdminLayout />
         </ProtectedRoute>
       }>
-        <Route index element={<PageLoader><AdminDashboard /></PageLoader>} />
-        <Route path="realtime" element={<PageLoader><AdminRealTime /></PageLoader>} />
-        <Route path="users" element={<PageLoader><AdminUsers /></PageLoader>} />
-        <Route path="conversations" element={<PageLoader><AdminConversations /></PageLoader>} />
-        <Route path="prompts" element={<PageLoader><AdminPrompts /></PageLoader>} />
-        <Route path="analytics" element={<PageLoader><AdminAnalytics /></PageLoader>} />
-        <Route path="ai-providers" element={<PageLoader><AdminAIProviders /></PageLoader>} />
-        <Route path="branding" element={<PageLoader><AdminBranding /></PageLoader>} />
-        <Route path="settings" element={<PageLoader><AdminSystemSettings /></PageLoader>} />
+        {adminRoutes.map((route, index) => {
+          const RouteComponent = route.element;
+          const element = (
+            <PageLoader {...route.meta}>
+              <RouteComponent />
+            </PageLoader>
+          );
+
+          return route.path === '' ? (
+            <Route key={index} index element={element} />
+          ) : (
+            <Route key={index} path={route.path} element={element} />
+          );
+        })}
       </Route>
 
       {/* Legacy route redirects */}
@@ -118,52 +372,49 @@ const AppRouter = () => {
       <Route path="/register" element={<Navigate to="/auth/register" replace />} />
       
       {/* 404 route */}
-      <Route path="*" element={<PageLoader><NotFound /></PageLoader>} />
+      <Route path="*" element={
+        <PageLoader 
+          title="Page Not Found"
+          description="The page you're looking for doesn't exist."
+          keywords="404, not found, error"
+        >
+          <NotFound />
+        </PageLoader>
+      } />
     </Routes>
   );
 };
 
-// Static route definitions for metadata (used by MainLayout)
-export const routes = [
-  {
-    path: '/',
-    meta: { title: 'Home', description: 'AI-powered platform for women\'s mental health and personal growth.' },
-    children: [
-      { path: '', meta: { title: 'Home' } },
-      { path: 'about', meta: { title: 'About' } },
-      { path: 'chat', meta: { title: 'Chat' } },
-      { path: 'shadow-work/:questionId?', meta: { title: 'Shadow Work' } },
-        { path: 'profile', meta: { title: 'Profile' } },
-        { path: 'breathing', meta: { title: 'Breathing Practices' } },
-        { path: 'search', meta: { title: 'Search' } },
-        { path: 'personality-test', meta: { title: 'Personality Test' } },
-        { path: 'subscription', meta: { title: 'Subscription' } },
-    ]
-  },
-  {
-    path: '/auth',
-    meta: { title: 'Auth' },
-    children: [
-      { path: 'login', meta: { title: 'Login' } },
-      { path: 'register', meta: { title: 'Register' } },
-      { path: 'forgot-password', meta: { title: 'Forgot Password' } },
-    ]
-  },
-  {
-    path: '/admin',
-    meta: { title: 'Admin' },
-    children: [
-      { path: '', meta: { title: 'Admin Dashboard' } },
-      { path: 'realtime', meta: { title: 'Real-Time Metrics' } },
-      { path: 'users', meta: { title: 'User Management' } },
-      { path: 'conversations', meta: { title: 'Conversation Monitor' } },
-      { path: 'prompts', meta: { title: 'Prompt Management' } },
-      { path: 'analytics', meta: { title: 'Analytics' } },
-      { path: 'ai-providers', meta: { title: 'AI Providers' } },
-      { path: 'branding', meta: { title: 'Branding Settings' } },
-      { path: 'settings', meta: { title: 'System Settings' } },
-    ]
-  },
-];
+// Generate static route definitions for metadata (used by MainLayout)
+export const routes = (() => {
+  const { mainRoutes, authRoutes, adminRoutes } = createDynamicRoutes();
+  
+  return [
+    {
+      path: '/',
+      meta: { title: 'Home', description: 'AI-powered platform for women\'s mental health and personal growth.' },
+      children: mainRoutes.map(route => ({
+        path: route.path,
+        meta: route.meta
+      }))
+    },
+    {
+      path: '/auth',
+      meta: { title: 'Auth' },
+      children: authRoutes.map(route => ({
+        path: route.path,
+        meta: route.meta
+      }))
+    },
+    {
+      path: '/admin',
+      meta: { title: 'Admin' },
+      children: adminRoutes.map(route => ({
+        path: route.path,
+        meta: route.meta
+      }))
+    },
+  ];
+})();
 
 export default AppRouter;

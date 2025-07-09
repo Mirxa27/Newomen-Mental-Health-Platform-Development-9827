@@ -170,7 +170,7 @@ const Login = () => {
         </motion.form>
       </motion.div>
 
-      <style jsx global>{`
+      <style>{`
         @keyframes animated-gradient-text-flow {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

@@ -145,3 +145,189 @@ model SystemSettings {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// Payment and Subscription Models
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  TRIALING
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+model Subscription {
+  id                String             @id @default(uuid())
+  userId            String             @unique
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId  String?            @unique
+  stripeSubscriptionId String?         @unique
+  status            SubscriptionStatus @default(TRIALING)
+  planId            String
+  plan              SubscriptionPlan   @relation(fields: [planId], references: [id])
+  currentPeriodStart DateTime?
+  currentPeriodEnd  DateTime?
+  cancelAtPeriodEnd Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  payments          Payment[]
+}
+
+model SubscriptionPlan {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+  price         Float          // Monthly price in cents
+  currency      String         @default("usd")
+  stripePriceId String?        @unique
+  features      Json           // List of features included
+  maxMessages   Int?           // Message limit per month
+  maxVoiceTime  Int?           // Voice chat time limit in minutes
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId   String?
+  subscription     Subscription? @relation(fields: [subscriptionId], references: [id])
+  stripePaymentId  String?       @unique
+  amount           Float         // Amount in cents
+  currency         String        @default("usd")
+  status           PaymentStatus @default(PENDING)
+  description      String?
+  failureReason    String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+// Notification Models
+enum NotificationType {
+  SYSTEM
+  REMINDER
+  ACHIEVEMENT
+  CRISIS_ALERT
+  PAYMENT
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType @default(SYSTEM)
+  title       String
+  message     String
+  isRead      Boolean          @default(false)
+  actionUrl   String?
+  metadata    Json?            // Additional notification data
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+  
+  @@index([userId, isRead])
+}
+
+// Crisis Support Models
+enum CrisisStatus {
+  ACTIVE
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
+
+model CrisisAlert {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messageId   String?     // If triggered by a specific message
+  message     Message?    @relation(fields: [messageId], references: [id])
+  severity    Int         @default(5) // 1-10 scale
+  status      CrisisStatus @default(ACTIVE)
+  keywords    String[]    // Keywords that triggered the alert
+  response    String?     // Counselor response
+  respondedBy String?     // Counselor ID who responded
+  createdAt   DateTime    @default(now())
+  resolvedAt  DateTime?
+  
+  @@index([status, severity])
+}
+
+// Analytics and Usage Models
+model UserAnalytics {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalMessages         Int      @default(0)
+  totalVoiceMinutes     Int      @default(0)
+  shadowWorkSessions    Int      @default(0)
+  lastActiveAt          DateTime @default(now())
+  streakDays            Int      @default(0)
+  longestStreak         Int      @default(0)
+  totalSessionTime      Int      @default(0) // In minutes
+  moodScores            Json?    // Historical mood tracking
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// File Upload Models
+enum FileType {
+  AVATAR
+  DOCUMENT
+  AUDIO
+  IMAGE
+  BACKUP
+}
+
+model FileUpload {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename  String
+  originalName String
+  mimetype  String
+  size      Int      // File size in bytes
+  type      FileType
+  url       String   // Storage URL
+  metadata  Json?    // Additional file metadata
+  createdAt DateTime @default(now())
+  
+  @@index([userId, type])
+}
+
+// Mood Tracking Models
+model MoodEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score       Int      // 1-10 mood scale
+  notes       String?
+  tags        String[] // Mood tags like "anxious", "happy", etc.
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, createdAt])
+}
+
+// Session Management for Real-time Features
+model ActiveSession {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  socketId        String   @unique
+  userAgent       String?
+  ipAddress       String?
+  isActive        Boolean  @default(true)
+  lastActivity    DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@index([userId, isActive])
+}

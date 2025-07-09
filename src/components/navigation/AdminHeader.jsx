@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuthStore } from '../../store/authStore';
+import AdminLogo from '../admin/AdminLogo';
 
 const { FiMenu, FiBell, FiUser, FiLogOut } = FiIcons;
 
@@ -20,11 +21,8 @@ const AdminHeader = ({ toggleSidebar }) => {
             <SafeIcon icon={FiMenu} className="w-5 h-5" />
           </button>
           
-          <Link to="/" className="ml-3 flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <span className="text-xl font-bold text-white">Admin</span>
+          <Link to="/admin" className="ml-3">
+            <AdminLogo />
           </Link>
         </div>
         

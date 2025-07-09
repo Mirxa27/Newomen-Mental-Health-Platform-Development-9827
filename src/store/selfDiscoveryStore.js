@@ -11,6 +11,17 @@ export const useShadowWorkStore = create(
       actionPlan: null,
       affirmations: [],
       
+      // Loading states
+      isLoading: false,
+      isSaving: false,
+      isGeneratingInsights: false,
+      
+      // Error states
+      error: null,
+      
+      // Clear error state
+      clearError: () => set({ error: null }),
+      
       questions: [
         {
           id: 1,
@@ -75,54 +86,107 @@ export const useShadowWorkStore = create(
       ],
       
       answerQuestion: (questionId, answer) => {
-        set((state) => ({
-          answers: {
-            ...state.answers,
-            [questionId]: answer,
-          },
-        }));
+        try {
+          if (!questionId || !answer) {
+            throw new Error('Question ID and answer are required');
+          }
+          
+          set((state) => ({
+            answers: {
+              ...state.answers,
+              [questionId]: answer,
+            },
+            error: null,
+          }));
+        } catch (error) {
+          set({ error: error.message || 'Failed to save answer' });
+          throw error;
+        }
       },
       
       nextQuestion: () => {
-        set((state) => ({
-          currentQuestion: Math.min(state.currentQuestion + 1, state.questions.length - 1),
-        }));
+        try {
+          set((state) => ({
+            currentQuestion: Math.min(state.currentQuestion + 1, state.questions.length - 1),
+            error: null,
+          }));
+        } catch (error) {
+          set({ error: error.message || 'Failed to navigate to next question' });
+          throw error;
+        }
       },
       
       previousQuestion: () => {
-        set((state) => ({
-          currentQuestion: Math.max(state.currentQuestion - 1, 0),
-        }));
+        try {
+          set((state) => ({
+            currentQuestion: Math.max(state.currentQuestion - 1, 0),
+            error: null,
+          }));
+        } catch (error) {
+          set({ error: error.message || 'Failed to navigate to previous question' });
+          throw error;
+        }
       },
 
       setCurrentQuestion: (index) => {
-        set((state) => ({
-          currentQuestion: Math.min(Math.max(index, 0), state.questions.length - 1),
-        }));
+        try {
+          if (typeof index !== 'number' || index < 0) {
+            throw new Error('Invalid question index');
+          }
+          
+          set((state) => ({
+            currentQuestion: Math.min(Math.max(index, 0), state.questions.length - 1),
+            error: null,
+          }));
+        } catch (error) {
+          set({ error: error.message || 'Failed to set current question' });
+          throw error;
+        }
       },
       
-       completeAssessment: () => {
-         set({ isCompleted: true });
-         // This would typically trigger AI analysis
-         get().generateInsights();
-         // Reward user with crystals for completion
-        import('../store/authStore').then(({ useAuthStore }) => {
-          useAuthStore.getState().addCrystals(10);
-          useAuthStore.getState().updateProgress(100);
-        });
-      },
+       completeAssessment: async () => {
+         try {
+           set({ isCompleted: true, error: null });
+           
+           // This would typically trigger AI analysis
+           await get().generateInsights();
+           
+           // Reward user with crystals for completion
+           try {
+             const { useAuthStore } = await import('../store/authStore');
+             useAuthStore.getState().addCrystals(10);
+             useAuthStore.getState().updateProgress(100);
+           } catch (rewardError) {
+             // Don't fail the assessment completion if reward fails
+           }
+         } catch (error) {
+           set({ error: error.message || 'Failed to complete assessment' });
+           throw error;
+         }
+       },
       
       generateInsights: async () => {
-        const { answers } = get();
-
-        const systemPrompt = `You are Newomen, an AI coach helping users perform shadow work. Based on the following answers, provide a summary of shadow patterns, hidden strengths, areas for transformation and a short action plan with affirmations.`;
-
+        set({ isGeneratingInsights: true, error: null });
+        
         try {
+          const { answers } = get();
+
+          if (!answers || Object.keys(answers).length === 0) {
+            throw new Error('No answers provided for insights generation');
+          }
+
+          const systemPrompt = `You are Newomen, an AI coach helping users perform shadow work. Based on the following answers, provide a summary of shadow patterns, hidden strengths, areas for transformation and a short action plan with affirmations.`;
+
+          const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+          if (!apiKey) {
+            throw new Error('OpenAI API key is not configured');
+          }
+
           const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+              'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
               model: 'gpt-4',
@@ -135,25 +199,50 @@ export const useShadowWorkStore = create(
             })
           });
 
+          if (!response.ok) {
+            throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+          }
+
           const data = await response.json();
           const content = data.choices?.[0]?.message?.content;
-          if (content) {
-            set({ insights: { summary: content } });
+          
+          if (!content) {
+            throw new Error('No insights content received from OpenAI');
           }
+          
+          set({ 
+            insights: { summary: content },
+            isGeneratingInsights: false,
+            error: null
+          });
         } catch (error) {
-          console.error('Failed to generate insights:', error);
+          const errorMessage = error.message || 'Failed to generate insights';
+          set({ 
+            isGeneratingInsights: false,
+            error: errorMessage
+          });
+          throw new Error(errorMessage);
         }
       },
       
       resetAssessment: () => {
-        set({
-          currentQuestion: 0,
-          answers: {},
-          isCompleted: false,
-          insights: null,
-          actionPlan: null,
-          affirmations: [],
-        });
+        try {
+          set({
+            currentQuestion: 0,
+            answers: {},
+            isCompleted: false,
+            insights: null,
+            actionPlan: null,
+            affirmations: [],
+            isLoading: false,
+            isSaving: false,
+            isGeneratingInsights: false,
+            error: null,
+          });
+        } catch (error) {
+          set({ error: error.message || 'Failed to reset assessment' });
+          throw error;
+        }
       },
     }),
     {

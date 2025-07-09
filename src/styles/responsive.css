@@ -1,223 +1,405 @@
-/* Mobile-first responsive design enhancements */
+/* Responsive Design Utilities */
 
-/* Base mobile styles */
+/* Safe Area Support for Mobile Devices */
+.pt-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pb-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pl-safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.pr-safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+.p-safe {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Viewport Height Utilities */
+.min-h-screen-safe {
+  min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.h-screen-safe {
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+/* Touch-friendly Interactive Elements */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Responsive Typography */
 @media (max-width: 767px) {
-  /* Ensure safe area handling */
-  .mobile-safe-area {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+  .responsive-text-scale {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
   }
-
-  /* Mobile navigation spacing */
-  .mobile-nav-spacing {
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
-  }
-
-  /* Hide elements on mobile */
-  .mobile-hidden {
-    display: none;
-  }
-
-  /* Mobile-optimized text sizes */
-  .mobile-text {
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
-  /* Touch-friendly sizing */
-  .mobile-touch {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Mobile glassmorphism adjustments */
-  .mobile-glass {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+  
+  .responsive-heading-scale {
+    font-size: clamp(1.5rem, 5vw, 2rem);
   }
 }
 
-/* Tablet styles */
 @media (min-width: 768px) and (max-width: 1023px) {
-  /* Tablet-specific adjustments */
-  .tablet-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .responsive-text-scale {
+    font-size: clamp(1rem, 2vw, 1.125rem);
   }
-
-  .tablet-sidebar {
-    width: 16rem;
+  
+  .responsive-heading-scale {
+    font-size: clamp(2rem, 4vw, 2.5rem);
   }
 }
 
-/* Desktop styles */
 @media (min-width: 1024px) {
-  /* Desktop-specific enhancements */
-  .desktop-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .responsive-text-scale {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
   }
-
-  .desktop-sidebar {
-    width: 18rem;
-  }
-
-  /* Desktop glassmorphism */
-  .desktop-glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  
+  .responsive-heading-scale {
+    font-size: clamp(2.5rem, 3vw, 3rem);
   }
 }
 
-/* High-DPI displays */
+/* Responsive Spacing */
+.responsive-padding {
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.responsive-margin {
+  margin: clamp(1rem, 4vw, 2rem);
+}
+
+.responsive-gap {
+  gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Responsive Grid */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+/* Aspect Ratio Support for Older Browsers */
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-ratio-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.aspect-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+/* Fallback for browsers without aspect-ratio support */
+@supports not (aspect-ratio: 1) {
+  .aspect-ratio-16-9 {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+  
+  .aspect-ratio-16-9 > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .aspect-ratio-4-3 {
+    position: relative;
+    height: 0;
+    padding-bottom: 75%; /* 4:3 aspect ratio */
+  }
+  
+  .aspect-ratio-4-3 > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .aspect-ratio-1-1 {
+    position: relative;
+    height: 0;
+    padding-bottom: 100%; /* 1:1 aspect ratio */
+  }
+  
+  .aspect-ratio-1-1 > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Responsive Images */
+.responsive-image {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+}
+
+/* High DPI Display Support */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  /* Crisp icons and graphics */
-  .high-dpi-icon {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
+  .retina-border {
+    border-width: 0.5px;
   }
 }
 
-/* Landscape orientation adjustments */
-@media (orientation: landscape) and (max-height: 500px) {
-  /* Compact header for landscape mobile */
-  .landscape-compact {
-    height: 3rem;
-  }
-}
-
-/* Dark mode optimizations */
-@media (prefers-color-scheme: dark) {
-  /* Enhanced dark mode support */
-  .dark-mode-glass {
-    background-color: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* Reduced motion preferences */
+/* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
-  /* Disable animations for accessibility */
-  .reduced-motion * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Print styles */
-@media print {
-  /* Print-friendly adjustments */
-  .print-hidden {
-    display: none !important;
-  }
-
-  .print-page-break {
-    page-break-after: always;
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .auto-dark-mode {
+    color-scheme: dark;
   }
 }
 
-/* Utility classes for responsive design */
-.responsive-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Focus Styles for Keyboard Navigation */
+.focus-visible-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-visible-ring:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive Flexbox Utilities */
+.flex-responsive {
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 768px) {
-  .responsive-container {
-    padding: 0 2rem;
+  .flex-responsive {
+    flex-direction: row;
   }
 }
 
-@media (min-width: 1024px) {
-  .responsive-container {
-    padding: 0 3rem;
+/* Responsive Text Alignment */
+.text-center-mobile {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .text-center-mobile {
+    text-align: left;
   }
 }
 
-/* Flexible grid system */
-.responsive-grid {
+/* Responsive Visibility */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block;
+  }
+}
+
+.show-mobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .show-mobile {
+    display: none;
+  }
+}
+
+.hide-desktop {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+.show-desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .show-desktop {
+    display: block;
+  }
+}
+
+/* Responsive Scrolling */
+.scroll-smooth-mobile {
+  scroll-behavior: smooth;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .scroll-smooth-mobile {
+    scroll-behavior: auto;
+  }
+}
+
+/* Responsive Backdrop Filter Support */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-responsive {
+    backdrop-filter: blur(10px);
+  }
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+  .backdrop-blur-responsive {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Responsive Sticky Positioning */
+.sticky-responsive {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+@media (max-width: 767px) {
+  .sticky-responsive {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Responsive Card Layouts */
+.card-responsive {
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr;
 }
 
-@media (min-width: 768px) {
-  .responsive-grid {
+@media (min-width: 640px) {
+  .card-responsive {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .responsive-grid {
+  .card-responsive {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
   }
 }
 
-/* Responsive text scaling */
-.responsive-text-sm {
+/* Responsive Button Sizing */
+.btn-responsive {
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
 }
 
-.responsive-text-base {
-  font-size: 1rem;
+@media (min-width: 768px) {
+  .btn-responsive {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
 }
 
-.responsive-text-lg {
-  font-size: 1.125rem;
+/* Responsive Form Elements */
+.form-responsive {
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
-  .responsive-text-sm {
-    font-size: 1rem;
-  }
-  
-  .responsive-text-base {
-    font-size: 1.125rem;
-  }
-  
-  .responsive-text-lg {
-    font-size: 1.25rem;
+  .form-responsive {
+    max-width: 400px;
   }
 }
 
-@media (min-width: 1024px) {
-  .responsive-text-sm {
-    font-size: 1.125rem;
-  }
-  
-  .responsive-text-base {
-    font-size: 1.25rem;
-  }
-  
-  .responsive-text-lg {
-    font-size: 1.5rem;
-  }
-}
-
-/* Responsive spacing */
-.responsive-spacing {
+/* Responsive Modal/Dialog */
+.modal-responsive {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 1rem;
 }
 
-@media (min-width: 768px) {
-  .responsive-spacing {
-    padding: 1.5rem;
+@media (max-width: 767px) {
+  .modal-responsive {
+    align-items: flex-end;
+    padding: 0;
+  }
+  
+  .modal-responsive .modal-content {
+    width: 100%;
+    max-height: 90vh;
+    border-radius: 1rem 1rem 0 0;
   }
 }
 
-@media (min-width: 1024px) {
-  .responsive-spacing {
-    padding: 2rem;
+/* Responsive Animation Performance */
+@media (hover: none) and (pointer: coarse) {
+  .animate-on-hover {
+    animation: none !important;
   }
 }
 
-/* Hover states for touch devices */
-@media (hover: hover) and (pointer: fine) {
-  .hover-enabled:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
   }
 }

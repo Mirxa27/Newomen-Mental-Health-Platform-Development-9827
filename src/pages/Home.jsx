@@ -20,25 +20,30 @@ import { useShadowWorkStore } from '../store/shadowWorkStore';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { isAuthenticated, personalityType } = useAuthStore();
-  const { affirmations } = useShadowWorkStore();
+  const { isAuthenticated, user, personalityType } = useAuthStore();
+  const { affirmations, generateAffirmations } = useShadowWorkStore();
   const [dailyAffirmation, setDailyAffirmation] = React.useState('');
 
-  const defaultAffirmations = ['You are worthy of growth and joy.'];
-  const personalityAffirmations = {
-    leader: ['Lead with compassion and courage.', 'Your vision inspires others.'],
-    nurturer: ['Your kindness uplifts those around you.', 'Self-care fuels your giving heart.'],
-    visionary: ['Your ideas shape a brighter future.', 'Creativity flows through you.'],
-  };
+  const defaultAffirmations = [
+    'You are capable of amazing things.',
+    'Your potential is limitless.',
+    'Embrace your journey with an open heart.',
+    'Today is an opportunity for growth.'
+  ];
 
   React.useEffect(() => {
-    let pool = affirmations && affirmations.length > 0 ? affirmations : defaultAffirmations;
-    if (personalityType && personalityAffirmations[personalityType]) {
-      pool = personalityAffirmations[personalityType];
+    // Generate affirmations if the user has a personality type but no affirmations yet
+    if (personalityType && (!affirmations || affirmations.length === 0)) {
+      generateAffirmations(personalityType);
     }
-    const index = Math.floor(Math.random() * pool.length);
-    setDailyAffirmation(pool[index]);
-  }, [affirmations, personalityType]);
+  }, [personalityType, affirmations, generateAffirmations]);
+
+  React.useEffect(() => {
+    // Set a daily affirmation from the available pool
+    const affirmationPool = affirmations && affirmations.length > 0 ? affirmations : defaultAffirmations;
+    const randomIndex = Math.floor(Math.random() * affirmationPool.length);
+    setDailyAffirmation(affirmationPool[randomIndex]);
+  }, [affirmations]);
 
   const features = [
     { 
@@ -138,6 +143,23 @@ const Home = () => {
               </span>
             </motion.h1>
             
+            {isAuthenticated && dailyAffirmation && (
+              <motion.div
+                key={dailyAffirmation} // Animate when affirmation changes
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="my-8"
+              >
+                <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-4">
+                  <p className="text-lg md:text-xl text-white italic">
+                    "{dailyAffirmation}"
+                  </p>
+                  <p className="text-right text-sm text-purple-300 mt-2">- Your Daily Affirmation</p>
+                </div>
+              </motion.div>
+            )}
+
             <motion.p
               variants={itemVariants}
               initial="hidden"
@@ -149,16 +171,6 @@ const Home = () => {
               tailored to your unique cultural background and personal aspirations.
             </motion.p>
 
-            {dailyAffirmation && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="text-lg text-white mt-6"
-              >
-                {dailyAffirmation}
-              </motion.p>
-            )}
             
             <motion.div
               variants={itemVariants}
