@@ -13,8 +13,11 @@ const Home = lazy(() => import('../pages/Home'));
 const About = lazy(() => import('../pages/About'));
 const Login = lazy(() => import('../pages/Login'));
 const Register = lazy(() => import('../pages/Register'));
+const PersonalityTest = lazy(() => import('../pages/PersonalityTest'));
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 const Chat = lazy(() => import('../pages/Chat'));
+const BreathingPractices = lazy(() => import('../pages/BreathingPractices'));
+const NicknameSearch = lazy(() => import('../pages/NicknameSearch'));
 const ShadowWork = lazy(() => import('../pages/ShadowWork'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Subscription = lazy(() => import('../pages/Subscription'));
@@ -59,6 +62,17 @@ const AppRouter = () => {
             <PageLoader><Profile /></PageLoader>
           </ProtectedRoute>
         } />
+        <Route path="breathing" element={
+          <ProtectedRoute>
+            <PageLoader><BreathingPractices /></PageLoader>
+          </ProtectedRoute>
+        } />
+        <Route path="search" element={
+          <ProtectedRoute>
+            <PageLoader><NicknameSearch /></PageLoader>
+          </ProtectedRoute>
+        } />
+        <Route path="personality-test" element={<PageLoader><PersonalityTest /></PageLoader>} />
         <Route path="subscription" element={
           <ProtectedRoute>
             <PageLoader><Subscription /></PageLoader>
@@ -109,8 +123,11 @@ export const routes = [
       { path: 'about', meta: { title: 'About' } },
       { path: 'chat', meta: { title: 'Chat' } },
       { path: 'shadow-work/:questionId?', meta: { title: 'Shadow Work' } },
-      { path: 'profile', meta: { title: 'Profile' } },
-      { path: 'subscription', meta: { title: 'Subscription' } },
+        { path: 'profile', meta: { title: 'Profile' } },
+        { path: 'breathing', meta: { title: 'Breathing Practices' } },
+        { path: 'search', meta: { title: 'Search' } },
+        { path: 'personality-test', meta: { title: 'Personality Test' } },
+        { path: 'subscription', meta: { title: 'Subscription' } },
     ]
   },
   {

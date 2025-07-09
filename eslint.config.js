@@ -34,5 +34,4 @@ export default [
       'react-refresh/only-export-components': 'off',
       'no-unused-vars': 'off',
       'no-case-declarations': 'off',
-    },
-  },];
+    },  },];

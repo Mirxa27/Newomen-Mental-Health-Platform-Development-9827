@@ -10,7 +10,7 @@ const { FiUser, FiHeart, FiTarget, FiStar, FiEdit } = FiIcons;
 
 const Profile = () => {
   const { t } = useTranslation();
-  const { user, subscription } = useAuthStore();
+  const { user, subscription, crystals, shadowProgress, updateProfile } = useAuthStore();
   const { affirmations, actionPlan, insights } = useShadowWorkStore();
 
   return (
@@ -51,6 +51,25 @@ const Profile = () => {
               </div>
               
               <div className="space-y-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <img
+                    src={user?.avatarUrl || '/icons/icon-128x128.png'}
+                    alt="Avatar"
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const url = URL.createObjectURL(file);
+                        updateProfile({ avatarUrl: url });
+                      }
+                    }}
+                    className="text-sm"
+                  />
+                </div>
                 <div>
                   <label className="text-sm text-gray-600">Name</label>
                   <p className="font-medium text-gray-900">{user?.name}</p>
@@ -63,11 +82,15 @@ const Profile = () => {
                   <label className="text-sm text-gray-600">Subscription</label>
                   <p className="font-medium text-gray-900 capitalize">{subscription.tier} Tier</p>
                 </div>
-                <div>
-                  <label className="text-sm text-gray-600">Minutes Remaining</label>
-                  <p className="font-medium text-gray-900">{subscription.minutesRemaining}</p>
+                  <div>
+                    <label className="text-sm text-gray-600">Minutes Remaining</label>
+                    <p className="font-medium text-gray-900">{subscription.minutesRemaining}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-600">Crystals</label>
+                    <p className="font-medium text-gray-900">{crystals}</p>
+                  </div>
                 </div>
-              </div>
             </motion.div>
 
             {/* Daily Affirmations */}
@@ -149,16 +172,25 @@ const Profile = () => {
                   <div className="text-2xl font-bold text-primary-600">7</div>
                   <div className="text-sm text-gray-600">Days Active</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-secondary-600">42</div>
-                  <div className="text-sm text-gray-600">Messages Sent</div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-secondary-600">42</div>
+                    <div className="text-sm text-gray-600">Messages Sent</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-accent-600">3</div>
+                    <div className="text-sm text-gray-600">Insights Gained</div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-accent-600">3</div>
-                  <div className="text-sm text-gray-600">Insights Gained</div>
+                <div className="mt-6">
+                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Shadow Work Progress</span>
+                    <span>{shadowProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-primary-500 to-secondary-500" style={{ width: `${shadowProgress}%` }} />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
             {/* Recent Insights */}
             {insights && (
@@ -185,5 +217,4 @@ const Profile = () => {
     </div>
   );
 };
-
 export default Profile;
