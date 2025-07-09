@@ -25,6 +25,16 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [showRealtimeVoice, setShowRealtimeVoice] = useState(false);
+  useEffect(() => {
+    const index = Math.floor(Math.random() * headlines.length);
+    setHeadline(headlines[index]);
+  }, []);
+  const headlines = [
+    'Share your feelings freely',
+    'Let your journey unfold',
+    'Speak your truth today'
+  ];
+  const [headline, setHeadline] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -184,7 +194,7 @@ const Chat = () => {
               <span className="text-white font-bold text-lg">N</span>
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-white">Newomen AI</h1>
+              <h1 className="text-lg font-semibold text-white">{headline}</h1>
               <p className="text-sm text-gray-400">Your compassionate companion</p>
             </div>
           </div>
@@ -196,8 +206,13 @@ const Chat = () => {
                 {subscription.minutesRemaining} min
               </p>
             </div>
-            <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartRealtimeVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="Start Voice Chat">
-              <FiPhone className="w-5 h-5" />
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStartRealtimeVoice}
+              className="w-full px-4 py-2 bg-primary-500 hover:bg-primary-600 rounded-full text-white font-medium transition-colors"
+              title="Start Voice Chat"
+            >
+              <FiPhone className="w-5 h-5 mr-2 inline" /> Start Call
             </motion.button>
             <motion.button whileTap={{ scale: 0.9 }} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
               <FiMoreHorizontal className="w-5 h-5" />
