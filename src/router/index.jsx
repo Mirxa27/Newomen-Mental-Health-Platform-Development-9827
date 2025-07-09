@@ -28,6 +28,8 @@ const NewMe = lazy(() => import('../pages/NewMe'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Onboarding = lazy(() => import('../pages/Onboarding'));
 import GamificationDashboard from '../components/dashboard/GamificationDashboard';
+import Community from '../pages/Community';
+import AIAdminPanel from '../components/admin/AIAdminPanel';
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/Admin'));
@@ -342,6 +344,7 @@ const AppRouter = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/profile/growth" element={<ProtectedRoute><GamificationDashboard /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
         </Route>
 
         {/* Auth layout routes */}
@@ -384,6 +387,7 @@ const AppRouter = () => {
             );
           })}
         </Route>
+        <Route path="/admin/ai-configuration" element={<ProtectedRoute adminOnly={true}><AIAdminPanel /></ProtectedRoute>} />
 
         {/* Legacy route redirects */}
         <Route path="/login" element={<Navigate to="/auth/login" replace />} />
