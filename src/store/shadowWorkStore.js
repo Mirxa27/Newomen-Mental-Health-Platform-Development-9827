@@ -101,10 +101,15 @@ export const useShadowWorkStore = create(
         }));
       },
       
-      completeAssessment: () => {
-        set({ isCompleted: true });
-        // This would typically trigger AI analysis
-        get().generateInsights();
+       completeAssessment: () => {
+         set({ isCompleted: true });
+         // This would typically trigger AI analysis
+         get().generateInsights();
+         // Reward user with crystals for completion
+        import('../store/authStore').then(({ useAuthStore }) => {
+          useAuthStore.getState().addCrystals(10);
+          useAuthStore.getState().updateProgress(100);
+        });
       },
       
       generateInsights: async () => {

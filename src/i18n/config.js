@@ -45,7 +45,7 @@ const resources = {
       
       // Shadow Work
       shadowWorkTitle: "Shadow Work Journey",
-      shadowWorkSubtitle: "Explore the hidden aspects of your psyche",
+        shadowWorkSubtitle: "Explore your inner depths and transform old patterns",
       question: "Question",
       of: "of",
       
@@ -135,7 +135,7 @@ const resources = {
       
       // Shadow Work
       shadowWorkTitle: "رحلة عمل الظل",
-      shadowWorkSubtitle: "استكشفي الجوانب المخفية من نفسيتك",
+        shadowWorkSubtitle: "استكشفي أعماقك وحولي الأنماط القديمة",
       question: "السؤال",
       of: "من",
       
@@ -200,5 +200,4 @@ i18n
       caches: ['localStorage'],
     },
   });
-
 export default i18n;
