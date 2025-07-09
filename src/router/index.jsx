@@ -20,6 +20,7 @@ const Chat = lazy(() => import('../pages/Chat'));
 const BreathingPractices = lazy(() => import('../pages/BreathingPractices'));
 const NicknameSearch = lazy(() => import('../pages/NicknameSearch'));
 const ShadowWork = lazy(() => import('../pages/ShadowWork'));
+const ConnectionJourney = lazy(() => import('../pages/ConnectionJourney'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Subscription = lazy(() => import('../pages/Subscription'));
 const Settings = lazy(() => import('../pages/Settings'));
@@ -324,6 +325,8 @@ const AppRouter = () => {
             <Route key={index} path={route.path} element={element} />
           );
         })}
+        <Route path="/connection-journey" element={<ProtectedRoute><ConnectionJourney /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       </Route>
 
       {/* Auth layout routes */}
@@ -370,10 +373,10 @@ const AppRouter = () => {
       {/* Legacy route redirects */}
       <Route path="/login" element={<Navigate to="/auth/login" replace />} />
       <Route path="/register" element={<Navigate to="/auth/register" replace />} />
-      
+
       {/* 404 route */}
       <Route path="*" element={
-        <PageLoader 
+        <PageLoader
           title="Page Not Found"
           description="The page you're looking for doesn't exist."
           keywords="404, not found, error"
@@ -388,7 +391,7 @@ const AppRouter = () => {
 // Generate static route definitions for metadata (used by MainLayout)
 export const routes = (() => {
   const { mainRoutes, authRoutes, adminRoutes } = createDynamicRoutes();
-  
+
   return [
     {
       path: '/',

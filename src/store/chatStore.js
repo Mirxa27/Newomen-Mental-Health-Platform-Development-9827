@@ -1,12 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import {
-  createConversation,
-  getConversations,
-  getConversation,
-  postMessage,
-} from '../services/chat';
-import { getOpenAICompletion } from '../services/openaiService';
+import api from '../utils/api'; // Ensure you have this api utility for authenticated requests
 
 export const useChatStore = create(
   persist(
@@ -15,150 +9,120 @@ export const useChatStore = create(
       currentConversation: null,
       isLoading: false,
       isTyping: false,
-      isListening: false,
-      isSpeaking: false,
-      emotionState: 'neutral',
 
-      addMessage: (message) => {
-        set((state) => {
-          const conversations = [...state.conversations];
-          const currentIndex = conversations.findIndex(
-            (c) => c.id === state.currentConversation?.id
-          );
-          if (currentIndex >= 0) {
-            conversations[currentIndex] = {
-              ...conversations[currentIndex],
-              messages: [
-                ...conversations[currentIndex].messages,
-                message,
-              ],
-              updatedAt: new Date().toISOString(),
-            };
-          }
-          return {
-            conversations,
-            currentConversation:
-              conversations[currentIndex] || state.currentConversation,
-          };
-        });
-      },
-
-      createConversation: (title = 'New Conversation') => {
-        const newConversation = {
-          id: Date.now().toString(),
-          title,
-          messages: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          emotionContext: {},
-        };
-        set((state) => ({
-          conversations: [newConversation, ...state.conversations],
-          currentConversation: newConversation,
-        }));
-        return newConversation;
-      },
-
-      selectConversation: (conversationId) => {
-        set((state) => ({
-          currentConversation:
-            state.conversations.find((c) => c.id === conversationId) || null,
-        }));
-      },
-
-      deleteConversation: (conversationId) => {
-        set((state) => ({
-          conversations: state.conversations.filter(
-            (c) => c.id !== conversationId
-          ),
-          currentConversation:
-            state.currentConversation?.id === conversationId
-              ? null
-              : state.currentConversation,
-        }));
-      },
-
-      setLoading: (loading) => set({ isLoading: loading }),
-      setTyping: (typing) => set({ isTyping: typing }),
-      setListening: (listening) => set({ isListening: listening }),
-      setSpeaking: (speaking) => set({ isSpeaking: speaking }),
-      setEmotionState: (emotion) => set({ emotionState: emotion }),
-
-      updateConversationEmotion: (emotion, intensity) => {
-        set((state) => {
-          if (!state.currentConversation) return state;
-          const conversations = [...state.conversations];
-          const currentIndex = conversations.findIndex(
-            (c) => c.id === state.currentConversation.id
-          );
-          if (currentIndex >= 0) {
-            conversations[currentIndex] = {
-              ...conversations[currentIndex],
-              emotionContext: {
-                ...conversations[currentIndex].emotionContext,
-                [emotion]: intensity,
-                lastUpdated: new Date().toISOString(),
-              },
-            };
-          }
-          return {
-            conversations,
-            currentConversation:
-              conversations[currentIndex] || state.currentConversation,
-          };
-        });
-      },
-
-      // Append incoming AI stream chunk to a message
-      updateLastMessageContent: (conversationId, messageId, chunk) => {
-        set((state) => {
-          const conversations = [...state.conversations];
-          const convIndex = conversations.findIndex(c => c.id === conversationId);
-          if (convIndex < 0) return state;
-          const conv = { ...conversations[convIndex] };
-          const msgIndex = conv.messages.findIndex(m => m.id === messageId);
-          if (msgIndex < 0) return state;
-          const messages = [...conv.messages];
-          messages[msgIndex] = {
-            ...messages[msgIndex],
-            content: messages[msgIndex].content + chunk,
-          };
-          conv.messages = messages;
-          conversations[convIndex] = conv;
-          const currentConversation = state.currentConversation?.id === conversationId ? conv : state.currentConversation;
-          return { conversations, currentConversation };
-        });
-      },
-
-      sendMessage: async (conversationId, text) => {
-        set({ loading: true, error: null });
+      // Fetches all conversations for the user
+      fetchConversations: async () => {
+        set({ isLoading: true });
         try {
-          const fullMessage = { role: 'user', content: text };
-          // Optimistic update
-          set((state) => ({
-            conversations: state.conversations.map((c) =>
-              c.id === conversationId ? { ...c, messages: [...c.messages, fullMessage] } : c
-            ),
-          }));
-
-          await postMessage(conversationId, text);
-          const currentConversation = get().conversations.find(c => c.id === conversationId);
-          const aiResponse = await getOpenAICompletion(currentConversation.messages);
-
-          const aiMessage = { role: 'assistant', content: aiResponse };
-          await postMessage(conversationId, aiResponse, 'assistant');
-
-          set((state) => ({
-            conversations: state.conversations.map((c) =>
-              c.id === conversationId ? { ...c, messages: [...c.messages, aiMessage] } : c
-            ),
-            loading: false,
-          }));
+          const response = await api.get('/chat/conversations');
+          set({ conversations: response.data, isLoading: false });
         } catch (error) {
-          set({ error: 'Failed to send message', loading: false });
+          console.error('Failed to fetch conversations:', error);
+          set({ isLoading: false });
         }
       },
+
+      // Selects a conversation and fetches its full message history
+      selectConversation: async (conversationId) => {
+        if (!conversationId) {
+          set({ currentConversation: null });
+          return;
+        }
+
+        set({ isLoading: true });
+        try {
+          const response = await api.get(`/chat/conversations/${conversationId}`);
+          set({ currentConversation: response.data, isLoading: false });
+        } catch (error) {
+          console.error('Failed to fetch conversation details:', error);
+          set({ isLoading: false });
+        }
+      },
+
+      // Creates a new conversation
+      createConversation: async (title, firstMessage) => {
+        set({ isLoading: true });
+        try {
+          const response = await api.post('/chat/conversations', { title, firstMessage });
+          const newConversation = response.data;
+
+          set((state) => ({
+            conversations: [newConversation, ...state.conversations],
+            currentConversation: newConversation,
+            isLoading: false,
+          }));
+          return newConversation;
+        } catch (error) {
+          console.error('Failed to create conversation:', error);
+          set({ isLoading: false });
+        }
+      },
+
+      // Sends a message and gets the AI response
+      sendMessage: async (conversationId, content) => {
+        if (!conversationId) {
+          console.error('No conversation selected');
+          return;
+        }
+
+        set({ isTyping: true });
+
+        // Optimistic update for user's message
+        const userMessage = {
+          id: `temp-${Date.now()}`,
+          role: 'user',
+          content,
+          timestamp: new Date().toISOString()
+        };
+
+        set(state => ({
+          currentConversation: {
+            ...state.currentConversation,
+            messages: [...state.currentConversation.messages, userMessage]
+          }
+        }));
+
+        try {
+          const response = await api.post(`/chat/conversations/${conversationId}/messages`, { content });
+          const aiMessage = response.data;
+
+          // Replace temp user message and add AI response
+          set(state => ({
+            isTyping: false,
+            currentConversation: {
+              ...state.currentConversation,
+              messages: [
+                ...state.currentConversation.messages.filter(m => m.id !== userMessage.id),
+                // The backend should ideally return the saved user message, but we'll re-add for now
+                { ...userMessage, id: `confirmed-${userMessage.id}` },
+                aiMessage
+              ]
+            }
+          }));
+
+        } catch (error) {
+          console.error('Failed to send message:', error);
+          set({ isTyping: false });
+          // Optionally revert optimistic update on error
+        }
+      },
+
+      // Deletes a conversation
+      deleteConversation: async (conversationId) => {
+        try {
+          await api.delete(`/chat/conversations/${conversationId}`);
+          set(state => ({
+            conversations: state.conversations.filter(c => c.id !== conversationId),
+            currentConversation: state.currentConversation?.id === conversationId ? null : state.currentConversation
+          }));
+        } catch (error) {
+          console.error('Failed to delete conversation', error);
+        }
+      }
     }),
-    { name: 'newomen-chat' }
+    {
+      name: 'newomen-chat-storage',
+      // partialize: (state) => ({ conversations: state.conversations })
+    }
   )
 );
