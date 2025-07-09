@@ -52,6 +52,11 @@ export const sendMessage = async (message, conversationId = null) => {
   });
 };
 
+// Post a message (alias for sendMessage)
+export const postMessage = async (message, conversationId = null) => {
+  return sendMessage(message, conversationId);
+};
+
 // Add a message to a conversation
 export const addMessage = async (conversationId, content, role = 'user') => {
   return makeAuthenticatedRequest(`/chat/conversations/${conversationId}/messages`, {

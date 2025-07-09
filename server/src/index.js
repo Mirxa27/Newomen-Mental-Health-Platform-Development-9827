@@ -11,9 +11,13 @@ import shadowWorkRouter from './routes/shadowwork.js';
 import adminRouter from './routes/admin.js';
 import aiProvidersRouter from './routes/aiProviders.js';
 import voiceChatRouter from './routes/voiceChat.js';
+import paymentsRouter from './routes/payments.js';
+import myFatoorahRouter from './routes/myFatoorah.js';
+import webrtcRouter, { initializeWebRTCSignaling } from './routes/webrtc.js';
 import paypalRouter from './routes/paypal.js';
 import livekitRouter from './routes/livekit.js';
 import agentRouter from './routes/agent.js';
+import socketService from './services/socketService.js';
 import initSocket from './services/socketService.js';
 import {
   generalLimiter,
@@ -64,6 +68,9 @@ app.use('/api/shadow-work', shadowWorkRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/ai-providers', aiProvidersRouter);
 app.use('/api/voice', voiceChatRouter);
+app.use('/api/webrtc', webrtcRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/myfatoorah', myFatoorahRouter);
 app.use('/api/paypal', paypalRouter);
 app.use('/api/livekit', livekitRouter);
 app.use('/api/agent', agentRouter);
@@ -71,4 +78,18 @@ app.use('/api/agent', agentRouter);
 // Error handling middleware (must be last)
 app.use(sanitizeErrors);
 
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Initialize Socket.IO
+socketService.initialize(server);
+
+// Initialize WebRTC Signaling
+initializeWebRTCSignaling(server);
+
+// Start periodic cleanup of inactive sessions
+setInterval(() => {
+  socketService.cleanupInactiveSessions();
+}, 15 * 60 * 1000); // Every 15 minutes
+
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Socket.IO enabled for real-time features`);
+});
