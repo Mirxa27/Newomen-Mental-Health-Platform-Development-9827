@@ -1,3 +1,4 @@
+/* App-specific styles - consolidated to remove duplicates */
 .app {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -11,22 +12,7 @@
   direction: ltr;
 }
 
-.glass-effect {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
+/* Chat-specific animations */
 .chat-bubble {
   animation: slideIn 0.3s ease-out;
 }
@@ -60,6 +46,7 @@
   30% { opacity: 0.4; }
 }
 
+/* Progress ring styles */
 .progress-ring {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
@@ -71,6 +58,7 @@
   transition: stroke-dashoffset 0.5s ease-in-out;
 }
 
+/* Floating action button */
 .floating-action {
   position: fixed;
   bottom: 2rem;
@@ -78,12 +66,7 @@
   z-index: 1000;
 }
 
-.shadow-work-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
+/* Language-specific fonts */
 .arabic-font {
   font-family: 'Noto Sans Arabic', Arial, sans-serif;
 }

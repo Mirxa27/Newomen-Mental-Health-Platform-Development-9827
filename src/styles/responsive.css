@@ -1,0 +1,223 @@
+/* Mobile-first responsive design enhancements */
+
+/* Base mobile styles */
+@media (max-width: 767px) {
+  /* Ensure safe area handling */
+  .mobile-safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Mobile navigation spacing */
+  .mobile-nav-spacing {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+
+  /* Hide elements on mobile */
+  .mobile-hidden {
+    display: none;
+  }
+
+  /* Mobile-optimized text sizes */
+  .mobile-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Touch-friendly sizing */
+  .mobile-touch {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mobile glassmorphism adjustments */
+  .mobile-glass {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet-specific adjustments */
+  .tablet-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tablet-sidebar {
+    width: 16rem;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  /* Desktop-specific enhancements */
+  .desktop-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .desktop-sidebar {
+    width: 18rem;
+  }
+
+  /* Desktop glassmorphism */
+  .desktop-glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* High-DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Crisp icons and graphics */
+  .high-dpi-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Compact header for landscape mobile */
+  .landscape-compact {
+    height: 3rem;
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  /* Enhanced dark mode support */
+  .dark-mode-glass {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable animations for accessibility */
+  .reduced-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  /* Print-friendly adjustments */
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+  }
+}
+
+/* Utility classes for responsive design */
+.responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .responsive-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding: 0 3rem;
+  }
+}
+
+/* Flexible grid system */
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Responsive text scaling */
+.responsive-text-sm {
+  font-size: 0.875rem;
+}
+
+.responsive-text-base {
+  font-size: 1rem;
+}
+
+.responsive-text-lg {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  .responsive-text-sm {
+    font-size: 1rem;
+  }
+  
+  .responsive-text-base {
+    font-size: 1.125rem;
+  }
+  
+  .responsive-text-lg {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text-sm {
+    font-size: 1.125rem;
+  }
+  
+  .responsive-text-base {
+    font-size: 1.25rem;
+  }
+  
+  .responsive-text-lg {
+    font-size: 1.5rem;
+  }
+}
+
+/* Responsive spacing */
+.responsive-spacing {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .responsive-spacing {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-spacing {
+    padding: 2rem;
+  }
+}
+
+/* Hover states for touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .hover-enabled:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+}

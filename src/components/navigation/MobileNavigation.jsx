@@ -1,202 +1,560 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { 
   FiHome, 
-  FiSearch,
-  FiPlus,
+  FiMessageCircle, 
   FiUser, 
+  FiHeart, 
+  FiWind,
+  FiInfo,
+  FiCheckSquare,
+  FiSearch,
   FiCreditCard,
-  FiMenu,
-  FiX
+  FiZap,
 } from 'react-icons/fi';
+import { FiHelpCircle } from 'react-icons/fi';
 import { useAuthStore } from '../../store/authStore';
+import { useChatStore } from '../../store/chatStore';
 
 const MobileNavigation = () => {
+  const { t } = useTranslation();
   const location = useLocation();
-  const { user } = useAuthStore();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+  const { isAuthenticated } = useAuthStore();
+  const { conversations } = useChatStore();
+  const [aiButtonAnimating, setAiButtonAnimating] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  // Track scroll position for parallax effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Main navigation items for the mobile footer - modified selection for better UX
   const navItems = [
-    { path: '/', icon: FiHome, label: 'Home' },
-    { path: '/search', icon: FiSearch, label: 'Search' },
-    { path: '/add', icon: FiPlus, label: 'Add' },
-    { path: '/profile', icon: FiUser, label: 'Profile' },
+    { 
+      id: 'home', 
+      label: t('home'), 
+      path: '/', 
+      icon: FiHome,
+      gradient: 'from-blue-400 to-cyan-400'
+    },
+    { 
+      id: 'chat', 
+      label: t('chat'), 
+      path: '/chat', 
+      icon: FiMessageCircle, 
+      requiresAuth: true, 
+      badge: conversations?.length || 0,
+      gradient: 'from-indigo-400 to-blue-500'
+    },
+    // AI button will be in the center
+    { 
+      id: 'shadowWork',
+      label: t('shadowWork'), 
+      path: '/shadow-work/1', 
+      icon: FiHeart, 
+      requiresAuth: true,
+      gradient: 'from-pink-400 to-rose-400'
+    },
+    { 
+      id: 'breathing', 
+      label: t('breathing'), 
+      path: '/breathing', 
+      icon: FiWind, 
+      requiresAuth: true,
+      gradient: 'from-purple-400 to-indigo-400'
+    },
+  ];
+  
+  // Secondary navigation items
+  const secondaryNavItems = [
+    { 
+      id: 'personalityTest', 
+      label: t('personalityTest'),
+      path: '/personality-test',
+      icon: FiHelpCircle,
+      gradient: 'from-amber-400 to-orange-400' 
+    },
+    { 
+      id: 'about', 
+      label: t('about'), 
+      path: '/about', 
+      icon: FiInfo,
+      gradient: 'from-emerald-400 to-teal-500'
+    },
+    { 
+      id: 'search', 
+      label: t('search'), 
+      path: '/search', 
+      icon: FiSearch, 
+      requiresAuth: true,
+      gradient: 'from-sky-400 to-blue-500'
+    },
+    { 
+      id: 'subscription', 
+      label: t('subscription'), 
+      path: '/subscription', 
+      icon: FiCreditCard, 
+      requiresAuth: true,
+      gradient: 'from-violet-400 to-purple-500'
+    },
+    { 
+      id: 'profile', 
+      label: t('profile'), 
+      path: '/profile', 
+      icon: FiUser, 
+      requiresAuth: true,
+      gradient: 'from-cyan-400 to-blue-500'
+    },
   ];
 
-  const menuItems = [
-    { path: '/subscription', icon: FiCreditCard, label: 'Subscription' },
-  ];
+  const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
+  
+  const filteredNavItems = navItems.filter(item => !item.requiresAuth || isAuthenticated);
+  const filteredSecondaryNavItems = secondaryNavItems.filter(item => !item.requiresAuth || isAuthenticated);
 
-  // Conditionally add admin link
-  if (user?.role === 'admin') {
-    menuItems.push({ path: '/admin', icon: FiUser, label: 'Admin' });
+  // Trigger AI button animation
+  const handleAiButtonClick = () => {
+    setAiButtonAnimating(true);
+    setTimeout(() => {
+      setAiButtonAnimating(false);
+      setShowSecondaryMenu(!showSecondaryMenu);
+    }, 800);
+  };
+
+  // Don't render on auth or admin pages
+  if (location.pathname.startsWith('/auth') || location.pathname.startsWith('/admin')) {
+    return null;
   }
 
   return (
     <>
-      {/* Main Glassmorphic Mobile Navigation */}
-      <motion.nav 
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 30, delay: 0.2 }}
-        // Hides the navigation on non-mobile screens and ensures safe area padding
-        className="md:hidden fixed left-0 right-0 z-50 flex justify-center pointer-events-auto"
-        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
+      {/* Liquid Glassmorphic Mobile Navigation */}
+      <motion.div
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4"
+        style={{ 
+          paddingBottom: 'max(env(safe-area-inset-bottom), 1rem)',
+          transform: `translateY(${scrollPosition * 0.02}px)`
+        }}
       >
-        {/* Pill-shaped container with glassmorphic effect */}
-        <div
-          className="flex items-center justify-around gap-1 bg-black/30 backdrop-blur-xl border border-white/10 rounded-full shadow-lg w-[95vw] max-w-sm mx-auto"
-          // Adds padding to respect the iPhone home bar/notch area
-          style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))', paddingTop: '0.5rem' }}
-        >
-          {/* Main Navigation Items */}
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              // Use react-router's `isActive` for cleaner state checking
-              className={({ isActive }) => `
-                group relative flex-1 flex flex-col items-center justify-center p-2 rounded-full 
-                transition-colors duration-300
-                ${isActive ? '' : 'hover:bg-white/10'}
-              `}
-            >
-              {({ isActive }) => (
-                <>
-                  <div className="relative">
-                    <item.icon 
-                      className={`relative z-10 w-6 h-6 transition-colors duration-300 ${
-                        isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                      }`}
-                    />
-                    {/* Animated highlight for the active tab */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeMobileTab"
-                        className="absolute inset-[-8px] rounded-full bg-primary-500/40"
-                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                      />
-                    )}
-                  </div>
-                  <span className={`text-[10px] mt-1 font-medium transition-colors duration-300 ${
-                    isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                  }`}>
-                    {item.label}
-                  </span>
-                </>
-              )}
-            </NavLink>
-          ))}
-          
-          {/* "More" Menu Button */}
-          <div className="self-stretch border-l border-white/10 mx-1" />
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsMenuOpen(true)}
-            className="group flex-1 max-w-[64px] flex flex-col items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors duration-300"
-          >
-            <FiMenu className="w-6 h-6 text-gray-300 group-hover:text-white transition-colors duration-300" />
-            <span className="text-[10px] mt-1 font-medium text-gray-300 group-hover:text-white transition-colors duration-300">More</span>
-          </motion.button>
-        </div>
-      </motion.nav>
-
-      {/* Fullscreen Glassmorphic "More" Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <>
-            {/* Overlay */}
+        {/* Secondary Menu (More Options) */}
+        <AnimatePresence>
+          {showSecondaryMenu && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
-            />
-            
-            {/* Menu Content */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 50 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 50 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed inset-x-4 bottom-[110px] z-[70] p-6 rounded-3xl overflow-hidden
-                         bg-gray-800/50 backdrop-blur-2xl border border-white/10 shadow-2xl"
-              style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="absolute bottom-full mb-6 left-4 right-4"
+              style={{
+                filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.25))'
+              }}
             >
-              {/* Decorative Liquid Blobs */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/30 rounded-full filter blur-3xl animate-liquid-blob" />
-              <div className="absolute -bottom-20 -left-20 w-32 h-32 bg-secondary-500/30 rounded-full filter blur-3xl animate-liquid-blob animation-delay-2000" />
-
-              <div className="relative z-10">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold text-white">Menu</h3>
-                  <motion.button
-                    whileTap={{ scale: 0.9, rotate: 90 }}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-300"
-                  >
-                    <FiX className="w-5 h-5 text-white" />
-                  </motion.button>
-                </div>
+              <div className="relative liquid-nav p-4 mb-2">
+                {/* Liquid blob decorations */}
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/20 rounded-full filter blur-xl animate-liquid-blob"></div>
+                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-blue-500/20 rounded-full filter blur-xl animate-liquid-blob animation-delay-4000"></div>
                 
-                <div className="space-y-2">
-                  {menuItems.map((item, index) => (
-                    <motion.div
-                      key={item.path}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 + 0.1 }}
+                {/* Secondary menu grid */}
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-3 relative z-10">
+                  {filteredSecondaryNavItems.map((item) => (
+                    <NavLink
+                      key={item.id}
+                      to={item.path}
+                      onClick={() => setShowSecondaryMenu(false)}
+                      className={({ isActive }) =>
+                        `relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 overflow-hidden group`
+                      }
                     >
-                      <NavLink
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center p-3 rounded-xl hover:bg-white/10 transition-colors duration-300 group"
-                      >
-                        <div className="p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-300">
-                          <item.icon className="w-5 h-5 text-primary-400" />
-                        </div>
-                        <span className="ml-4 font-medium text-gray-200">{item.label}</span>
-                      </NavLink>
-                    </motion.div>
+                      {({ isActive }) => (
+                        <>
+                          {/* Background gradient effect */}
+                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 ${isActive ? 'opacity-20' : ''} transition-opacity duration-300`}></div>
+                          
+                          {/* Icon container with gradient border */}
+                          <motion.div
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`p-3 rounded-xl relative ${
+                              isActive ? 'bg-white/20 shadow-inner' : ''
+                            } ${isActive ? 'border-2 border-white/20' : 'border border-white/10'}`}
+                          >
+                            {isActive && (
+                              <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-20 rounded-xl`}></div>
+                            )}
+                            <item.icon 
+                              className={`w-5 h-5 ${
+                                isActive ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+                              }`} 
+                            />
+                          </motion.div>
+                          
+                          {/* Label */}
+                          <span className="text-xs mt-2 font-medium text-white/80 group-hover:text-white">
+                            {item.label}
+                          </span>
+                        </>
+                      )}
+                    </NavLink>
                   ))}
                 </div>
               </div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-      
-      {/* 
-        Self-contained styles for portability. 
-        These define the custom animations for the liquid glassmorphic effect.
-        (Requires a CSS-in-JS solution like styled-jsx or Emotion, or add to global CSS)
-      */}
-      <style jsx global>{`
-        @keyframes liquid-blob-animation {
-          0% { transform: scale(1) translate(0px, 0px); }
-          33% { transform: scale(1.1) translate(20px, -30px); }
-          66% { transform: scale(0.9) translate(-20px, 20px); }
-          100% { transform: scale(1) translate(0px, 0px); }
-        }
-        .animate-liquid-blob {
-          animation: liquid-blob-animation 15s infinite ease-in-out;
-        }
-        .animation-delay-2000 {
-          animation-delay: -7s; /* Use negative delay to start at a different point */
-        }
-        /* Define primary/secondary colors if not in Tailwind config */
-        :root {
-          --primary-400: #60a5fa; /* Example: blue-400 */
-          --primary-500: #3b82f6; /* Example: blue-500 */
-          --secondary-500: #ec4899; /* Example: pink-500 */
-        }
-        .bg-primary-500\\/40 { background-color: rgba(59, 130, 246, 0.4); }
-        .bg-primary-500\\/30 { background-color: rgba(59, 130, 246, 0.3); }
-        .bg-secondary-500\\/30 { background-color: rgba(236, 72, 153, 0.3); }
-        .text-primary-400 { color: var(--primary-400); }
-      `}</style>
+          )}
+        </AnimatePresence>
+        
+        {/* Floating Navigation Bar */}
+        <div className="relative mb-2">
+          {/* Liquid blobs outside nav bar */}
+          <motion.div 
+            className="absolute -top-16 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full filter blur-2xl"
+            animate={{ 
+              x: [0, 10, -10, 0],
+              y: [0, -10, 10, 0],
+              scale: [1, 1.05, 0.95, 1]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "reverse" 
+            }}
+          />
+          <motion.div 
+            className="absolute -bottom-8 right-1/4 w-24 h-24 bg-blue-500/10 rounded-full filter blur-2xl"
+            animate={{ 
+              x: [0, -10, 10, 0],
+              y: [0, 10, -10, 0],
+              scale: [1, 0.95, 1.05, 1]
+            }}
+            transition={{ 
+              duration: 7,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: 1 
+            }}
+          />
+          
+          {/* Main navigation bar with glassmorphic effect */}
+          <motion.div 
+            className="liquid-nav-floating"
+            whileHover={{
+              scale: 1.01,
+              transition: { duration: 0.3 }
+            }}
+          >
+            <div className="relative flex items-center justify-between px-4 py-2">
+              {/* Left items */}
+              <div className="flex flex-1 justify-around">
+                {filteredNavItems.slice(0, 2).map((item) => (
+                  <NavLink
+                    key={item.id}
+                    to={item.path}
+                    className={({ isActive }) => `group`}
+                  >
+                    {({ isActive }) => (
+                      <div className="flex flex-col items-center py-2 px-3">
+                        {/* Icon Container */}
+                        <motion.div
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          whileTap={{ scale: 0.9 }}
+                          className={`relative p-3 rounded-xl transition-all duration-300 overflow-hidden
+                            ${isActive ? 'shadow-lg' : ''}
+                          `}
+                        >
+                          {/* Active/hover gradient background */}
+                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 
+                            group-hover:opacity-20 ${isActive ? 'opacity-30' : ''} transition-opacity duration-300 rounded-xl`}
+                          />
+                          
+                          {/* Border effect */}
+                          <div className={`absolute inset-0 rounded-xl ${isActive ? 'border-2 border-white/20' : 'border border-white/5'}`}/>
+                          
+                          <item.icon 
+                            className={`relative z-10 w-6 h-6 ${
+                              isActive ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+                            }`} 
+                          />
+                          
+                          {/* Badge */}
+                          {item.badge > 0 && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-gray-900/80"
+                            >
+                              {item.badge > 9 ? '9+' : item.badge}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                        
+                        {/* Label */}
+                        <motion.span 
+                          className={`text-xs mt-1 font-medium ${
+                            isActive ? 'text-white' : 'text-white/60 group-hover:text-white/90'
+                          }`}
+                          animate={{ 
+                            scale: isActive ? 1.05 : 1
+                          }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      </div>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+              
+              {/* Center AI button */}
+              <div className="relative -mt-8">
+                <motion.button
+                  onClick={handleAiButtonClick}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  animate={aiButtonAnimating ? {
+                    rotate: [0, 15, -15, 15, -15, 0],
+                    scale: [1, 1.2, 1.2, 1.2, 1.2, 1],
+                  } : {}}
+                  transition={aiButtonAnimating ? {
+                    duration: 0.8,
+                    ease: "easeInOut",
+                  } : {}}
+                  className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 ai-button-glow ai-pulse"
+                >
+                  {/* Animated robot/AI face */}
+                  <div className="relative w-full h-full p-3">
+                    {/* AI Brain or Robot Face */}
+                    {aiButtonAnimating ? (
+                      // Animated AI face during activation
+                      <motion.div className="w-full h-full relative">
+                        {/* Animated pulses */}
+                        <motion.div
+                          className="absolute inset-0 rounded-full bg-white/30"
+                          initial={{ scale: 0, opacity: 0.8 }}
+                          animate={{ scale: 2, opacity: 0 }}
+                          transition={{ duration: 1, repeat: 1 }}
+                        />
+                        <motion.div
+                          className="absolute inset-0 rounded-full bg-white/20"
+                          initial={{ scale: 0, opacity: 0.6 }}
+                          animate={{ scale: 1.5, opacity: 0 }}
+                          transition={{ duration: 1, delay: 0.2, repeat: 1 }}
+                        />
+                        
+                        {/* AI face animating */}
+                        <svg viewBox="0 0 24 24" className="w-full h-full">
+                          <motion.path
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            d="M 6,12 C 6,8 8,5 12,5 C 16,5 18,8 18,12"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: 1 }}
+                            transition={{ duration: 0.4 }}
+                          />
+                          <motion.circle
+                            cx="8"
+                            cy="10"
+                            r="1.5"
+                            fill="white"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.2, 1] }}
+                            transition={{ duration: 0.4, delay: 0.3 }}
+                          />
+                          <motion.circle
+                            cx="16"
+                            cy="10"
+                            r="1.5"
+                            fill="white"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.2, 1] }}
+                            transition={{ duration: 0.4, delay: 0.3 }}
+                          />
+                          <motion.path
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            d="M 9,16 C 10,17 14,17 15,16"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: 1 }}
+                            transition={{ duration: 0.3, delay: 0.6 }}
+                          />
+                        </svg>
+                      </motion.div>
+                    ) : (
+                      // Default AI icon
+                      <motion.div
+                        className="w-full h-full flex items-center justify-center"
+                        animate={{
+                          scale: [1, 1.05, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                        }}
+                      >
+                        <FiZap className="w-8 h-8 text-white" />
+                      </motion.div>
+                    )}
+                  </div>
+                  
+                  {/* Animated glow effect */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-white/20"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      opacity: [0.2, 0.4, 0.2]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  />
+                </motion.button>
+                
+                {/* Label under AI button */}
+                <motion.span 
+                  className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-white/90 whitespace-nowrap"
+                  animate={{
+                    opacity: [0.8, 1, 0.8]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
+                >
+                  {showSecondaryMenu ? t('close') : "AI"}
+                </motion.span>
+              </div>
+              
+              {/* Right items */}
+              <div className="flex flex-1 justify-around">
+                {filteredNavItems.slice(2).map((item) => (
+                  <NavLink
+                    key={item.id}
+                    to={item.path}
+                    className={({ isActive }) => `group`}
+                  >
+                    {({ isActive }) => (
+                      <div className="flex flex-col items-center py-2 px-3">
+                        {/* Icon Container */}
+                        <motion.div
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          whileTap={{ scale: 0.9 }}
+                          className={`relative p-3 rounded-xl transition-all duration-300 overflow-hidden
+                            ${isActive ? 'shadow-lg' : ''}
+                          `}
+                        >
+                          {/* Active/hover gradient background */}
+                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 
+                            group-hover:opacity-20 ${isActive ? 'opacity-30' : ''} transition-opacity duration-300 rounded-xl`}
+                          />
+                          
+                          {/* Border effect */}
+                          <div className={`absolute inset-0 rounded-xl ${isActive ? 'border-2 border-white/20' : 'border border-white/5'}`}/>
+                          
+                          <item.icon 
+                            className={`relative z-10 w-6 h-6 ${
+                              isActive ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+                            }`} 
+                          />
+                          
+                          {/* Badge */}
+                          {item.badge > 0 && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-gray-900/80"
+                            >
+                              {item.badge > 9 ? '9+' : item.badge}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                        
+                        {/* Label */}
+                        <motion.span 
+                          className={`text-xs mt-1 font-medium ${
+                            isActive ? 'text-white' : 'text-white/60 group-hover:text-white/90'
+                          }`}
+                          animate={{ 
+                            scale: isActive ? 1.05 : 1
+                          }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      </div>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+            
+            {/* Animated light reflections */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+              <motion.div
+                className="absolute -top-2 left-1/4 w-32 h-2 bg-white/20 blur-md rounded-full"
+                animate={{
+                  left: ["0%", "75%", "0%"]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+              <motion.div
+                className="absolute -bottom-2 right-1/4 w-24 h-2 bg-white/10 blur-md rounded-full"
+                animate={{
+                  right: ["0%", "70%", "0%"]
+                }}
+                transition={{
+                  duration: 7,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: 2
+                }}
+              />
+              
+              {/* Subtle particle effects */}
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white/30 rounded-full"
+                  style={{
+                    left: `${20 + i * 15}%`,
+                    top: `${30 + (i % 3) * 20}%`
+                  }}
+                  animate={{
+                    opacity: [0, 0.8, 0],
+                    y: [-5, 5],
+                    x: [-2, 2]
+                  }}
+                  transition={{
+                    duration: 2 + i,
+                    repeat: Infinity,
+                    delay: i * 0.5,
+                    repeatType: "reverse"
+                  }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
     </>
   );
 };

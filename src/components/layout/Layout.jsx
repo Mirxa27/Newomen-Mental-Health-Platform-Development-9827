@@ -12,16 +12,20 @@ const Layout = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
-      {/* Liquid animated background blobs */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-gradient-to-br from-primary-400 to-secondary-400 opacity-30 rounded-full filter blur-3xl animate-blob1" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-gradient-to-tr from-secondary-400 to-primary-400 opacity-30 rounded-full filter blur-3xl animate-blob2" />
+    <div className="min-h-screen bg-gray-900 text-gray-200 relative overflow-x-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 animated-gradient-bg" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/20 rounded-full filter blur-3xl animate-liquid-blob" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary-500/20 rounded-full filter blur-3xl animate-liquid-blob animation-delay-4000" />
+        <div className="absolute top-1/3 left-1/2 w-64 h-64 bg-indigo-500/10 rounded-full filter blur-3xl animate-liquid-blob animation-delay-2000" />
       </div>
-      <Navbar className="glass-effect z-10" />
+      
+      <Navbar />
+      
       <div className="flex relative z-10">
-        {isAuthenticated && !isMobile && <Sidebar className="glass-effect" />}
-        <main className={`flex-1 transition-all duration-300 ${isAuthenticated && !isMobile ? 'ml-64' : ''} pb-20 md:pb-0`}>
+        {isAuthenticated && !isMobile && <Sidebar />}
+        <main className={`flex-1 transition-all duration-300 pt-20 ${isAuthenticated && !isMobile ? 'ml-64' : ''} pb-32 md:pb-8`}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -32,7 +36,8 @@ const Layout = () => {
           </motion.div>
         </main>
       </div>
-      {isAuthenticated && isMobile && <MobileNavigation className="glass-effect" />}
+      
+      {isMobile && <MobileNavigation />}
     </div>
   );
 };

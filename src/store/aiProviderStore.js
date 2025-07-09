@@ -32,6 +32,17 @@ export const useAIProviderStore = create(
   persist(
     (set, get) => ({
       providers: defaultProviders,
+      settings: {
+        brandingSettings: {
+          brandName: 'Newomen',
+          logoUrl: '',
+          accentColor: '#667eea',
+          secondaryColor: '#764ba2',
+          tagline: 'Your Journey to Self',
+          favicon: '',
+          customCSS: '',
+        }
+      },
       addProvider: (provider) =>
         set((state) => ({ providers: [...state.providers, provider] })),
       updateProvider: (id, data) =>
@@ -62,6 +73,13 @@ export const useAIProviderStore = create(
         })),
       setProviders: (providers) => set({ providers }),
       getDefaultProvider: () => get().providers.find((p) => p.isDefault),
+      updateSettings: (newSettings) =>
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            ...newSettings,
+          },
+        })),
     }),
     { name: 'newomen-ai-providers' }
   )

@@ -1,10 +1,17 @@
 import 'dotenv/config';
+
+if (!process.env.OPENAI_API_KEY) {
+  console.error('Missing OPENAI_API_KEY in environment.');
+  process.exit(1);
+}
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import fs from 'fs';
 import authRouter from './routes/auth.js';
 import chatRouter from './routes/chat.js';
-import shadowWorkRouter from './routes/shadowwork.js';
+import selfDiscoveryRouter from './routes/selfdiscovery.js';
 import adminRouter from './routes/admin.js';
 import aiProvidersRouter from './routes/aiProviders.js';
 import voiceChatRouter from './routes/voiceChat.js';
@@ -19,6 +26,12 @@ import {
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Create public/uploads directory if it doesn't exist
+const uploadsDir = path.join(path.resolve(), 'public/uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Trust proxy for accurate IP addresses behind reverse proxies
 app.set('trust proxy', 1);
@@ -35,10 +48,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Serve static files
+app.use(express.static('public'));
+
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
-app.use('/api/shadowwork', shadowWorkRouter);
+app.use('/api/selfdiscovery', selfDiscoveryRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/ai-providers', aiProvidersRouter);
 app.use('/api/voice', voiceChatRouter);

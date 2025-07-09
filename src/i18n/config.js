@@ -9,9 +9,14 @@ const resources = {
       home: "Home",
       chat: "Chat",
       shadowWork: "Shadow Work",
+      breathing: "Breathing Practices",
+      breathingPractices: "Breathing Practices", 
+      personalityTest: "Personality Test",
+      search: "Search",
       profile: "Profile",
       subscription: "Subscription",
       admin: "Admin",
+      more: "More",
       
       // Common
       welcome: "Welcome",
@@ -23,6 +28,12 @@ const resources = {
       loading: "Loading...",
       error: "Error",
       success: "Success",
+      switchLanguage: "Switch Language",
+      signIn: "Sign In",
+      signUp: "Sign Up",
+      selfDiscovery: "Self Discovery",
+      close: "Close",
+      userProfile: "User Profile",
       
       // Authentication
       login: "Login",
@@ -99,9 +110,14 @@ const resources = {
       home: "الرئيسية",
       chat: "المحادثة",
       shadowWork: "عمل الظل",
+      breathing: "تمارين التنفس",
+      breathingPractices: "تمارين التنفس",
+      personalityTest: "اختبار الشخصية",
+      search: "البحث",
       profile: "الملف الشخصي",
       subscription: "الاشتراك",
       admin: "الإدارة",
+      more: "المزيد",
       
       // Common
       welcome: "مرحباً",
@@ -113,6 +129,12 @@ const resources = {
       loading: "جاري التحميل...",
       error: "خطأ",
       success: "نجح",
+      switchLanguage: "تغيير اللغة",
+      signIn: "تسجيل الدخول",
+      signUp: "إنشاء حساب",
+      selfDiscovery: "اكتشاف الذات",
+      close: "إغلاق",
+      userProfile: "الملف الشخصي للمستخدم",
       
       // Authentication
       login: "تسجيل الدخول",

@@ -8,8 +8,11 @@ import UserManagement from '../components/admin/UserManagement';
 import ConversationMonitor from '../components/admin/ConversationMonitor';
 import PromptManagement from '../components/admin/PromptManagement';
 import Analytics from '../components/admin/Analytics';
-import AIProviderSettings from '../components/admin/AIProviderSettings';
+import AIProviderManagement from '../components/admin/AIProviderManagement';
 import SystemSettings from '../components/admin/SystemSettings';
+import BrandingSettings from '../components/admin/BrandingSettings';
+import RealTimeDashboard from '../components/admin/RealTimeDashboard';
+import FeatureCompletionDashboard from '../components/dashboard/FeatureCompletionDashboard';
 
 const { 
   FiHome, 
@@ -18,7 +21,10 @@ const {
   FiEdit, 
   FiBarChart3, 
   FiCpu, 
-  FiSettings 
+  FiSettings,
+  FiImage,
+  FiActivity,
+  FiCheckCircle
 } = FiIcons;
 
 const Admin = () => {
@@ -27,11 +33,14 @@ const Admin = () => {
 
   const adminNav = [
     { name: 'Dashboard', href: '/admin', icon: FiHome },
+    { name: 'Completion', href: '/admin/feature-completion', icon: FiCheckCircle },
+    { name: 'Real-Time', href: '/admin/realtime', icon: FiActivity },
     { name: 'Users', href: '/admin/users', icon: FiUsers },
     { name: 'Conversations', href: '/admin/conversations', icon: FiMessageSquare },
     { name: 'Prompts', href: '/admin/prompts', icon: FiEdit },
     { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart3 },
     { name: 'AI Providers', href: '/admin/ai-providers', icon: FiCpu },
+    { name: 'Branding', href: '/admin/branding', icon: FiImage },
     { name: 'System Settings', href: '/admin/settings', icon: FiSettings },
   ];
 
@@ -144,12 +153,15 @@ const Admin = () => {
         <div className="flex-1 p-4 md:p-8">
           <Routes>
             <Route index element={<AdminDashboard />} />
+            <Route path="realtime" element={<RealTimeDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="conversations" element={<ConversationMonitor />} />
             <Route path="prompts" element={<PromptManagement />} />
             <Route path="analytics" element={<Analytics />} />
-            <Route path="ai-providers" element={<AIProviderSettings />} />
+            <Route path="ai-providers" element={<AIProviderManagement />} />
+            <Route path="branding" element={<BrandingSettings />} />
             <Route path="settings" element={<SystemSettings />} />
+            <Route path="feature-completion" element={<FeatureCompletionDashboard />} />
           </Routes>
         </div>
       </div>

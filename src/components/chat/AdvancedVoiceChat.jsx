@@ -108,27 +108,8 @@ const AdvancedVoiceChat = ({ conversationId, onClose }) => {
 
   const setupAudioContext = async () => {
     try {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: settings.echoCancellation,
-          noiseSuppression: settings.noiseReduction,
-          autoGainControl: true,
-          channelCount: 1,
-          sampleRate: 16000,
-        },
-      });
-
-      mediaStreamRef.current = stream;
-      
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-      
-      source.connect(analyserRef.current);
-      
-      startAudioLevelMonitoring();
+      // Audio context setup is now handled by the voice session
+      console.log('Audio context setup delegated to voice session');
     } catch (error) {
       console.error('Error setting up audio context:', error);
       toast.error('Could not access microphone');
@@ -136,23 +117,8 @@ const AdvancedVoiceChat = ({ conversationId, onClose }) => {
   };
 
   const startAudioLevelMonitoring = () => {
-    if (!analyserRef.current) return;
-
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    
-    const updateAudioLevel = () => {
-      if (analyserRef.current) {
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-        setAudioLevel(average / 255);
-      }
-      
-      if (isListening) {
-        animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
-      }
-    };
-
-    updateAudioLevel();
+    // Audio level monitoring is now handled by the voice session
+    console.log('Audio level monitoring delegated to voice session');
   };
 
   const startVoiceSession = async () => {
@@ -187,6 +153,16 @@ const AdvancedVoiceChat = ({ conversationId, onClose }) => {
         setCurrentSession(data.session);
         setIsConnected(true);
         setConnectionStatus('connected');
+        
+        // Initialize the voice session with real audio handling
+        if (data.sessionData && data.sessionData.websocket) {
+          // Setup audio level monitoring callback
+          if (data.sessionData.websocket.setAudioLevelCallback) {
+            data.sessionData.websocket.setAudioLevelCallback((level) => {
+              setAudioLevel(level);
+            });
+          }
+        }
         
         if (settings.autoStart) {
           setIsListening(true);

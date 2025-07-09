@@ -1,12 +1,18 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import { VoiceAgentService, EncryptionService } from '../services/voiceAgentService.js';
+import { 
+  VoiceAgentService, 
+  OpenAIRealtimeProvider,
+  ElevenLabsProvider,
+  GoogleSpeechProvider,
+  AzureSpeechProvider
+} from '../services/voiceAgentService.js';
+import { encryptionService } from '../services/encryptionService.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 const voiceService = new VoiceAgentService();
-const encryption = new EncryptionService();
 
 // Middleware to verify JWT token and admin role
 const authenticateAdmin = (req, res, next) => {
@@ -123,7 +129,7 @@ router.post('/', authenticateAdmin, async (req, res) => {
     }
 
     // Encrypt API key
-    const encryptedApiKey = encryption.encrypt(apiKey);
+    const encryptedApiKey = encryptionService.encryptApiKey(apiKey, name);
 
     // If this is set as default, unset other defaults of the same type
     if (isDefault) {
@@ -204,7 +210,7 @@ router.put('/:id', authenticateAdmin, async (req, res) => {
 
     // Only update API key if provided
     if (apiKey) {
-      const encryptedApiKey = encryption.encrypt(apiKey);
+      const encryptedApiKey = encryptionService.encryptApiKey(apiKey, name);
       updateData.apiKey = JSON.stringify(encryptedApiKey);
     }
 
@@ -263,7 +269,7 @@ router.post('/:id/test', authenticateAdmin, async (req, res) => {
 
     // Decrypt API key
     const encryptedApiKey = JSON.parse(provider.apiKey);
-    const apiKey = encryption.decrypt(encryptedApiKey);
+    const apiKey = encryptionService.decryptApiKey(encryptedApiKey, provider.name);
 
     // Create provider instance for testing
     const config = {
@@ -375,7 +381,7 @@ router.get('/:id/voices', authenticateAdmin, async (req, res) => {
 
     // Decrypt API key
     const encryptedApiKey = JSON.parse(provider.apiKey);
-    const apiKey = encryption.decrypt(encryptedApiKey);
+    const apiKey = encryptionService.decryptApiKey(encryptedApiKey, provider.name);
 
     const config = {
       type: provider.type,

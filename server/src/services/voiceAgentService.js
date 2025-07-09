@@ -1,121 +1,288 @@
-import crypto from 'crypto';
+import WebSocket from 'ws';
+import fetch from 'node-fetch';
+import FormData from 'form-data';
+import { encryptionService } from './encryptionService.js';
+import { EventEmitter } from 'events';
 
-// Abstract base class for voice providers
-class VoiceProvider {
+/**
+ * Abstract base class for voice providers
+ */
+export class VoiceProvider extends EventEmitter {
   constructor(config) {
+    super();
     this.config = config;
+    this.apiKey = encryptionService.decryptApiKey(config.apiKey, config.name);
     this.type = config.type;
-    this.apiKey = config.apiKey;
-    this.apiUrl = config.apiUrl;
+    this.status = 'INACTIVE';
+    this.usageCount = 0;
+    this.lastError = null;
   }
 
   async testConnection() {
-    throw new Error('testConnection must be implemented by subclass');
+    throw new Error('testConnection method must be implemented by subclass');
   }
 
   async startSession(options) {
-    throw new Error('startSession must be implemented by subclass');
+    throw new Error('startSession method must be implemented by subclass');
   }
 
   async endSession(sessionId) {
-    throw new Error('endSession must be implemented by subclass');
+    throw new Error('endSession method must be implemented by subclass');
+  }
+
+  updateStatus(status, error = null) {
+    this.status = status;
+    this.lastError = error;
+    this.emit('statusChange', { status, error });
+  }
+
+  incrementUsage() {
+    this.usageCount++;
   }
 }
 
-// OpenAI Realtime API Provider
-class OpenAIRealtimeProvider extends VoiceProvider {
+/**
+ * OpenAI Realtime API Provider - Production Implementation
+ */
+export class OpenAIRealtimeProvider extends VoiceProvider {
   constructor(config) {
     super(config);
-    this.sessions = new Map();
+    this.baseUrl = config.apiUrl || 'wss://api.openai.com/v1/realtime';
+    this.model = config.model || 'gpt-4o-realtime-preview-2024-12-17';
+    this.voice = config.voice || 'nova';
+    this.activeSessions = new Map();
   }
 
   async testConnection() {
     try {
+      // Test with a simple HTTP request to OpenAI API
       const response = await fetch('https://api.openai.com/v1/models', {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
       });
-      return response.ok;
+
+      if (response.ok) {
+        this.updateStatus('ACTIVE');
+        return { success: true, message: 'OpenAI API connection successful' };
+      } else {
+        const error = await response.text();
+        this.updateStatus('ERROR', error);
+        return { success: false, message: `OpenAI API error: ${response.status}` };
+      }
     } catch (error) {
-      console.error('OpenAI connection test failed:', error);
-      return false;
+      this.updateStatus('ERROR', error.message);
+      return { success: false, message: `Connection failed: ${error.message}` };
     }
   }
 
   async startSession(options = {}) {
-    const sessionConfig = {
-      model: this.config.model || 'gpt-4o-realtime-preview-2024-12-17',
-      voice: this.config.voice || 'nova',
-      instructions: this.buildInstructions(options.userContext),
-      input_audio_format: 'pcm16',
-      output_audio_format: 'pcm16',
-      input_audio_transcription: {
-        model: 'whisper-1'
-      },
-      turn_detection: {
-        type: 'server_vad',
-        threshold: 0.5,
-        prefix_padding_ms: 300,
-        silence_duration_ms: 500
-      },
-      tools: []
-    };
+    const sessionId = `openai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    try {
+      const sessionConfig = {
+        sessionId,
+        model: this.model,
+        voice: this.voice,
+        temperature: this.config.settings?.temperature || 0.7,
+        max_tokens: this.config.settings?.max_tokens || 500,
+        modalities: ['text', 'audio'],
+        instructions: options.instructions || this.buildInstructions(options.userContext),
+        turn_detection: {
+          type: 'server_vad',
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 800,
+          create_response: true,
+        },
+        input_audio_format: 'pcm16',
+        output_audio_format: 'pcm16',
+        input_audio_transcription: {
+          model: 'whisper-1',
+        },
+      };
 
-    // Mock session for development
-    const sessionId = crypto.randomUUID();
-    const session = {
-      id: sessionId,
-      config: sessionConfig,
-      status: 'active',
-      startTime: new Date(),
-      events: []
-    };
+      // Create WebSocket connection
+      const ws = new WebSocket(`${this.baseUrl}?model=${this.model}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'OpenAI-Beta': 'realtime=v1',
+        },
+      });
 
-    this.sessions.set(sessionId, session);
-    return { sessionId, config: sessionConfig };
+      const session = {
+        sessionId,
+        websocket: ws,
+        config: sessionConfig,
+        status: 'connecting',
+        startTime: new Date(),
+        events: [],
+        isActive: true,
+      };
+
+      // Store session
+      this.activeSessions.set(sessionId, session);
+
+      // Setup WebSocket event handlers
+      ws.on('open', () => {
+        console.log(`OpenAI Realtime session ${sessionId} connected`);
+        session.status = 'connected';
+        
+        // Send session configuration
+        this.sendEvent(ws, {
+          type: 'session.update',
+          session: {
+            modalities: sessionConfig.modalities,
+            instructions: sessionConfig.instructions,
+            voice: sessionConfig.voice,
+            input_audio_format: sessionConfig.input_audio_format,
+            output_audio_format: sessionConfig.output_audio_format,
+            input_audio_transcription: sessionConfig.input_audio_transcription,
+            turn_detection: sessionConfig.turn_detection,
+            temperature: sessionConfig.temperature,
+            max_tokens: sessionConfig.max_tokens,
+          },
+        });
+
+        this.emit('sessionStarted', { sessionId, session });
+      });
+
+      ws.on('message', (data) => {
+        try {
+          const event = JSON.parse(data.toString());
+          session.events.push({ ...event, timestamp: new Date() });
+          this.handleServerEvent(sessionId, event);
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
+        }
+      });
+
+      ws.on('error', (error) => {
+        console.error(`WebSocket error for session ${sessionId}:`, error);
+        session.status = 'error';
+        session.error = error.message;
+        this.emit('sessionError', { sessionId, error });
+      });
+
+      ws.on('close', () => {
+        console.log(`OpenAI Realtime session ${sessionId} closed`);
+        session.status = 'closed';
+        session.isActive = false;
+        this.emit('sessionEnded', { sessionId });
+      });
+
+      this.incrementUsage();
+      return session;
+
+    } catch (error) {
+      console.error('Failed to start OpenAI Realtime session:', error);
+      throw error;
+    }
   }
 
   async endSession(sessionId) {
-    const session = this.sessions.get(sessionId);
-    if (session) {
-      session.status = 'ended';
-      session.endTime = new Date();
-      this.sessions.delete(sessionId);
+    const session = this.activeSessions.get(sessionId);
+    if (!session) {
+      throw new Error(`Session ${sessionId} not found`);
     }
-    return { success: true };
+
+    try {
+      if (session.websocket && session.websocket.readyState === WebSocket.OPEN) {
+        session.websocket.close();
+      }
+      
+      session.isActive = false;
+      session.endTime = new Date();
+      session.duration = session.endTime - session.startTime;
+
+      this.activeSessions.delete(sessionId);
+      
+      return {
+        sessionId,
+        duration: session.duration,
+        eventCount: session.events.length,
+        status: 'ended',
+      };
+    } catch (error) {
+      console.error('Failed to end session:', error);
+      throw error;
+    }
+  }
+
+  sendEvent(ws, event) {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(event));
+    }
+  }
+
+  handleServerEvent(sessionId, event) {
+    const session = this.activeSessions.get(sessionId);
+    if (!session) return;
+
+    this.emit('serverEvent', { sessionId, event });
+
+    switch (event.type) {
+      case 'session.created':
+        session.serverSessionId = event.session.id;
+        break;
+      case 'error':
+        session.status = 'error';
+        session.error = event.error.message;
+        break;
+      case 'response.audio.delta':
+        this.emit('audioChunk', { sessionId, audioData: event.delta });
+        break;
+      case 'response.audio_transcript.done':
+        this.emit('transcript', { 
+          sessionId, 
+          transcript: event.transcript,
+          role: 'assistant' 
+        });
+        break;
+      case 'input_audio_buffer.speech_started':
+        this.emit('speechStarted', { sessionId });
+        break;
+      case 'input_audio_buffer.speech_stopped':
+        this.emit('speechStopped', { sessionId });
+        break;
+    }
   }
 
   buildInstructions(userContext = {}) {
-    return `You are Newomen, a compassionate AI companion for women's mental health and wellbeing. 
+    return `You are Newomen, a compassionate AI companion for women's mental health and personal growth. 
+    
+    User Context:
+    - Name: ${userContext.name || 'sister'}
+    - Cultural Context: ${userContext.culturalContext || 'MENA'}
+    - Language: ${userContext.language || 'en'}
+    
+    Guidelines:
+    - Speak with warmth and cultural awareness
+    - Use Arabic phrases like حبيبتي when appropriate
+    - Provide supportive and empathetic responses
+    - Maintain professional boundaries while being caring
+    - Be sensitive to cultural and religious considerations`;
+  }
 
-Cultural Context: You understand and respect ${userContext.culturalContext || 'diverse cultural backgrounds'}, particularly MENA (Middle East and North Africa) values and traditions.
+  getSessionInfo(sessionId) {
+    return this.activeSessions.get(sessionId);
+  }
 
-Communication Style:
-- Speak naturally and warmly in ${userContext.language || 'English'}
-- Use a calm, soothing tone
-- Be empathetic and non-judgmental
-- Provide culturally-sensitive support
-- Maintain appropriate boundaries while being personable
-
-Guidelines:
-- Listen actively and validate emotions
-- Offer practical coping strategies when appropriate
-- Encourage self-reflection and personal growth
-- Recognize when to suggest professional help
-- Use inclusive language that honors diverse backgrounds
-- Respect religious and cultural values
-
-Remember: You're a supportive companion on their wellness journey, not a replacement for professional therapy when needed.`;
+  getAllSessions() {
+    return Array.from(this.activeSessions.values());
   }
 }
 
-// ElevenLabs Text-to-Speech Provider
-class ElevenLabsProvider extends VoiceProvider {
+/**
+ * ElevenLabs TTS Provider - Production Implementation
+ */
+export class ElevenLabsProvider extends VoiceProvider {
   constructor(config) {
     super(config);
-    this.baseUrl = 'https://api.elevenlabs.io/v1';
+    this.baseUrl = config.apiUrl || 'https://api.elevenlabs.io/v1';
+    this.voiceId = config.voice || '21m00Tcm4TlvDq8ikWAM'; // Rachel voice
+    this.model = config.model || 'eleven_multilingual_v2';
   }
 
   async testConnection() {
@@ -125,26 +292,34 @@ class ElevenLabsProvider extends VoiceProvider {
           'xi-api-key': this.apiKey,
         },
       });
-      return response.ok;
+
+      if (response.ok) {
+        this.updateStatus('ACTIVE');
+        return { success: true, message: 'ElevenLabs API connection successful' };
+      } else {
+        const error = await response.text();
+        this.updateStatus('ERROR', error);
+        return { success: false, message: `ElevenLabs API error: ${response.status}` };
+      }
     } catch (error) {
-      console.error('ElevenLabs connection test failed:', error);
-      return false;
+      this.updateStatus('ERROR', error.message);
+      return { success: false, message: `Connection failed: ${error.message}` };
     }
   }
 
-  async synthesizeSpeech(text, voiceId = null) {
-    const targetVoiceId = voiceId || this.config.voice || '21m00Tcm4TlvDq8ikWAM';
-    
+  async synthesizeSpeech(text, options = {}) {
     try {
-      const response = await fetch(`${this.baseUrl}/text-to-speech/${targetVoiceId}`, {
+      const voiceId = options.voiceId || this.voiceId;
+      
+      const response = await fetch(`${this.baseUrl}/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: {
           'xi-api-key': this.apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: text,
-          model_id: this.config.model || 'eleven_multilingual_v2',
+          text,
+          model_id: this.model,
           voice_settings: {
             stability: this.config.settings?.stability || 0.5,
             similarity_boost: this.config.settings?.similarity_boost || 0.5,
@@ -158,6 +333,7 @@ class ElevenLabsProvider extends VoiceProvider {
         throw new Error(`ElevenLabs API error: ${response.status}`);
       }
 
+      this.incrementUsage();
       return await response.arrayBuffer();
     } catch (error) {
       console.error('ElevenLabs synthesis failed:', error);
@@ -184,18 +360,71 @@ class ElevenLabsProvider extends VoiceProvider {
       throw error;
     }
   }
+
+  async startSession(options = {}) {
+    const sessionId = `elevenlabs_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    return {
+      sessionId,
+      provider: 'elevenlabs',
+      type: 'text_to_speech',
+      status: 'ready',
+      startTime: new Date(),
+      voiceId: options.voiceId || this.voiceId,
+      model: this.model,
+    };
+  }
+
+  async endSession(sessionId) {
+    return {
+      sessionId,
+      status: 'ended',
+      endTime: new Date(),
+    };
+  }
 }
 
-// Google Speech-to-Text Provider
-class GoogleSpeechProvider extends VoiceProvider {
+/**
+ * Google Speech-to-Text Provider - Production Implementation
+ */
+export class GoogleSpeechProvider extends VoiceProvider {
   constructor(config) {
     super(config);
     this.baseUrl = 'https://speech.googleapis.com/v1';
+    this.projectId = config.settings?.projectId || process.env.GOOGLE_SPEECH_PROJECT_ID;
   }
 
   async testConnection() {
-    // Mock test for now - would require proper Google Cloud setup
-    return true;
+    try {
+      const response = await fetch(`${this.baseUrl}/speech:recognize?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          config: {
+            encoding: 'LINEAR16',
+            sampleRateHertz: 16000,
+            languageCode: 'en-US',
+          },
+          audio: {
+            content: 'UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LHeSMFl', // minimal test audio
+          },
+        }),
+      });
+
+      if (response.ok) {
+        this.updateStatus('ACTIVE');
+        return { success: true, message: 'Google Speech API connection successful' };
+      } else {
+        const error = await response.text();
+        this.updateStatus('ERROR', error);
+        return { success: false, message: `Google Speech API error: ${response.status}` };
+      }
+    } catch (error) {
+      this.updateStatus('ERROR', error.message);
+      return { success: false, message: `Connection failed: ${error.message}` };
+    }
   }
 
   async transcribeAudio(audioData, options = {}) {
@@ -209,6 +438,7 @@ class GoogleSpeechProvider extends VoiceProvider {
           enableAutomaticPunctuation: true,
           enableWordTimeOffsets: true,
           model: options.model || 'latest_long',
+          useEnhanced: true,
         },
         audio: {
           content: Buffer.from(audioData).toString('base64'),
@@ -228,20 +458,51 @@ class GoogleSpeechProvider extends VoiceProvider {
       }
 
       const result = await response.json();
-      return result.results?.[0]?.alternatives?.[0]?.transcript || '';
+      this.incrementUsage();
+      
+      return {
+        transcript: result.results?.[0]?.alternatives?.[0]?.transcript || '',
+        confidence: result.results?.[0]?.alternatives?.[0]?.confidence || 0,
+        words: result.results?.[0]?.alternatives?.[0]?.words || [],
+      };
     } catch (error) {
       console.error('Google Speech transcription failed:', error);
       throw error;
     }
   }
+
+  async startSession(options = {}) {
+    const sessionId = `google_speech_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    return {
+      sessionId,
+      provider: 'google_speech',
+      type: 'speech_to_text',
+      status: 'ready',
+      startTime: new Date(),
+      languageCode: options.languageCode || 'en-US',
+      model: options.model || 'latest_long',
+    };
+  }
+
+  async endSession(sessionId) {
+    return {
+      sessionId,
+      status: 'ended',
+      endTime: new Date(),
+    };
+  }
 }
 
-// Azure Speech Services Provider
-class AzureSpeechProvider extends VoiceProvider {
+/**
+ * Azure Speech Services Provider - Production Implementation
+ */
+export class AzureSpeechProvider extends VoiceProvider {
   constructor(config) {
     super(config);
-    this.region = config.settings?.region || 'eastus';
+    this.region = config.settings?.region || process.env.AZURE_SPEECH_REGION || 'eastus';
     this.baseUrl = `https://${this.region}.tts.speech.microsoft.com`;
+    this.sttBaseUrl = `https://${this.region}.stt.speech.microsoft.com`;
   }
 
   async testConnection() {
@@ -251,19 +512,27 @@ class AzureSpeechProvider extends VoiceProvider {
           'Ocp-Apim-Subscription-Key': this.apiKey,
         },
       });
-      return response.ok;
+
+      if (response.ok) {
+        this.updateStatus('ACTIVE');
+        return { success: true, message: 'Azure Speech API connection successful' };
+      } else {
+        const error = await response.text();
+        this.updateStatus('ERROR', error);
+        return { success: false, message: `Azure Speech API error: ${response.status}` };
+      }
     } catch (error) {
-      console.error('Azure Speech connection test failed:', error);
-      return false;
+      this.updateStatus('ERROR', error.message);
+      return { success: false, message: `Connection failed: ${error.message}` };
     }
   }
 
-  async synthesizeSpeech(text, voiceId = null) {
-    const targetVoice = voiceId || this.config.voice || 'en-US-AriaNeural';
+  async synthesizeSpeech(text, options = {}) {
+    const voiceId = options.voiceId || this.config.voice || 'en-US-AriaNeural';
     
     const ssml = `
       <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
-        <voice name="${targetVoice}">
+        <voice name="${voiceId}">
           <prosody rate="${this.config.settings?.rate || 'medium'}" 
                    pitch="${this.config.settings?.pitch || 'medium'}">
             ${text}
@@ -287,9 +556,40 @@ class AzureSpeechProvider extends VoiceProvider {
         throw new Error(`Azure Speech API error: ${response.status}`);
       }
 
+      this.incrementUsage();
       return await response.arrayBuffer();
     } catch (error) {
       console.error('Azure Speech synthesis failed:', error);
+      throw error;
+    }
+  }
+
+  async transcribeAudio(audioData, options = {}) {
+    try {
+      const response = await fetch(`${this.sttBaseUrl}/speech/recognition/conversation/cognitiveservices/v1`, {
+        method: 'POST',
+        headers: {
+          'Ocp-Apim-Subscription-Key': this.apiKey,
+          'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000',
+          'Accept': 'application/json',
+        },
+        body: audioData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Azure Speech API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      this.incrementUsage();
+      
+      return {
+        transcript: result.DisplayText || '',
+        confidence: result.Confidence || 0,
+        duration: result.Duration || 0,
+      };
+    } catch (error) {
+      console.error('Azure Speech transcription failed:', error);
       throw error;
     }
   }
@@ -312,18 +612,70 @@ class AzureSpeechProvider extends VoiceProvider {
       throw error;
     }
   }
-}
 
-// Voice Agent Service Manager
-export class VoiceAgentService {
-  constructor() {
-    this.providers = new Map();
-    this.activeSessions = new Map();
+  async startSession(options = {}) {
+    const sessionId = `azure_speech_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    return {
+      sessionId,
+      provider: 'azure_speech',
+      type: options.type || 'text_to_speech',
+      status: 'ready',
+      startTime: new Date(),
+      voiceId: options.voiceId || this.config.voice,
+      region: this.region,
+    };
   }
 
+  async endSession(sessionId) {
+    return {
+      sessionId,
+      status: 'ended',
+      endTime: new Date(),
+    };
+  }
+}
+
+/**
+ * Voice Agent Service Manager - Production Implementation
+ */
+export class VoiceAgentService extends EventEmitter {
+  constructor() {
+    super();
+    this.providers = new Map();
+    this.activeSessions = new Map();
+    this.sessionCleanupInterval = null;
+    
+    // Start session cleanup
+    this.startSessionCleanup();
+  }
+
+  /**
+   * Register a voice provider
+   */
   registerProvider(name, providerClass, config) {
     try {
       const provider = new providerClass(config);
+      
+      // Listen to provider events
+      provider.on('statusChange', ({ status, error }) => {
+        this.emit('providerStatusChange', { providerName: name, status, error });
+      });
+
+      provider.on('sessionStarted', (session) => {
+        this.activeSessions.set(session.sessionId, {
+          provider: name,
+          session,
+          startTime: new Date(),
+        });
+        this.emit('sessionStarted', { providerName: name, ...session });
+      });
+
+      provider.on('sessionEnded', ({ sessionId }) => {
+        this.activeSessions.delete(sessionId);
+        this.emit('sessionEnded', { providerName: name, sessionId });
+      });
+
       this.providers.set(name, provider);
       return { success: true, provider };
     } catch (error) {
@@ -332,10 +684,16 @@ export class VoiceAgentService {
     }
   }
 
+  /**
+   * Get a provider by name
+   */
   getProvider(name) {
     return this.providers.get(name);
   }
 
+  /**
+   * Test a provider connection
+   */
   async testProvider(name) {
     const provider = this.getProvider(name);
     if (!provider) {
@@ -344,6 +702,9 @@ export class VoiceAgentService {
     return await provider.testConnection();
   }
 
+  /**
+   * Start a voice session
+   */
   async startVoiceSession(providerName, options = {}) {
     const provider = this.getProvider(providerName);
     if (!provider) {
@@ -360,6 +721,9 @@ export class VoiceAgentService {
     return session;
   }
 
+  /**
+   * End a voice session
+   */
   async endVoiceSession(sessionId) {
     const sessionInfo = this.activeSessions.get(sessionId);
     if (!sessionInfo) {
@@ -373,11 +737,63 @@ export class VoiceAgentService {
     return result;
   }
 
+  /**
+   * Get all active sessions
+   */
   getActiveSessions() {
     return Array.from(this.activeSessions.values());
   }
 
-  // Provider factory methods
+  /**
+   * Get session by ID
+   */
+  getSession(sessionId) {
+    return this.activeSessions.get(sessionId);
+  }
+
+  /**
+   * Clean up expired sessions
+   */
+  startSessionCleanup() {
+    if (this.sessionCleanupInterval) return;
+
+    const timeout = process.env.VOICE_SESSION_TIMEOUT || 300000; // 5 minutes
+    const interval = process.env.VOICE_SESSION_CLEANUP_INTERVAL || 60000; // 1 minute
+
+    this.sessionCleanupInterval = setInterval(() => {
+      const now = Date.now();
+      const expiredSessions = [];
+
+      for (const [sessionId, sessionInfo] of this.activeSessions) {
+        const age = now - sessionInfo.startTime.getTime();
+        if (age > timeout) {
+          expiredSessions.push(sessionId);
+        }
+      }
+
+      expiredSessions.forEach(sessionId => {
+        console.log(`Cleaning up expired session: ${sessionId}`);
+        this.endVoiceSession(sessionId).catch(err => {
+          console.error(`Failed to cleanup session ${sessionId}:`, err);
+        });
+      });
+
+    }, interval);
+  }
+
+  /**
+   * Stop session cleanup
+   */
+  stopSessionCleanup() {
+    if (this.sessionCleanupInterval) {
+      clearInterval(this.sessionCleanupInterval);
+      this.sessionCleanupInterval = null;
+    }
+  }
+
+  /**
+   * Provider factory methods
+   */
   static createOpenAIProvider(config) {
     return new OpenAIRealtimeProvider(config);
   }
@@ -393,42 +809,24 @@ export class VoiceAgentService {
   static createAzureSpeechProvider(config) {
     return new AzureSpeechProvider(config);
   }
-}
 
-// Encryption utilities for API keys
-export class EncryptionService {
-  constructor() {
-    this.algorithm = 'aes-256-gcm';
-    this.key = process.env.ENCRYPTION_KEY || crypto.randomBytes(32);
-  }
+  /**
+   * Shutdown all providers and sessions
+   */
+  async shutdown() {
+    this.stopSessionCleanup();
+    
+    // End all active sessions
+    const sessions = Array.from(this.activeSessions.keys());
+    await Promise.allSettled(
+      sessions.map(sessionId => this.endVoiceSession(sessionId))
+    );
 
-  encrypt(text) {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher(this.algorithm, this.key);
-    cipher.setAAD(Buffer.from('newomen-voice', 'utf8'));
-    
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    
-    const authTag = cipher.getAuthTag();
-    
-    return {
-      encrypted,
-      iv: iv.toString('hex'),
-      authTag: authTag.toString('hex'),
-    };
-  }
-
-  decrypt(encryptedData) {
-    const decipher = crypto.createDecipher(this.algorithm, this.key);
-    decipher.setAAD(Buffer.from('newomen-voice', 'utf8'));
-    decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
-    
-    let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
-    return decrypted;
+    this.providers.clear();
+    this.activeSessions.clear();
   }
 }
 
-export default VoiceAgentService;
+// Singleton instance
+export const voiceAgentService = new VoiceAgentService();
+export default voiceAgentService;

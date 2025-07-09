@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
-import { NewomenVoiceSession, generateEphemeralKey } from '../../services/realtimeAgent';
+import { NewomenVoiceSession } from '../../services/realtimeAgent';
 import { useAuthStore } from '../../store/authStore';
 import { useAIProviderStore } from '../../store/aiProviderStore';
 import { useChatStore } from '../../store/chatStore';
@@ -66,13 +66,28 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
     try {
       setIsLoading(true);
       
-      const provider = getDefaultProvider();
-      const apiKey = await generateEphemeralKey(provider?.apiKey);
-      if (!apiKey) {
-        throw new Error(
-          'Missing API key. Set your OpenAI key in Admin → AI Provider Settings or .env'
-        );
+      const response = await fetch('/api/voice/sessions/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          providerName: 'OpenAI Realtime', // Or get from a default provider
+          userContext: {
+            name: user?.name,
+            culturalContext: user?.preferences?.culturalContext || 'mena',
+            language: user?.preferences?.language || 'en',
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to start voice session');
       }
+
+      const { sessionData, config } = await response.json();
       
       const voiceSession = new NewomenVoiceSession();
       sessionRef.current = voiceSession;
@@ -148,20 +163,10 @@ const RealtimeVoiceChat = ({ isOpen, onClose }) => {
         toast.error('Voice connection error: ' + error.message);
       });
 
-      // Connect with user context
-      const userContext = {
-        name: user?.name,
-        culturalContext: user?.preferences?.culturalContext || 'mena',
-        language: user?.preferences?.language || 'en',
-        sessionType: 'voice_chat',
-      };
-      
       const connected = await voiceSession.connect({
-        apiKey,
-        endpoint: provider?.endpoint ? `${provider.endpoint}/realtime` : 'https://api.openai.com/v1/realtime',
-        model: provider?.model || 'gpt-4o-realtime-preview-2025-06-03',
-        voice: provider?.settings?.voice || 'nova',
-        userContext,
+        apiKey: config.apiKey,
+        endpoint: config.apiUrl,
+        ...config,
       });
       setSession(voiceSession);
       

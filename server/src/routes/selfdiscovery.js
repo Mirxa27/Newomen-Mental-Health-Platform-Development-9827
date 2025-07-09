@@ -1,4 +1,5 @@
 import express from 'express';
+import OpenAI from 'openai';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
@@ -209,14 +210,33 @@ router.post('/sessions/:id/insights', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    // TODO: Integrate with OpenAI API for generating insights
-    // For now, return a mock insight
-    const mockInsight = `Based on your response, I can see you're exploring deep patterns within yourself. This kind of self-reflection takes courage. Consider how this pattern might be both protecting you and limiting you. What small step could you take to honor both the protection and the growth you're seeking?`;
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const question = shadowWorkQuestions.find(q => q.id === session.questionId);
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a compassionate and insightful AI guide for a mental wellness app called Newomen. Your role is to help users with "shadow work" by providing gentle, empowering, and actionable reflections on their journal entries. Your tone should be encouraging, non-judgmental, and focused on self-discovery and growth. Frame your insights as observations and possibilities, not definitive statements. Your response must be a JSON object with three keys: "shadowPatterns", "hiddenStrengths", and "transformationAreas", each containing an array of 3-4 short, insightful strings.`,
+        },
+        {
+          role: 'user',
+          content: `Here is my answer to the question "${question.question}":\n\n${session.response}`,
+        },
+      ],
+      response_format: { type: 'json_object' },
+    });
+
+    const insights = JSON.parse(completion.choices[0].message.content);
 
     const updatedSession = await prisma.shadowWorkSession.update({
       where: { id: req.params.id },
       data: {
-        insights: mockInsight,
+        insights,
         updatedAt: new Date(),
       },
     });

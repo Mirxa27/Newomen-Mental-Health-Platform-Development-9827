@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, matchPath } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import Navbar from '../components/navigation/Navbar';
-import Sidebar from '../components/navigation/Sidebar';
+import Navbar from '../components/layout/Navbar';
+import Sidebar from '../components/layout/Sidebar';
 import MobileNavigation from '../components/navigation/MobileNavigation';
 import Footer from '../components/layout/Footer';
 import PWAInstallPrompt from '../components/common/PWAInstallPrompt';
@@ -91,72 +91,41 @@ const MainLayout = () => {
           <div className="absolute top-1/3 left-1/2 w-64 h-64 bg-indigo-500/10 rounded-full filter blur-3xl animate-liquid-blob animation-delay-2000" />
         </div>
         
+        <Navbar />
+        
         {/* Content Container: Positioned above the background */}
-        <div className="relative z-10 flex flex-col min-h-screen">
-          {!isMobile && <Navbar />}
+        <div className="relative z-10 flex min-h-screen">
           <NetworkStatus />
           
-          <div className="flex flex-1">
-            {isAuthenticated && !isMobile && <Sidebar />}
-            
-            <main 
-              className={`flex-1 transition-all duration-300 ${
-                isAuthenticated && !isMobile ? 'md:ml-64' : ''
-              }`}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  // Ensure content area fills available space and has padding
-                  className="flex-grow w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 pb-28 md:pb-8"
-                >
-                  <Outlet />
-                </motion.div>
-              </AnimatePresence>
-            </main>
-          </div>
+          {isAuthenticated && !isMobile && <Sidebar />}
           
-          {/* Footer is shown only on desktop for a cleaner mobile experience */}
-          {!isMobile && <Footer />}
+          <main 
+            className={`flex-1 transition-all duration-300 pt-20 ${isAuthenticated && !isMobile ? 'ml-64' : ''}`}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="flex-grow w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 pb-32 md:pb-8"
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+            
+            {!isMobile && <Footer />}
+          </main>
         </div>
+        
+        {isMobile && <MobileNavigation />}
 
         {/* Mobile-specific UI elements, also on top layer */}
         <div className="relative z-20">
-          {isMobile && isAuthenticated && <MobileNavigation />}
           <PWAInstallPrompt />
         </div>
       </div>
-
-      {/* Self-contained global styles for animations. No need for external CSS files. */}
-      <style jsx global>{`
-        @keyframes animated-gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animated-gradient-bg {
-          background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #4f46e5);
-          background-size: 400% 400%;
-          animation: animated-gradient 25s ease infinite;
-        }
-
-        @keyframes liquid-blob-animation {
-          0% { transform: scale(1) translate(0px, 0px) rotate(0deg); }
-          25% { transform: scale(1.1) translate(20px, -30px) rotate(90deg); }
-          50% { transform: scale(0.9) translate(-30px, 20px) rotate(180deg); }
-          75% { transform: scale(1.2) translate(-10px, 30px) rotate(270deg); }
-          100% { transform: scale(1) translate(0px, 0px) rotate(360deg); }
-        }
-        .animate-liquid-blob {
-          animation: liquid-blob-animation 30s infinite ease-in-out alternate;
-        }
-        .animation-delay-2000 { animation-delay: -15s; }
-        .animation-delay-4000 { animation-delay: -7s; }
-      `}</style>
     </>
   );
 };

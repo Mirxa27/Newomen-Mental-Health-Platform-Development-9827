@@ -21,15 +21,18 @@ const NicknameSearch = lazy(() => import('../pages/NicknameSearch'));
 const ShadowWork = lazy(() => import('../pages/ShadowWork'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Subscription = lazy(() => import('../pages/Subscription'));
+const Settings = lazy(() => import('../pages/Settings'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/Admin'));
+const AdminRealTime = lazy(() => import('../components/admin/RealTimeDashboard'));
 const AdminUsers = lazy(() => import('../components/admin/UserManagement'));
 const AdminConversations = lazy(() => import('../components/admin/ConversationMonitor'));
 const AdminPrompts = lazy(() => import('../components/admin/PromptManagement'));
 const AdminAnalytics = lazy(() => import('../components/admin/Analytics'));
 const AdminAIProviders = lazy(() => import('../components/admin/AIProviderManagement'));
+const AdminBranding = lazy(() => import('../components/admin/BrandingSettings'));
 const AdminSystemSettings = lazy(() => import('../components/admin/SystemSettings'));
 
 // Route loader component
@@ -78,6 +81,11 @@ const AppRouter = () => {
             <PageLoader><Subscription /></PageLoader>
           </ProtectedRoute>
         } />
+        <Route path="settings" element={
+          <ProtectedRoute>
+            <PageLoader><Settings /></PageLoader>
+          </ProtectedRoute>
+        } />
       </Route>
 
       {/* Auth layout routes */}
@@ -95,11 +103,13 @@ const AppRouter = () => {
         </ProtectedRoute>
       }>
         <Route index element={<PageLoader><AdminDashboard /></PageLoader>} />
+        <Route path="realtime" element={<PageLoader><AdminRealTime /></PageLoader>} />
         <Route path="users" element={<PageLoader><AdminUsers /></PageLoader>} />
         <Route path="conversations" element={<PageLoader><AdminConversations /></PageLoader>} />
         <Route path="prompts" element={<PageLoader><AdminPrompts /></PageLoader>} />
         <Route path="analytics" element={<PageLoader><AdminAnalytics /></PageLoader>} />
         <Route path="ai-providers" element={<PageLoader><AdminAIProviders /></PageLoader>} />
+        <Route path="branding" element={<PageLoader><AdminBranding /></PageLoader>} />
         <Route path="settings" element={<PageLoader><AdminSystemSettings /></PageLoader>} />
       </Route>
 
@@ -144,11 +154,13 @@ export const routes = [
     meta: { title: 'Admin' },
     children: [
       { path: '', meta: { title: 'Admin Dashboard' } },
+      { path: 'realtime', meta: { title: 'Real-Time Metrics' } },
       { path: 'users', meta: { title: 'User Management' } },
       { path: 'conversations', meta: { title: 'Conversation Monitor' } },
       { path: 'prompts', meta: { title: 'Prompt Management' } },
       { path: 'analytics', meta: { title: 'Analytics' } },
       { path: 'ai-providers', meta: { title: 'AI Providers' } },
+      { path: 'branding', meta: { title: 'Branding Settings' } },
       { path: 'settings', meta: { title: 'System Settings' } },
     ]
   },

@@ -80,12 +80,12 @@ const About = () => {
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 <span className="animated-gradient-text">Empowering Women</span>
                 <br />
-                <span className="text-gray-300">Through Technology & Wisdom</span>
+                <span className="text-gray-100">Through Technology & Wisdom</span>
               </h1>
               
-              <p className="text-xl text-gray-400 leading-relaxed max-w-3xl mx-auto">
-                Newomen is more than a platform—it's a movement born from one woman's 
-                transformative journey and her vision to create a global sisterhood of 
+              <p className="text-xl text-gray-100 leading-relaxed max-w-3xl mx-auto">
+                Newomen is more than a platform—it's a movement born from one woman's
+                transformative journey and her vision to create a global sisterhood of
                 empowered, authentic leaders.
               </p>
             </motion.div>
@@ -107,25 +107,25 @@ const About = () => {
                 <h2 className="text-4xl font-bold mb-6">
                   The Vision Behind <span className="animated-gradient-text">Newomen</span>
                 </h2>
-                <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
+                <div className="space-y-4 text-gray-100 text-lg leading-relaxed">
                   <p>
-                    In 2021, Katrina Zhuk, a young entrepreneur from Belarus, embarked on a 
-                    life-changing journey to Saudi Arabia. What began as a business trip 
+                    In 2021, Katrina Zhuk, a young entrepreneur from Belarus, embarked on a
+                    life-changing journey to Saudi Arabia. What began as a business trip
                     transformed into a profound awakening.
                   </p>
                   <p>
-                    "I was deeply moved by the strength, resilience, and wisdom of the women 
-                    I met," Katrina reflects. "Despite cultural differences, I discovered a 
-                    universal truth: every woman yearns for authentic self-expression and 
+                    "I was deeply moved by the strength, resilience, and wisdom of the women
+                    I met," Katrina reflects. "Despite cultural differences, I discovered a
+                    universal truth: every woman yearns for authentic self-expression and
                     meaningful connection."
                   </p>
                   <p className="italic text-purple-300">
-                    "This experience ignited my passion to create a platform where women from 
-                    all backgrounds could access the tools for personal transformation while 
+                    "This experience ignited my passion to create a platform where women from
+                    all backgrounds could access the tools for personal transformation while
                     honoring their cultural heritage."
                   </p>
                   <p>
-                    Today, Newomen stands as a testament to the power of cross-cultural 
+                    Today, Newomen stands as a testament to the power of cross-cultural
                     understanding and the universal journey of self-discovery.
                   </p>
                 </div>
@@ -139,14 +139,14 @@ const About = () => {
                   className="relative rounded-3xl overflow-hidden shadow-2xl"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 z-10"></div>
-                  <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 h-[400px] flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                        <span className="text-4xl font-bold text-white">KZ</span>
-                      </div>
-                      <p className="text-xl text-gray-300 font-medium">Katrina Zhuk</p>
-                      <p className="text-purple-400">Founder & CEO</p>
-                    </div>
+                  <img
+                    src="/images/katrina-zhuk.jpg"
+                    alt="Katrina Zhuk, Founder & CEO of Newomen"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                    <p className="text-xl text-white font-medium">Katrina Zhuk</p>
+                    <p className="text-purple-300">Founder & CEO</p>
                   </div>
                 </motion.div>
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-purple-500/20 rounded-full filter blur-2xl"></div>
@@ -169,7 +169,7 @@ const About = () => {
               <h2 className="text-4xl font-bold mb-4">
                 Our <span className="animated-gradient-text">Journey</span>
               </h2>
-              <p className="text-xl text-gray-400">From vision to global movement</p>
+              <p className="text-xl text-gray-100">From vision to global movement</p>
             </motion.div>
 
             <div className="relative">
@@ -193,7 +193,7 @@ const About = () => {
                     }`}>
                       <h3 className="text-2xl font-bold text-purple-400 mb-2">{milestone.year}</h3>
                       <h4 className="text-xl font-semibold mb-2">{milestone.event}</h4>
-                      <p className="text-gray-400">{milestone.description}</p>
+                      <p className="text-gray-100">{milestone.description}</p>
                     </div>
                   </div>
                   
@@ -218,7 +218,7 @@ const About = () => {
               <h2 className="text-4xl font-bold mb-4">
                 Our <span className="animated-gradient-text">Core Values</span>
               </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-100 max-w-2xl mx-auto">
                 The principles that guide our mission to empower women worldwide
               </p>
             </motion.div>
@@ -242,7 +242,7 @@ const About = () => {
                     {value.title}
                   </h3>
                   
-                  <p className="text-gray-400 leading-relaxed">
+                  <p className="text-gray-100 leading-relaxed">
                     {value.description}
                   </p>
                 </motion.div>
@@ -265,12 +265,12 @@ const About = () => {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 animated-gradient-text">
                 Our Mission
               </h2>
-              <p className="text-xl text-gray-300 leading-relaxed mb-8">
-                To create a global community where every woman can embark on a transformative 
-                journey of self-discovery, leveraging AI technology and cultural wisdom to 
+              <p className="text-xl text-gray-100 leading-relaxed mb-8">
+                To create a global community where every woman can embark on a transformative
+                journey of self-discovery, leveraging AI technology and cultural wisdom to
                 unlock her authentic potential and lead with purpose.
               </p>
-              <div className="flex justify-center space-x-8 text-gray-400">
+              <div className="flex justify-center space-x-8 text-gray-100">
                 <div>
                   <FiUsers className="w-8 h-8 mx-auto mb-2 text-purple-400" />
                   <p className="text-sm">Global Reach</p>
@@ -302,7 +302,7 @@ const About = () => {
                 Join the <span className="animated-gradient-text">Movement</span>
               </h2>
               
-              <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-100 mb-10 max-w-2xl mx-auto">
                 Be part of a global sisterhood committed to authentic growth and collective empowerment.
               </p>
               
@@ -325,32 +325,6 @@ const About = () => {
         </section>
       </div>
 
-      <style jsx global>{`
-        @keyframes animated-gradient-text-flow {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animated-gradient-text {
-          background: linear-gradient(-45deg, #a78bfa, #f472b6, #60a5fa, #a78bfa);
-          background-size: 300% 300%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: animated-gradient-text-flow 10s ease infinite;
-        }
-        @keyframes liquid-blob-animation {
-          0% { transform: scale(1) translate(0px, 0px) rotate(0deg); }
-          25% { transform: scale(1.2) translate(20px, -30px) rotate(90deg); }
-          50% { transform: scale(0.8) translate(-30px, 20px) rotate(180deg); }
-          75% { transform: scale(1.1) translate(-10px, 30px) rotate(270deg); }
-          100% { transform: scale(1) translate(0px, 0px) rotate(360deg); }
-        }
-        .animate-liquid-blob {
-          animation: liquid-blob-animation 40s infinite ease-in-out alternate;
-        }
-        .animation-delay-4000 { animation-delay: -20s; }
-      `}</style>
     </div>
   );
 };

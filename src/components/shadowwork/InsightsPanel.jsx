@@ -45,12 +45,16 @@ const InsightsPanel = ({ insights }) => {
             </div>
             
             <ul className="space-y-3">
-              {shadowPatterns.map((pattern, index) => (
+              {shadowPatterns?.map((pattern, index) => (
                 <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
                   <span className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0" />
                   <span>{pattern}</span>
                 </li>
-              ))}
+              )) || (
+                <li className="text-sm text-gray-500 italic">
+                  Insights are being generated...
+                </li>
+              )}
             </ul>
           </motion.div>
 
@@ -69,12 +73,16 @@ const InsightsPanel = ({ insights }) => {
             </div>
             
             <ul className="space-y-3">
-              {hiddenStrengths.map((strength, index) => (
+              {hiddenStrengths?.map((strength, index) => (
                 <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
                   <span className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0" />
                   <span>{strength}</span>
                 </li>
-              ))}
+              )) || (
+                <li className="text-sm text-gray-500 italic">
+                  Insights are being generated...
+                </li>
+              )}
             </ul>
           </motion.div>
 
@@ -93,12 +101,16 @@ const InsightsPanel = ({ insights }) => {
             </div>
             
             <ul className="space-y-3">
-              {transformationAreas.map((area, index) => (
+              {transformationAreas?.map((area, index) => (
                 <li key={index} className="text-sm text-gray-700 flex items-start space-x-2">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
                   <span>{area}</span>
                 </li>
-              ))}
+              )) || (
+                <li className="text-sm text-gray-500 italic">
+                  Insights are being generated...
+                </li>
+              )}
             </ul>
           </motion.div>
         </div>

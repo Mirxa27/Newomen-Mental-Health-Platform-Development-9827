@@ -6,6 +6,8 @@ import ErrorBoundary from './components/common/ErrorBoundary.jsx';
 import { HelmetProvider } from 'react-helmet-async';
 import './i18n/config.js';
 import './index.css';
+import './styles/responsive.css';
+import './styles/consolidated.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

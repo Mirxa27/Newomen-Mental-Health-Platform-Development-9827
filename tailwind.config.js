@@ -38,6 +38,20 @@ export default {
           800: '#9d174d',
           900: '#831843',
         },
+        // NEUTRAL COLORS: A refined grayscale for text and backgrounds
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+          950: '#0c0a09',
+        },
         // DARK THEME: Essential for the glassmorphic look
         dark: {
           950: '#0c0a09', // Near black for deep backgrounds
@@ -120,7 +134,7 @@ export default {
         // Base styles for a dark theme
         'body': {
           backgroundColor: theme('colors.dark.900'),
-          color: theme('colors.gray.200'),
+          color: theme('colors.gray.50'), // Changed to a lighter gray for better visibility
           fontFamily: theme('fontFamily.sans'),
         },
       });
@@ -147,6 +161,9 @@ export default {
           '@screen md': {
             fontSize: '1.25rem', // 20px
           },
+        },
+        '.text-glow': { // New utility for glowing text
+          animation: 'glow 3s ease-in-out infinite alternate',
         },
       });
     }),

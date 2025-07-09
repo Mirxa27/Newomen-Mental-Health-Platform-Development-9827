@@ -1,12 +1,18 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import { VoiceAgentService, EncryptionService } from '../services/voiceAgentService.js';
+import { 
+  VoiceAgentService, 
+  OpenAIRealtimeProvider,
+  ElevenLabsProvider,
+  GoogleSpeechProvider,
+  AzureSpeechProvider
+} from '../services/voiceAgentService.js';
+import { encryptionService } from '../services/encryptionService.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 const voiceService = new VoiceAgentService();
-const encryption = new EncryptionService();
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
@@ -169,11 +175,11 @@ router.post('/sessions/start', authenticateToken, async (req, res) => {
     }
 
     // Decrypt API key
-    const encryptedApiKey = JSON.parse(provider.apiKey);
-    const apiKey = encryption.decrypt(encryptedApiKey);
+    const apiKey = encryptionService.decryptApiKey(provider.apiKey, provider.name);
 
     // Create provider instance
     const config = {
+      name: provider.name,
       type: provider.type,
       apiKey,
       apiUrl: provider.apiUrl,
@@ -185,10 +191,28 @@ router.post('/sessions/start', authenticateToken, async (req, res) => {
       },
     };
 
-    let providerInstance;
+    let providerClass;
     switch (provider.type) {
       case 'REALTIME_VOICE':
-        providerInstance = VoiceAgentService.createOpenAIProvider(config);
+        providerClass = OpenAIRealtimeProvider;
+        break;
+      case 'TEXT_TO_SPEECH':
+        if (provider.name.toLowerCase().includes('elevenlabs')) {
+          providerClass = ElevenLabsProvider;
+        } else if (provider.name.toLowerCase().includes('azure')) {
+          providerClass = AzureSpeechProvider;
+        } else {
+          return res.status(400).json({ error: 'Unsupported TTS provider' });
+        }
+        break;
+      case 'SPEECH_TO_TEXT':
+        if (provider.name.toLowerCase().includes('google')) {
+          providerClass = GoogleSpeechProvider;
+        } else if (provider.name.toLowerCase().includes('azure')) {
+          providerClass = AzureSpeechProvider;
+        } else {
+          return res.status(400).json({ error: 'Unsupported STT provider' });
+        }
         break;
       default:
         return res.status(400).json({ error: 'Unsupported provider type for voice sessions' });
@@ -196,7 +220,10 @@ router.post('/sessions/start', authenticateToken, async (req, res) => {
 
     // Register provider if not already registered
     if (!voiceService.getProvider(provider.name)) {
-      voiceService.registerProvider(provider.name, providerInstance.constructor, config);
+      const registrationResult = voiceService.registerProvider(provider.name, providerClass, config);
+      if (!registrationResult.success) {
+        return res.status(500).json({ error: `Failed to register provider: ${registrationResult.error}` });
+      }
     }
 
     // Start voice session

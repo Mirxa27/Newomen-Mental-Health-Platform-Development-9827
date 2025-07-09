@@ -74,13 +74,25 @@ export const useShadowWorkStore = create(
         },
       ],
       
-      answerQuestion: (questionId, answer) => {
-        set((state) => ({
-          answers: {
-            ...state.answers,
-            [questionId]: answer,
-          },
-        }));
+      answerQuestion: async (questionId, answer) => {
+        const { api } = await import('../utils/api');
+        try {
+          const response = await api.post('/self-discovery/sessions', {
+            questionId: String(questionId),
+            response: answer,
+          });
+          set((state) => ({
+            answers: {
+              ...state.answers,
+              [questionId]: {
+                text: answer,
+                sessionId: response.data.id,
+              },
+            },
+          }));
+        } catch (error) {
+          console.error("Failed to save answer:", error);
+        }
       },
       
       nextQuestion: () => {
@@ -101,11 +113,11 @@ export const useShadowWorkStore = create(
         }));
       },
       
-       completeAssessment: () => {
-         set({ isCompleted: true });
-         // This would typically trigger AI analysis
-         get().generateInsights();
-         // Reward user with crystals for completion
+      completeAssessment: () => {
+        set({ isCompleted: true });
+        // This would typically trigger AI analysis
+        get().generateInsights();
+        // Reward user with crystals for completion
         import('../store/authStore').then(({ useAuthStore }) => {
           useAuthStore.getState().addCrystals(10);
           useAuthStore.getState().updateProgress(100);
@@ -113,35 +125,24 @@ export const useShadowWorkStore = create(
       },
       
       generateInsights: async () => {
-        const { answers } = get();
+        const { answers, questions } = get();
+        const { api } = await import('../utils/api');
+        
+        // Find the session ID for the last question answered
+        const lastQuestionId = questions[questions.length - 1].id;
+        const lastAnswer = answers[lastQuestionId];
 
-        const systemPrompt = `You are Newomen, an AI coach helping users perform shadow work. Based on the following answers, provide a summary of shadow patterns, hidden strengths, areas for transformation and a short action plan with affirmations.`;
+        if (!lastAnswer || !lastAnswer.sessionId) {
+          console.error("Could not find session ID for the last answer.");
+          return;
+        }
 
         try {
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-              model: 'gpt-4',
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: JSON.stringify(answers) }
-              ],
-              max_tokens: 300,
-              temperature: 0.7
-            })
-          });
-
-          const data = await response.json();
-          const content = data.choices?.[0]?.message?.content;
-          if (content) {
-            set({ insights: { summary: content } });
-          }
+          const response = await api.post(`/self-discovery/sessions/${lastAnswer.sessionId}/insights`);
+          set({ insights: response.data.insights });
         } catch (error) {
           console.error('Failed to generate insights:', error);
+          // Optionally, set some error state to show in the UI
         }
       },
       
@@ -157,7 +158,9 @@ export const useShadowWorkStore = create(
       },
     }),
     {
-      name: 'newomen-shadow-work',
+      name: 'shadow-work-storage',
     }
   )
 );
+
+export default useShadowWorkStore;

@@ -1,6 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import path from 'path';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -27,6 +29,51 @@ const authenticateAdmin = (req, res, next) => {
     next();
   });
 };
+
+// Multer config for logo upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, 'logo' + path.extname(file.originalname))
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// Route to upload logo
+router.post('/settings/branding/logo', authenticateAdmin, upload.single('logo'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const logoUrl = `/uploads/${req.file.filename}`;
+
+    await prisma.systemSettings.upsert({
+      where: { key: 'brandingSettings' },
+      update: {
+        value: {
+          ...((await prisma.systemSettings.findUnique({ where: { key: 'brandingSettings' } }))?.value || {}),
+          logoUrl,
+        }
+      },
+      create: {
+        key: 'brandingSettings',
+        value: { logoUrl },
+        description: 'Branding settings for the application',
+        category: 'branding',
+        isPublic: true,
+      },
+    });
+
+    res.json({ logoUrl });
+  } catch (error) {
+    console.error('Error uploading logo:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Get dashboard statistics
 router.get('/dashboard/stats', authenticateAdmin, async (req, res) => {
@@ -310,6 +357,90 @@ router.get('/settings', authenticateAdmin, async (req, res) => {
     res.json(settings);
   } catch (error) {
     console.error('Error fetching settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Real-time metrics endpoint
+router.get('/metrics/realtime', authenticateAdmin, async (req, res) => {
+  try {
+    // Get current timestamp for time-based queries
+    const now = new Date();
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const lastHour = new Date(now.getTime() - 60 * 60 * 1000);
+
+    // Active users (users with activity in the last 15 minutes)
+    const activeUsers = await prisma.user.count({
+      where: {
+        lastLoginAt: {
+          gte: new Date(now.getTime() - 15 * 60 * 1000)
+        }
+      }
+    });
+
+    // Total sessions today
+    const totalSessions = await prisma.conversation.count({
+      where: {
+        createdAt: {
+          gte: new Date(now.toDateString())
+        }
+      }
+    });
+
+    // Average session duration (in seconds)
+    const sessions = await prisma.conversation.findMany({
+      where: {
+        createdAt: {
+          gte: last24Hours
+        },
+        updatedAt: {
+          not: null
+        }
+      },
+      select: {
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    const averageSessionDuration = sessions.length > 0 
+      ? sessions.reduce((acc, session) => {
+          const duration = (session.updatedAt - session.createdAt) / 1000;
+          return acc + duration;
+        }, 0) / sessions.length
+      : 0;
+
+    // Messages per second (approximate based on last hour)
+    const recentMessages = await prisma.message.count({
+      where: {
+        timestamp: {
+          gte: lastHour
+        }
+      }
+    });
+    const messagesPerSecond = recentMessages / 3600; // 3600 seconds in an hour
+
+    // System health metrics (mock implementation)
+    const systemHealth = 'excellent'; // Could be calculated based on various factors
+    const responseTime = Math.floor(Math.random() * 100 + 50); // Mock response time
+    const cpuUsage = Math.floor(Math.random() * 30 + 20); // Mock CPU usage
+    const memoryUsage = Math.floor(Math.random() * 40 + 30); // Mock memory usage
+    const storageUsage = Math.floor(Math.random() * 20 + 15); // Mock storage usage
+
+    res.json({
+      activeUsers,
+      totalSessions,
+      averageSessionDuration: Math.round(averageSessionDuration),
+      messagesPerSecond,
+      systemHealth,
+      responseTime,
+      cpuUsage,
+      memoryUsage,
+      storageUsage,
+      timestamp: now.toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching real-time metrics:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

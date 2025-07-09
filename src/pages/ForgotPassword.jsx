@@ -21,12 +21,29 @@ const ForgotPassword = () => {
     setIsSubmitting(true);
 
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send reset instructions');
+      }
+
+      const data = await response.json();
+
       setIsSubmitted(true);
-      toast.success('Password reset instructions sent to your email');
+      toast.success(data.message);
+      if (data.previewURL) {
+        console.log(`Password reset preview URL: ${data.previewURL}`);
+        toast.success(<span>Password reset preview URL: <a href={data.previewURL} target="_blank" rel="noopener noreferrer">{data.previewURL}</a></span>, {duration: 10000});
+      }
+
     } catch (error) {
-      toast.error('Failed to send reset instructions. Please try again.');
+      toast.error(error.message || 'Failed to send reset instructions. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

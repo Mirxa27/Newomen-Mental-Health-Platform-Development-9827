@@ -2,6 +2,8 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import {
   authLimiter,
   validateRegistration,
@@ -191,10 +193,99 @@ router.get('/me', async (req, res, next) => {
   }
 });
 
-// Forgot password endpoint (placeholder)
-router.post('/forgot-password', async (req, res) => {
-  // TODO: Implement password reset functionality
-  res.json({ message: 'Password reset functionality not implemented yet' });
+// Forgot password endpoint
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const passwordResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    const passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await prisma.user.update({
+      where: { email },
+      data: { passwordResetToken, passwordResetExpires },
+    });
+
+    const resetURL = `${req.protocol}://${req.get('host')}/auth/reset-password?token=${resetToken}`;
+
+    // Create a test account for nodemailer
+    let testAccount = await nodemailer.createTestAccount();
+
+    // Create a transporter
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+      },
+    });
+
+    const message = {
+      from: '"Newomen Support" <support@newomen.com>',
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n${resetURL}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    const info = await transporter.sendMail(message);
+
+    console.log('Message sent: %s', info.messageId);
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+    res.json({ message: 'Password reset email sent', previewURL: nodemailer.getTestMessageUrl(info) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Reset password endpoint
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    const passwordResetToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken,
+        passwordResetExpires: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Password reset token is invalid or has expired' });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+
+    res.json({ message: 'Password has been reset' });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

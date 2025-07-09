@@ -70,10 +70,10 @@ const ShadowWork = () => {
           className="text-center mb-6 md:mb-8"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-            {t('shadowWorkTitle')}
+            Shadow Work Journey
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
-            {t('shadowWorkSubtitle')}
+            Embrace your whole self through deep introspection
           </p>
           <ProgressBar current={currentQuestion + 1} total={questions.length} />
         </motion.div>
@@ -105,11 +105,11 @@ const ShadowWork = () => {
             aria-label="Previous question"
           >
             <SafeIcon icon={FiArrowLeft} className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-sm md:text-base">{t('back')}</span>
+            <span className="text-sm md:text-base">Back</span>
           </button>
           
           <div className="text-xs md:text-sm text-gray-500">
-            {t('question')} {currentQuestion + 1} {t('of')} {questions.length}
+            Question {currentQuestion + 1} of {questions.length}
           </div>
           
           <button
@@ -118,7 +118,7 @@ const ShadowWork = () => {
             className="flex items-center space-x-1 md:space-x-2 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={isLastQuestion ? "Complete assessment" : "Next question"}
           >
-            <span className="text-sm md:text-base">{isLastQuestion ? 'Complete' : t('next')}</span>
+            <span className="text-sm md:text-base">{isLastQuestion ? 'Complete' : 'Next'}</span>
             <SafeIcon icon={isLastQuestion ? FiCheck : FiArrowRight} className="w-4 h-4 md:w-5 md:h-5" />
           </button>
         </div>

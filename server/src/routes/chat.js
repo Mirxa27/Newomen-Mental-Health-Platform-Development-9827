@@ -272,12 +272,8 @@ Remember: You're a companion for the journey, not a replacement for professional
         aiResponse = completion.choices[0].message.content;
       } catch (openaiError) {
         console.error('OpenAI API error:', openaiError);
-        // Fallback to intelligent mock response
-        aiResponse = generateContextualResponse(message, conversation.messages);
+        return res.status(500).json({ error: 'AI service unavailable' });
       }
-    } else {
-      // Generate contextual mock response
-      aiResponse = generateContextualResponse(message, conversation.messages);
     }
 
     // Save AI response

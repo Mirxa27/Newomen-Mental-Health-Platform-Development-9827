@@ -1,15 +1,15 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../hooks/useAuth';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  if (adminOnly && user?.role !== 'admin') {
+  if (adminOnly && !isAdmin()) {
     return <Navigate to="/" replace />;
   }
 
