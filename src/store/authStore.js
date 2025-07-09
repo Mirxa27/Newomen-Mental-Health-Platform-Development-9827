@@ -3,9 +3,12 @@ import { persist } from 'zustand/middleware';
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
-      user: null,
-      isAuthenticated: false,
+      (set, get) => ({
+        user: null,
+        isAuthenticated: false,
+        personalityType: null,
+        crystals: 0,
+        shadowProgress: 0,
       subscription: {
         tier: 'discovery',
         minutesRemaining: 10,
@@ -21,17 +24,21 @@ export const useAuthStore = create(
         set({
           user: {
             ...userData,
-            role: isAdmin ? 'admin' : 'user'
+            role: isAdmin ? 'admin' : 'user',
+            avatarUrl: userData.avatarUrl || null,
           },
           isAuthenticated: true,
         });
       },
 
-      logout: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-          subscription: {
+        logout: () => {
+          set({
+            user: null,
+            isAuthenticated: false,
+            personalityType: null,
+            crystals: 0,
+            shadowProgress: 0,
+            subscription: {
             tier: 'discovery',
             minutesRemaining: 10,
             isActive: true,
@@ -58,14 +65,22 @@ export const useAuthStore = create(
         }));
       },
 
-      updateProfile: (profileData) => {
-        set((state) => ({
-          user: {
-            ...state.user,
-            ...profileData,
-          },
-        }));
-      },
+        updateProfile: (profileData) => {
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...profileData,
+            },
+          }));
+        },
+
+        setPersonality: (type) => set({ personalityType: type }),
+
+        addCrystals: (amount) =>
+          set((state) => ({ crystals: state.crystals + amount })),
+
+        updateProgress: (value) =>
+          set({ shadowProgress: Math.min(100, value) }),
 
       // Admin functions
       isAdmin: () => {
@@ -77,5 +92,4 @@ export const useAuthStore = create(
     {
       name: 'newomen-auth',
     }
-  )
-);
+  ));

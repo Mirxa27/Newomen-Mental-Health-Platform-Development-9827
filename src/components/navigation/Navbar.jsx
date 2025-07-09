@@ -7,10 +7,11 @@ import {
   FiX, 
   FiGlobe, 
   FiUser, 
-  FiLogOut, 
-  FiBell, 
+  FiLogOut,
+  FiBell,
   FiSettings,
-  FiChevronDown
+  FiChevronDown,
+  FiActivity
 } from 'react-icons/fi';
 import { useAuthStore } from '../../store/authStore';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -155,10 +156,13 @@ const Navbar = () => {
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           className="absolute right-0 mt-2 w-56 p-2 rounded-2xl bg-slate-800/70 backdrop-blur-xl border border-white/10 shadow-2xl"
                         >
-                          <Link to="/profile" className="menu-item">
-                            <FiUser /><span>{t('profile')}</span>
-                          </Link>
-                          {user?.role === 'admin' && (
+            <Link to="/profile" className="menu-item">
+              <FiUser /><span>{t('profile')}</span>
+            </Link>
+            <Link to="/breathing" className="menu-item">
+              <FiActivity /><span>Breathing</span>
+            </Link>
+            {user?.role === 'admin' && (
                             <Link to="/admin" className="menu-item">
                               <FiSettings /><span>{t('admin')}</span>
                             </Link>
@@ -233,11 +237,12 @@ const Navbar = () => {
                         <p className="text-sm text-gray-400">{user?.email}</p>
                       </div>
                     </div>
-                    {user?.role === 'admin' && (
-                      <Link to="/admin" className="mobile-menu-item"><FiSettings /><span>{t('admin')}</span></Link>
-                    )}
-                  </>
-                ) : (
+                      {user?.role === 'admin' && (
+                        <Link to="/admin" className="mobile-menu-item"><FiSettings /><span>{t('admin')}</span></Link>
+                      )}
+                      <Link to="/breathing" className="mobile-menu-item"><FiActivity /><span>Breathing</span></Link>
+                    </>
+                  ) : (
                   <div className="space-y-3">
                     <Link to="/auth/login" className="block w-full text-center py-3 bg-white/10 rounded-xl text-white font-semibold">
                       {t('login')}

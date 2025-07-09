@@ -16,10 +16,29 @@ import { FiUsers } from 'react-icons/fi';
 import { FiTarget } from 'react-icons/fi';
 import { FiTrendingUp } from 'react-icons/fi';
 import { useAuthStore } from '../store/authStore';
+import { useShadowWorkStore } from '../store/shadowWorkStore';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, personalityType } = useAuthStore();
+  const { affirmations } = useShadowWorkStore();
+  const [dailyAffirmation, setDailyAffirmation] = React.useState('');
+
+  const defaultAffirmations = ['You are worthy of growth and joy.'];
+  const personalityAffirmations = {
+    leader: ['Lead with compassion and courage.', 'Your vision inspires others.'],
+    nurturer: ['Your kindness uplifts those around you.', 'Self-care fuels your giving heart.'],
+    visionary: ['Your ideas shape a brighter future.', 'Creativity flows through you.'],
+  };
+
+  React.useEffect(() => {
+    let pool = affirmations && affirmations.length > 0 ? affirmations : defaultAffirmations;
+    if (personalityType && personalityAffirmations[personalityType]) {
+      pool = personalityAffirmations[personalityType];
+    }
+    const index = Math.floor(Math.random() * pool.length);
+    setDailyAffirmation(pool[index]);
+  }, [affirmations, personalityType]);
 
   const features = [
     { 
@@ -129,6 +148,17 @@ const Home = () => {
               Embark on a transformative journey of self-discovery with AI-powered guidance 
               tailored to your unique cultural background and personal aspirations.
             </motion.p>
+
+            {dailyAffirmation && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-lg text-white mt-6"
+              >
+                {dailyAffirmation}
+              </motion.p>
+            )}
             
             <motion.div
               variants={itemVariants}

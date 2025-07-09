@@ -57,10 +57,17 @@ const AdminDashboard = () => {
   const quickActions = [
     {
       title: 'AI Provider Settings',
-      description: 'Configure OpenAI, Anthropic, and other AI providers',
+      description: 'Configure OpenAI, ElevenLabs, and voice providers',
       icon: FiCpu,
       link: '/admin/ai-providers',
       color: 'from-purple-500 to-purple-600'
+    },
+    {
+      title: 'Voice Chat Management',
+      description: 'Configure voice assistants and speech providers',
+      icon: FiMic,
+      link: '/admin/ai-providers',
+      color: 'from-pink-500 to-pink-600'
     },
     {
       title: 'System Settings',

@@ -7,7 +7,7 @@ import {
   FiVolumeX,
   FiPlay,
   FiPause,
-  FiStop,
+  FiX,
   FiSettings,
   FiUser,
   FiWifi,
@@ -328,7 +328,7 @@ const AdvancedVoiceChat = ({ conversationId, onClose }) => {
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             >
-              <FiStop className="w-5 h-5" />
+              <FiX className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -442,7 +442,7 @@ const AdvancedVoiceChat = ({ conversationId, onClose }) => {
                   onClick={endVoiceSession}
                   className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg flex items-center gap-2"
                 >
-                  <FiStop className="w-5 h-5" />
+                  <FiX className="w-5 h-5" />
                   End Session
                 </motion.button>
               </div>

@@ -43,7 +43,7 @@ const Register = () => {
     try {
       const userData = await registerUser(formData.name, formData.email, formData.password);
       toast.success('Welcome to Newomen!');
-      navigate('/shadow-work/1');
+        navigate('/personality-test');
     } catch (error) {
       toast.error('Registration failed. Please try again.');
     } finally {

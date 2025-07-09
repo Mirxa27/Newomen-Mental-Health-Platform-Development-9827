@@ -80,8 +80,8 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
             className="fixed md:sticky top-16 left-0 bottom-0 w-64 bg-white/80 backdrop-blur-sm border-r border-gray-200 min-h-[calc(100vh-64px)] z-50 transition-all duration-300 overflow-y-auto"
           >
             <div className="p-4 md:p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900">Admin Panel</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <img src="/vite.svg" alt="Logo" className="w-8 h-8" />
                 <button
                   onClick={toggleSidebar}
                   className="text-gray-500 hover:text-gray-700 md:hidden"

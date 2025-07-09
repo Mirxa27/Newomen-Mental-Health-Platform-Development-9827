@@ -194,13 +194,8 @@ class GoogleSpeechProvider extends VoiceProvider {
   }
 
   async testConnection() {
-    try {
-      // Mock test for now - would require proper Google Cloud setup
-      return true;
-    } catch (error) {
-      console.error('Google Speech connection test failed:', error);
-      return false;
-    }
+    // Mock test for now - would require proper Google Cloud setup
+    return true;
   }
 
   async transcribeAudio(audioData, options = {}) {
