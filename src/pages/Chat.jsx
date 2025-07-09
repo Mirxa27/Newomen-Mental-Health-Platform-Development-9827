@@ -20,6 +20,7 @@ import TypingIndicator from '../components/chat/TypingIndicator';
 import EmotionIndicator from '../components/chat/EmotionIndicator';
 import RealtimeVoiceChat from '../components/chat/RealtimeVoiceChat';
 import AdvancedVoiceChat from '../components/chat/AdvancedVoiceChat';
+import VoiceAgentIntegration from '../components/chat/VoiceAgentIntegration';
 import toast from 'react-hot-toast';
 
 const Chat = () => {
@@ -28,6 +29,7 @@ const Chat = () => {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [showRealtimeVoice, setShowRealtimeVoice] = useState(false);
   const [showAdvancedVoice, setShowAdvancedVoice] = useState(false);
+  const [showWebRTCVoice, setShowWebRTCVoice] = useState(false);
   const [headline, setHeadline] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -230,6 +232,14 @@ const Chat = () => {
     setShowAdvancedVoice(true);
   };
 
+  const handleStartWebRTCVoice = () => {
+    if (subscription.minutesRemaining <= 0) {
+      toast.error('No minutes remaining. Please upgrade your subscription.');
+      return;
+    }
+    setShowWebRTCVoice(true);
+  };
+
   const autoResizeTextarea = (e) => {
     const textarea = e.target;
     textarea.style.height = 'auto';
@@ -267,7 +277,7 @@ const Chat = () => {
             >
               <FiPhone className="w-5 h-5 mr-2" /> Start Call
             </motion.button>
-            <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartAdvancedVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="Advanced Voice Chat">
+            <motion.button whileTap={{ scale: 0.9 }} onClick={handleStartWebRTCVoice} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors" title="WebRTC Voice Chat">
               <FiMic className="w-5 h-5" />
             </motion.button>
             <motion.button whileTap={{ scale: 0.9 }} className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
@@ -375,6 +385,27 @@ const Chat = () => {
           <AdvancedVoiceChat 
             conversationId={currentConversation?.id}
             onClose={() => setShowAdvancedVoice(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* WebRTC Voice Agent Modal */}
+      <AnimatePresence>
+        {showWebRTCVoice && (
+          <VoiceAgentIntegration
+            onTranscript={(transcript) => {
+              setInputValue(transcript);
+              handleSendMessage(transcript);
+            }}
+            onResponse={(response) => {
+              addMessage({
+                id: Date.now().toString(),
+                content: response.text,
+                sender: 'ai',
+                timestamp: new Date().toISOString(),
+              });
+            }}
+            onClose={() => setShowWebRTCVoice(false)}
           />
         )}
       </AnimatePresence>
