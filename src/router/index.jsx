@@ -27,6 +27,7 @@ const Settings = lazy(() => import('../pages/Settings'));
 const NewMe = lazy(() => import('../pages/NewMe'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Onboarding = lazy(() => import('../pages/Onboarding'));
+import GamificationDashboard from '../components/dashboard/GamificationDashboard';
 
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/Admin'));
@@ -340,6 +341,7 @@ const AppRouter = () => {
           <Route path="/connection-journey" element={<ProtectedRoute><ConnectionJourney /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+          <Route path="/profile/growth" element={<ProtectedRoute><GamificationDashboard /></ProtectedRoute>} />
         </Route>
 
         {/* Auth layout routes */}
