@@ -164,41 +164,28 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  CANCELLED
-}
-
 model Subscription {
   id                String             @id @default(uuid())
   userId            String             @unique
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeCustomerId  String?            @unique
-  stripeSubscriptionId String?         @unique
-  status            SubscriptionStatus @default(TRIALING)
   planId            String
   plan              SubscriptionPlan   @relation(fields: [planId], references: [id])
-  currentPeriodStart DateTime?
-  currentPeriodEnd  DateTime?
-  cancelAtPeriodEnd Boolean            @default(false)
+  status            SubscriptionStatus @default(TRIALING)
+  paypalSubscriptionId String?         @unique
+  currentPeriodStart DateTime          @default(now())
+  currentPeriodEnd  DateTime
+  minutesRemaining  Int
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-  payments          Payment[]
 }
 
 model SubscriptionPlan {
   id            String         @id @default(uuid())
   name          String         @unique
   description   String?
-  price         Float          // Monthly price in cents
-  currency      String         @default("usd")
-  stripePriceId String?        @unique
-  features      Json           // List of features included
-  maxMessages   Int?           // Message limit per month
-  maxVoiceTime  Int?           // Voice chat time limit in minutes
+  price         Float          // Monthly price
+  currency      String         @default("USD")
+  minutes       Int            // Minutes included in the plan
   isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
