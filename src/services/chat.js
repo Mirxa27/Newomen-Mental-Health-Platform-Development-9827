@@ -115,3 +115,5 @@ export const sendMessageStream = async (message, conversationId = null, onChunk)
     reader.releaseLock();
   }
 };
+
+export const postMessage = addMessage;
