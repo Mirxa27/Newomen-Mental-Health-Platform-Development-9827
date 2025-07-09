@@ -50,7 +50,8 @@ const RealTimeDashboard = () => {
         setLastUpdated(new Date());
       }
     } catch (error) {
-      console.error('Failed to fetch realtime metrics:', error);
+      // Error handling - could show toast notification instead
+      setMetrics(null);
     } finally {
       setIsRefreshing(false);
     }

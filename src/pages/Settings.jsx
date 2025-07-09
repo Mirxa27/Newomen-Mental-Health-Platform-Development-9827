@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
 import { useAuthStore } from '../store/authStore';
-import SafeIcon from '../components/common/SafeIcon';
 import toast from 'react-hot-toast';
 
 const { 
@@ -149,7 +148,7 @@ const Settings = () => {
             {t('fullName')}
           </label>
           <div className="relative">
-            <SafeIcon icon={FiUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               name="name"
@@ -166,7 +165,7 @@ const Settings = () => {
             {t('emailAddress')}
           </label>
           <div className="relative">
-            <SafeIcon icon={FiMail} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="email"
               name="email"
@@ -183,7 +182,7 @@ const Settings = () => {
           disabled={isLoading}
           className="flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
         >
-          <SafeIcon icon={FiSave} className="w-4 h-4" />
+          <FiSave className="w-4 h-4" />
           {isLoading ? t('saving') : t('saveChanges')}
         </button>
       </form>
@@ -204,7 +203,7 @@ const Settings = () => {
             {t('currentPassword')}
           </label>
           <div className="relative">
-            <SafeIcon icon={FiLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type={showPasswords.current ? 'text' : 'password'}
               name="currentPassword"
@@ -218,7 +217,7 @@ const Settings = () => {
               onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <SafeIcon icon={showPasswords.current ? FiEyeOff : FiEye} className="w-5 h-5" />
+              {showPasswords.current ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -228,7 +227,7 @@ const Settings = () => {
             {t('newPassword')}
           </label>
           <div className="relative">
-            <SafeIcon icon={FiLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type={showPasswords.new ? 'text' : 'password'}
               name="newPassword"
@@ -242,7 +241,7 @@ const Settings = () => {
               onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <SafeIcon icon={showPasswords.new ? FiEyeOff : FiEye} className="w-5 h-5" />
+              {showPasswords.new ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -252,7 +251,7 @@ const Settings = () => {
             {t('confirmPassword')}
           </label>
           <div className="relative">
-            <SafeIcon icon={FiLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type={showPasswords.confirm ? 'text' : 'password'}
               name="confirmPassword"
@@ -266,7 +265,7 @@ const Settings = () => {
               onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <SafeIcon icon={showPasswords.confirm ? FiEyeOff : FiEye} className="w-5 h-5" />
+              {showPasswords.confirm ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -276,7 +275,7 @@ const Settings = () => {
           disabled={isLoading}
           className="flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
         >
-          <SafeIcon icon={FiSave} className="w-4 h-4" />
+          <FiSave className="w-4 h-4" />
           {isLoading ? t('updating') : t('updatePassword')}
         </button>
       </form>
@@ -294,7 +293,7 @@ const Settings = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3">
-            <SafeIcon icon={FiBell} className="w-5 h-5 text-gray-600" />
+            <FiBell className="w-5 h-5 text-gray-600" />
             <div>
               <h4 className="font-medium text-gray-900">{t('pushNotifications')}</h4>
               <p className="text-sm text-gray-600">{t('pushNotificationsDesc')}</p>
@@ -313,7 +312,7 @@ const Settings = () => {
 
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3">
-            <SafeIcon icon={FiMail} className="w-5 h-5 text-gray-600" />
+            <FiMail className="w-5 h-5 text-gray-600" />
             <div>
               <h4 className="font-medium text-gray-900">{t('emailUpdates')}</h4>
               <p className="text-sm text-gray-600">{t('emailUpdatesDesc')}</p>
@@ -344,7 +343,7 @@ const Settings = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3">
-            <SafeIcon icon={FiMoon} className="w-5 h-5 text-gray-600" />
+            <FiMoon className="w-5 h-5 text-gray-600" />
             <div>
               <h4 className="font-medium text-gray-900">{t('darkMode')}</h4>
               <p className="text-sm text-gray-600">{t('darkModeDesc')}</p>
@@ -363,7 +362,7 @@ const Settings = () => {
 
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3">
-            <SafeIcon icon={FiSmartphone} className="w-5 h-5 text-gray-600" />
+            <FiSmartphone className="w-5 h-5 text-gray-600" />
             <div>
               <h4 className="font-medium text-gray-900">{t('hapticFeedback')}</h4>
               <p className="text-sm text-gray-600">{t('hapticFeedbackDesc')}</p>
@@ -382,7 +381,7 @@ const Settings = () => {
 
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-3 mb-3">
-            <SafeIcon icon={FiGlobe} className="w-5 h-5 text-gray-600" />
+            <FiGlobe className="w-5 h-5 text-gray-600" />
             <div>
               <h4 className="font-medium text-gray-900">{t('language')}</h4>
               <p className="text-sm text-gray-600">{t('languageDesc')}</p>
@@ -414,7 +413,7 @@ const Settings = () => {
       <div className="space-y-4">
         <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center gap-3 mb-4">
-            <SafeIcon icon={FiTrash2} className="w-6 h-6 text-red-600" />
+            <FiTrash2 className="w-6 h-6 text-red-600" />
             <div>
               <h4 className="font-medium text-red-900">{t('deleteAccount')}</h4>
               <p className="text-sm text-red-700">{t('deleteAccountDesc')}</p>
@@ -427,7 +426,7 @@ const Settings = () => {
 
         <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-3 mb-4">
-            <SafeIcon icon={FiShield} className="w-6 h-6 text-blue-600" />
+            <FiShield className="w-6 h-6 text-blue-600" />
             <div>
               <h4 className="font-medium text-blue-900">{t('dataExport')}</h4>
               <p className="text-sm text-blue-700">{t('dataExportDesc')}</p>
@@ -482,7 +481,7 @@ const Settings = () => {
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    <SafeIcon icon={section.icon} className="w-5 h-5" />
+                    <section.icon className="w-5 h-5" />
                     {section.label}
                   </button>
                 ))}

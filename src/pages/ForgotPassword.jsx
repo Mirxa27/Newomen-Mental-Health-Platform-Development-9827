@@ -37,8 +37,8 @@ const ForgotPassword = () => {
 
       setIsSubmitted(true);
       toast.success(data.message);
-      if (data.previewURL) {
-        console.log(`Password reset preview URL: ${data.previewURL}`);
+      // Note: previewURL is only for development environments
+      if (data.previewURL && import.meta.env.DEV) {
         toast.success(<span>Password reset preview URL: <a href={data.previewURL} target="_blank" rel="noopener noreferrer">{data.previewURL}</a></span>, {duration: 10000});
       }
 

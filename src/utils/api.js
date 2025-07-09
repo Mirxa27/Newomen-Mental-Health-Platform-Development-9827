@@ -79,4 +79,145 @@ apiClient.interceptors.response.use(
   }
 );
 
+// API Endpoints
+export const api = {
+  // Auth endpoints
+  auth: {
+    login: (data) => apiClient.post('/auth/login', data),
+    register: (data) => apiClient.post('/auth/register', data),
+    logout: () => apiClient.post('/auth/logout'),
+    forgotPassword: (email) => apiClient.post('/auth/forgot-password', { email }),
+    resetPassword: (token, password) => apiClient.post('/auth/reset-password', { token, password }),
+    verifyToken: () => apiClient.get('/auth/verify'),
+    updateProfile: (data) => apiClient.put('/auth/profile', data),
+    changePassword: (data) => apiClient.post('/auth/change-password', data),
+  },
+
+  // User endpoints
+  user: {
+    getProfile: () => apiClient.get('/user/profile'),
+    updateProfile: (data) => apiClient.put('/user/profile', data),
+    updateSettings: (data) => apiClient.put('/user/settings', data),
+    deleteAccount: () => apiClient.delete('/user/account'),
+    exportData: () => apiClient.get('/user/export'),
+  },
+
+  // Chat endpoints
+  chat: {
+    sendMessage: (message) => apiClient.post('/chat', { message }),
+    getHistory: (params) => apiClient.get('/chat/history', { params }),
+    deleteConversation: (id) => apiClient.delete(`/chat/conversation/${id}`),
+    clearHistory: () => apiClient.delete('/chat/history'),
+  },
+
+  // Voice chat endpoints
+  voiceChat: {
+    createSession: () => apiClient.post('/voice-chat/session'),
+    endSession: (sessionId) => apiClient.post(`/voice-chat/session/${sessionId}/end`),
+    getSessionDetails: (sessionId) => apiClient.get(`/voice-chat/session/${sessionId}`),
+    getUsageStats: () => apiClient.get('/voice-chat/usage'),
+  },
+
+  // Self discovery endpoints
+  selfDiscovery: {
+    startJourney: () => apiClient.post('/selfdiscovery/journey'),
+    saveProgress: (data) => apiClient.post('/selfdiscovery/progress', data),
+    getProgress: () => apiClient.get('/selfdiscovery/progress'),
+    getInsights: () => apiClient.get('/selfdiscovery/insights'),
+    completeSection: (sectionId, data) => apiClient.post(`/selfdiscovery/section/${sectionId}/complete`, data),
+  },
+
+  // Admin endpoints
+  admin: {
+    getUsers: (params) => apiClient.get('/admin/users', { params }),
+    updateUser: (userId, data) => apiClient.put(`/admin/users/${userId}`, data),
+    deleteUser: (userId) => apiClient.delete(`/admin/users/${userId}`),
+    getAnalytics: (params) => apiClient.get('/admin/analytics', { params }),
+    getConversations: (params) => apiClient.get('/admin/conversations', { params }),
+    getPrompts: () => apiClient.get('/admin/prompts'),
+    updatePrompt: (promptId, data) => apiClient.put(`/admin/prompts/${promptId}`, data),
+    createPrompt: (data) => apiClient.post('/admin/prompts', data),
+    deletePrompt: (promptId) => apiClient.delete(`/admin/prompts/${promptId}`),
+    exportAnalytics: (format) => apiClient.get(`/admin/analytics/export?format=${format}`),
+  },
+
+  // AI Provider endpoints
+  aiProviders: {
+    getAll: () => apiClient.get('/ai-providers'),
+    getById: (id) => apiClient.get(`/ai-providers/${id}`),
+    create: (data) => apiClient.post('/ai-providers', data),
+    update: (id, data) => apiClient.put(`/ai-providers/${id}`, data),
+    delete: (id) => apiClient.delete(`/ai-providers/${id}`),
+    test: (id) => apiClient.post(`/ai-providers/${id}/test`),
+    setDefault: (id) => apiClient.post(`/ai-providers/${id}/set-default`),
+  },
+
+  // Subscription endpoints
+  subscription: {
+    getCurrent: () => apiClient.get('/subscription/current'),
+    getPlans: () => apiClient.get('/subscription/plans'),
+    createCheckoutSession: (planId) => apiClient.post('/subscription/checkout', { planId }),
+    cancelSubscription: () => apiClient.post('/subscription/cancel'),
+    getUsage: () => apiClient.get('/subscription/usage'),
+  },
+
+  // Utility endpoints
+  utils: {
+    uploadFile: (file, type = 'image') => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      return apiClient.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    },
+    getSystemStatus: () => apiClient.get('/health'),
+  }
+};
+
+// Error handling utilities
+export const handleApiError = (error) => {
+  if (error.response) {
+    // Server responded with error
+    const { status, data } = error.response;
+    
+    switch (status) {
+      case 400:
+        return { error: data.message || 'Invalid request', code: 'BAD_REQUEST' };
+      case 401:
+        return { error: 'Please login to continue', code: 'UNAUTHORIZED' };
+      case 403:
+        return { error: 'You don\'t have permission to perform this action', code: 'FORBIDDEN' };
+      case 404:
+        return { error: 'Resource not found', code: 'NOT_FOUND' };
+      case 429:
+        return { error: 'Too many requests. Please try again later', code: 'RATE_LIMITED' };
+      case 500:
+        return { error: 'Server error. Please try again later', code: 'SERVER_ERROR' };
+      default:
+        return { error: data.message || 'An unexpected error occurred', code: 'UNKNOWN' };
+    }
+  } else if (error.request) {
+    // Request made but no response
+    return { error: 'Network error. Please check your connection', code: 'NETWORK_ERROR' };
+  } else {
+    // Error in request setup
+    return { error: error.message || 'An unexpected error occurred', code: 'REQUEST_ERROR' };
+  }
+};
+
+// Request retry logic
+export const retryRequest = async (requestFn, retries = 3, delay = 1000) => {
+  try {
+    return await requestFn();
+  } catch (error) {
+    if (retries === 0 || error.response?.status < 500) {
+      throw error;
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return retryRequest(requestFn, retries - 1, delay * 2);
+  }
+};
+
 export default apiClient;
