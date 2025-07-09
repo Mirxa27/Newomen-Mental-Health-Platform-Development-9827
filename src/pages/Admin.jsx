@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FiHome, FiUsers, FiMessageSquare, FiEdit, FiBarChart, FiCpu, FiSettings, FiImage, FiActivity, FiCheckCircle } from 'react-icons/fi';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import AdminDashboard from '../components/admin/AdminDashboard';
@@ -14,19 +15,6 @@ import BrandingSettings from '../components/admin/BrandingSettings';
 import RealTimeDashboard from '../components/admin/RealTimeDashboard';
 import FeatureCompletionDashboard from '../components/dashboard/FeatureCompletionDashboard';
 
-const { 
-  FiHome, 
-  FiUsers, 
-  FiMessageSquare, 
-  FiEdit, 
-  FiBarChart3, 
-  FiCpu, 
-  FiSettings,
-  FiImage,
-  FiActivity,
-  FiCheckCircle
-} = FiIcons;
-
 const Admin = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,7 +26,7 @@ const Admin = () => {
     { name: 'Users', href: '/admin/users', icon: FiUsers },
     { name: 'Conversations', href: '/admin/conversations', icon: FiMessageSquare },
     { name: 'Prompts', href: '/admin/prompts', icon: FiEdit },
-    { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart3 },
+    { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart },
     { name: 'AI Providers', href: '/admin/ai-providers', icon: FiCpu },
     { name: 'Branding', href: '/admin/branding', icon: FiImage },
     { name: 'System Settings', href: '/admin/settings', icon: FiSettings },

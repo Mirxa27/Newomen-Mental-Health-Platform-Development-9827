@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
+import GlassCard from '../components/common/GlassCard';
+import GlassButton from '../components/common/GlassButton';
 
 const { FiPlay, FiPause, FiRefreshCw, FiHeart, FiWind, FiSun, FiMoon, FiActivity } = FiIcons;
 
@@ -102,18 +104,18 @@ const BreathingPractices = () => {
     // Breathing timer
     let phaseIndex = 0;
     let remainingTime = exercise.phases[0].duration;
-    
+
     intervalRef.current = setInterval(() => {
       remainingTime--;
       setTimeRemaining(remainingTime);
 
       if (remainingTime === 0) {
         phaseIndex = (phaseIndex + 1) % exercise.phases.length;
-        
+
         if (phaseIndex === 0) {
           setCycleCount(prev => prev + 1);
         }
-        
+
         const nextPhase = exercise.phases[phaseIndex];
         setCurrentPhase(nextPhase.name.toLowerCase());
         remainingTime = nextPhase.duration;
@@ -216,7 +218,7 @@ const BreathingPractices = () => {
                 className="transition-all duration-1000 ease-in-out"
               />
             </svg>
-            
+
             {/* Center Content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
               <motion.div
@@ -239,18 +241,25 @@ const BreathingPractices = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card text-white text-center mb-8 min-w-[200px]"
+            className="mb-8"
           >
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm text-blue-200">Cycles</div>
-                <div className="text-xl font-semibold">{cycleCount}</div>
+            <GlassCard
+              padding="20px"
+              cornerRadius={16}
+              className="text-white text-center min-w-[200px]"
+              overLight={false}
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-blue-200">Cycles</div>
+                  <div className="text-xl font-semibold">{cycleCount}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-blue-200">Duration</div>
+                  <div className="text-xl font-semibold">{formatTime(sessionDuration)}</div>
+                </div>
               </div>
-              <div>
-                <div className="text-sm text-blue-200">Duration</div>
-                <div className="text-xl font-semibold">{formatTime(sessionDuration)}</div>
-              </div>
-            </div>
+            </GlassCard>
           </motion.div>
 
           {/* Controls */}
@@ -302,10 +311,15 @@ const BreathingPractices = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`glass-card group cursor-pointer hover:shadow-2xl transition-all duration-300 bg-gradient-to-br ${exercise.color} p-1`}
+              className={`group cursor-pointer hover:shadow-2xl transition-all duration-300 bg-gradient-to-br ${exercise.color} p-1 rounded-3xl`}
               onClick={() => startExercise(exercise)}
             >
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 h-full">
+              <GlassCard
+                className="bg-white/95 backdrop-blur-sm h-full"
+                padding="24px"
+                cornerRadius={20}
+                overLight={true}
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${exercise.color} flex items-center justify-center text-white shadow-lg`}>
                     <SafeIcon icon={exercise.icon} className="w-8 h-8" />
@@ -341,15 +355,15 @@ const BreathingPractices = () => {
                   <div className="text-sm text-gray-500">
                     {exercise.phases.length} phases
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-6 py-2 bg-gradient-to-r ${exercise.color} text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300`}
+                  <GlassButton
+                    variant="primary"
+                    size="md"
+                    className={`bg-gradient-to-r ${exercise.color} text-white font-medium shadow-lg hover:shadow-xl`}
                   >
                     Start Practice
-                  </motion.button>
+                  </GlassButton>
                 </div>
-              </div>
+              </GlassCard>
             </motion.div>
           ))}
         </div>
@@ -359,25 +373,27 @@ const BreathingPractices = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-16 glass-card text-center"
+          className="mt-16"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Breathing Practice Tips
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-600">
-            <div>
-              <SafeIcon icon={FiWind} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
-              <p><strong>Find your rhythm:</strong> Don't force the breath, let it flow naturally</p>
+          <GlassCard padding="32px" cornerRadius={24} className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Breathing Practice Tips
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-600">
+              <div>
+                <SafeIcon icon={FiWind} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
+                <p><strong>Find your rhythm:</strong> Don't force the breath, let it flow naturally</p>
+              </div>
+              <div>
+                <SafeIcon icon={FiHeart} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
+                <p><strong>Stay consistent:</strong> Regular practice yields the best results</p>
+              </div>
+              <div>
+                <SafeIcon icon={FiSun} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
+                <p><strong>Create space:</strong> Find a quiet, comfortable place to practice</p>
+              </div>
             </div>
-            <div>
-              <SafeIcon icon={FiHeart} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
-              <p><strong>Stay consistent:</strong> Regular practice yields the best results</p>
-            </div>
-            <div>
-              <SafeIcon icon={FiSun} className="w-8 h-8 text-primary-500 mx-auto mb-2" />
-              <p><strong>Create space:</strong> Find a quiet, comfortable place to practice</p>
-            </div>
-          </div>
+          </GlassCard>
         </motion.div>
       </div>
     </div>

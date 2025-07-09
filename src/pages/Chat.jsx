@@ -11,6 +11,7 @@ import {
   FiPaperclip
 } from 'react-icons/fi';
 import { useChatStore } from '../store/chatStore';
+import { sendMessageStream } from '../services/chat';
 import { useAuthStore } from '../store/authStore';
 import { useAIProviderStore } from '../store/aiProviderStore';
 import VoiceInput from '../components/chat/VoiceInput';
@@ -41,6 +42,7 @@ const Chat = () => {
     createConversation, 
     setLoading,
     setTyping,
+    updateLastMessageContent,
   } = useChatStore();
   
   const { subscription, deductMinutes } = useAuthStore();
@@ -128,17 +130,24 @@ const Chat = () => {
     setTyping(true);
     
     try {
-      const aiContent = await generateAIResponse(content);
-      const aiResponse = {
-        id: (Date.now() + 1).toString(),
-        content: aiContent,
+      // Initialize placeholder AI message for streaming
+      const aiMessageId = 'ai-' + Date.now();
+      addMessage({
+        id: aiMessageId,
+        content: '',
         sender: 'ai',
         timestamp: new Date().toISOString(),
         culturalContext: 'mena',
-      };
-      addMessage(aiResponse);
-      // Deduct minutes based on the length of the AI's response
-      const minutesUsed = Math.ceil(aiContent.length / 150); // Example: 1 min per 150 chars
+      });
+      // Stream chunks and update store
+      let fullContent = '';
+      await sendMessageStream(content, currentConversation.id, (data) => {
+        const chunk = data.chunk || data.choices?.[0]?.delta?.content || '';
+        fullContent += chunk;
+        updateLastMessageContent(currentConversation.id, aiMessageId, chunk);
+      });
+      // Deduct minutes based on the total streamed content length
+      const minutesUsed = Math.ceil(fullContent.length / 150);
       deductMinutes(minutesUsed);
     } catch (error) {
       console.error("Message sending failed:", error);

@@ -9,12 +9,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import fs from 'fs';
+import { createServer } from 'http';
 import authRouter from './routes/auth.js';
 import chatRouter from './routes/chat.js';
 import shadowWorkRouter from './routes/shadowwork.js';
 import adminRouter from './routes/admin.js';
 import aiProvidersRouter from './routes/aiProviders.js';
 import voiceChatRouter from './routes/voiceChat.js';
+import paymentsRouter from './routes/payments.js';
 import {
   generalLimiter,
   speedLimiter,
@@ -58,6 +60,7 @@ app.use('/api/shadow-work', shadowWorkRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/ai-providers', aiProvidersRouter);
 app.use('/api/voice', voiceChatRouter);
+app.use('/api/payments', paymentsRouter);
 
 // Error handling middleware (must be last)
 app.use(sanitizeErrors);

@@ -1,20 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as FiIcons from 'react-icons/fi';
+import { FiHome, FiUsers, FiMessageSquare, FiEdit, FiBarChart, FiCpu, FiSettings, FiX } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-
-const { 
-  FiHome, 
-  FiUsers, 
-  FiMessageSquare, 
-  FiEdit, 
-  FiBarChart3, 
-  FiCpu, 
-  FiSettings,
-  FiX
-} = FiIcons;
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -25,7 +14,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Users', href: '/admin/users', icon: FiUsers },
     { name: 'Conversations', href: '/admin/conversations', icon: FiMessageSquare },
     { name: 'Prompts', href: '/admin/prompts', icon: FiEdit },
-    { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart3 },
+    { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart },
     { name: 'AI Providers', href: '/admin/ai-providers', icon: FiCpu },
     { name: 'System Settings', href: '/admin/settings', icon: FiSettings },
   ];

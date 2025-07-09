@@ -101,6 +101,27 @@ export const useChatStore = create(
           };
         });
       },
+
+      // Append incoming AI stream chunk to a message
+      updateLastMessageContent: (conversationId, messageId, chunk) => {
+        set((state) => {
+          const conversations = [...state.conversations];
+          const convIndex = conversations.findIndex(c => c.id === conversationId);
+          if (convIndex < 0) return state;
+          const conv = { ...conversations[convIndex] };
+          const msgIndex = conv.messages.findIndex(m => m.id === messageId);
+          if (msgIndex < 0) return state;
+          const messages = [...conv.messages];
+          messages[msgIndex] = {
+            ...messages[msgIndex],
+            content: messages[msgIndex].content + chunk,
+          };
+          conv.messages = messages;
+          conversations[convIndex] = conv;
+          const currentConversation = state.currentConversation?.id === conversationId ? conv : state.currentConversation;
+          return { conversations, currentConversation };
+        });
+      },
     }),
     { name: 'newomen-chat' }
   )

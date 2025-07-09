@@ -28,6 +28,14 @@ model User {
   shadowWorkSessions  ShadowWorkSession[]
   voiceProfiles       VoiceProfile[]
   voiceSessions       VoiceSession[]
+  subscription        Subscription?
+  payments            Payment[]
+  notifications       Notification[]
+  crisisAlerts        CrisisAlert[]
+  analytics           UserAnalytics?
+  fileUploads         FileUpload[]
+  moodEntries         MoodEntry[]
+  activeSessions      ActiveSession[]
 }
 
 model Conversation {
@@ -48,6 +56,7 @@ model Message {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   timestamp      DateTime     @default(now())
+  crisisAlerts   CrisisAlert[]
 }
 
 model ShadowWorkSession {
