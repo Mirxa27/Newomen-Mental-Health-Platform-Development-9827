@@ -78,13 +78,6 @@ const MobileNavigation = () => {
       gradient: 'from-pink-400 to-rose-400' 
     },
     { 
-      id: 'selfDiscovery', 
-      label: 'Self Discovery',
-      path: '/selfdiscovery',
-      icon: FiCheckSquare,
-      gradient: 'from-green-400 to-lime-400' 
-    },
-    { 
       id: 'personalityTest', 
       label: 'Personality Test',
       path: '/personality-test',
