@@ -1,5 +1,4 @@
 import React from 'react';
-import LiquidGlass from 'liquid-glass-react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 
@@ -37,40 +36,6 @@ const GlassButton = ({
     ${className}
   `.trim();
 
-    const glassProps = {
-        primary: {
-            displacementScale: 64,
-            blurAmount: 0.1,
-            saturation: 130,
-            aberrationIntensity: 2,
-            elasticity: 0.35,
-            cornerRadius: 8
-        },
-        secondary: {
-            displacementScale: 50,
-            blurAmount: 0.08,
-            saturation: 110,
-            aberrationIntensity: 1.5,
-            elasticity: 0.25,
-            cornerRadius: 8
-        },
-        outline: {
-            displacementScale: 40,
-            blurAmount: 0.05,
-            saturation: 100,
-            aberrationIntensity: 1,
-            elasticity: 0.2,
-            cornerRadius: 8
-        },
-        ghost: {
-            displacementScale: 30,
-            blurAmount: 0.03,
-            saturation: 90,
-            aberrationIntensity: 0.5,
-            elasticity: 0.15,
-            cornerRadius: 8
-        }
-    };
 
     const handleClick = (e) => {
         if (disabled || loading) return;
@@ -78,32 +43,28 @@ const GlassButton = ({
     };
 
     return (
-        <motion.div
+        <motion.button
             whileHover={{ scale: disabled ? 1 : 1.02 }}
             whileTap={{ scale: disabled ? 1 : 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className={fullWidth ? 'w-full' : 'inline-block'}
+            className={`${buttonClasses} ${fullWidth ? 'w-full' : 'inline-block'}`}
+            onClick={handleClick}
+            disabled={disabled}
+            {...props}
         >
-            <LiquidGlass
-                {...glassProps[variant]}
-                onClick={handleClick}
-                className={buttonClasses}
-                {...props}
-            >
-                {loading ? (
-                    <div className="flex items-center space-x-2">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                        />
-                        <span>Loading...</span>
-                    </div>
-                ) : (
-                    children
-                )}
-            </LiquidGlass>
-        </motion.div>
+            {loading ? (
+                <div className="flex items-center space-x-2">
+                    <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                    />
+                    <span>Loading...</span>
+                </div>
+            ) : (
+                children
+            )}
+        </motion.button>
     );
 };
 
