@@ -118,13 +118,13 @@ export const api = {
     getUsageStats: () => apiClient.get('/voice-chat/usage'),
   },
 
-  // Self discovery endpoints
-  selfDiscovery: {
-    startJourney: () => apiClient.post('/selfdiscovery/journey'),
-    saveProgress: (data) => apiClient.post('/selfdiscovery/progress', data),
-    getProgress: () => apiClient.get('/selfdiscovery/progress'),
-    getInsights: () => apiClient.get('/selfdiscovery/insights'),
-    completeSection: (sectionId, data) => apiClient.post(`/selfdiscovery/section/${sectionId}/complete`, data),
+  // Shadow work endpoints
+  shadowWork: {
+    startJourney: () => apiClient.post('/shadow-work/journey'),
+    saveProgress: (data) => apiClient.post('/shadow-work/progress', data),
+    getProgress: () => apiClient.get('/shadow-work/progress'),
+    getInsights: () => apiClient.get('/shadow-work/insights'),
+    completeSection: (sectionId, data) => apiClient.post(`/shadow-work/section/${sectionId}/complete`, data),
   },
 
   // Admin endpoints

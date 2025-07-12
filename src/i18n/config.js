@@ -106,7 +106,6 @@ const resources = {
       switchLanguage: "Switch Language",
       signIn: "Sign In",
       signUp: "Sign Up",
-      selfDiscovery: "Self Discovery",
       close: "Close",
       userProfile: "User Profile",
       
@@ -282,7 +281,6 @@ const resources = {
       switchLanguage: "تغيير اللغة",
       signIn: "تسجيل الدخول",
       signUp: "إنشاء حساب",
-      selfDiscovery: "اكتشاف الذات",
       close: "إغلاق",
       userProfile: "الملف الشخصي للمستخدم",
       
