@@ -7,8 +7,8 @@ import {
   RemoteTrackPublication,
   LocalAudioTrack,
 } from 'livekit-client';
-import api from '../utils/api';
-import { useAuthStore } from '../store/authStore';
+import api from '../../utils/api';
+import { useAuthStore } from '../../store/authStore';
 
 const VoiceAgent = ({ roomName }) => {
   const [isConnected, setIsConnected] = useState(false);

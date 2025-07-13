@@ -1,33 +1,40 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiSave, FiTool, FiKey, FiInfo } from 'react-icons/fi';
-import { useOpenAIStore } from '../../store/openaiStore';
+import toast from 'react-hot-toast';
+import { useAIProviderStore } from '../../store/aiProviderStore';
 import GlassCard from '../common/GlassCard';
 import GlassButton from '../common/GlassButton';
 
 const OpenAISettings = () => {
     const {
-        apiKey,
-        setApiKey,
-        model,
-        setModel,
-        temperature,
-        setTemperature,
-        maxTokens,
-        setMaxTokens,
-    } = useOpenAIStore();
+        getDefaultProvider,
+        updateProvider,
+    } = useAIProviderStore();
 
-    const [localApiKey, setLocalApiKey] = useState(apiKey);
-    const [localModel, setLocalModel] = useState(model);
-    const [localTemperature, setLocalTemperature] = useState(temperature);
-    const [localMaxTokens, setLocalMaxTokens] = useState(maxTokens);
+    const defaultProvider = getDefaultProvider();
+
+    const [localApiKey, setLocalApiKey] = useState(defaultProvider?.apiKey || '');
+    const [localModel, setLocalModel] = useState(defaultProvider?.model || 'gpt-4');
+    const [localTemperature, setLocalTemperature] = useState(defaultProvider?.settings.temperature || 0.7);
+    const [localMaxTokens, setLocalMaxTokens] = useState(defaultProvider?.settings.maxTokens || 1000);
 
     const handleSave = () => {
-        setApiKey(localApiKey);
-        setModel(localModel);
-        setTemperature(localTemperature);
-        setMaxTokens(localMaxTokens);
-        // Add toast notification for success
+        if (!defaultProvider) {
+            toast.error('No default provider found');
+            return;
+        }
+
+        updateProvider(defaultProvider.id, {
+            apiKey: localApiKey,
+            model: localModel,
+            settings: {
+                ...defaultProvider.settings,
+                temperature: localTemperature,
+                maxTokens: localMaxTokens,
+            }
+        });
+        toast.success('Settings saved successfully');
     };
 
     return (
