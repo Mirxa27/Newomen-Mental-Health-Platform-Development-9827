@@ -1,5 +1,4 @@
 import React from 'react';
-import LiquidGlass from 'liquid-glass-react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 
@@ -22,23 +21,11 @@ const GlassCard = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className={`glass-card-wrapper ${className}`}
+            className={`glass-card ${className}`}
+            onClick={onClick}
             {...props}
         >
-            <LiquidGlass
-                displacementScale={displacementScale}
-                blurAmount={blurAmount}
-                saturation={saturation}
-                aberrationIntensity={aberrationIntensity}
-                elasticity={elasticity}
-                cornerRadius={cornerRadius}
-                padding={padding}
-                overLight={overLight}
-                onClick={onClick}
-                className="w-full h-full"
-            >
-                {children}
-            </LiquidGlass>
+            {children}
         </motion.div>
     );
 };

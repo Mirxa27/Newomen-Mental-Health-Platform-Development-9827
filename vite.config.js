@@ -166,4 +166,13 @@ export default defineConfig({
     host: true,
     port: 4173,
     strictPort: false
-  }});
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    coverage: {
+      reporter: ['text', 'html', 'json'],
+      provider: 'v8'
+    }
+  }
+});
