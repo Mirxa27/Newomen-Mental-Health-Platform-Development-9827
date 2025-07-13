@@ -207,6 +207,12 @@ npm run build
 npm run preview
 ```
 
+### Unit Tests
+```bash
+npm run test
+npm run test:coverage
+```
+
 ### Mobile Testing
 1. **Chrome DevTools**: Device simulation
 2. **Local Network**: Test on real devices
