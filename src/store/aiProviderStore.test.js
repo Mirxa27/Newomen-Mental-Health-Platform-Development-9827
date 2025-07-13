@@ -57,3 +57,29 @@ describe('aiProviderStore', () => {
     }).toThrow();
   });
 });
+it('deletes provider when not default', () => {
+  useAIProviderStore.getState().addProvider({ id: 'gemini', name: 'Gemini', type: 'chat' });
+  useAIProviderStore.getState().deleteProvider('gemini');
+  const provider = useAIProviderStore.getState().providers.find(p => p.id === 'gemini');
+  expect(provider).toBeUndefined();
+});
+
+it('throws when deleting default provider', () => {
+  expect(() => {
+    useAIProviderStore.getState().deleteProvider('openai');
+  }).toThrow();
+});
+
+it('getDefaultProvider returns provider', () => {
+  const provider = useAIProviderStore.getState().getDefaultProvider();
+  expect(provider.id).toBe('openai');
+});
+
+it('clearError resets error state', () => {
+  expect(() => {
+    useAIProviderStore.getState().updateProvider('invalid', { model: 'x' });
+  }).toThrow();
+  expect(useAIProviderStore.getState().error).not.toBeNull();
+  useAIProviderStore.getState().clearError();
+  expect(useAIProviderStore.getState().error).toBeNull();
+});
