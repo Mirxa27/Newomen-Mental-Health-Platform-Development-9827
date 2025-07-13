@@ -25,16 +25,20 @@ const OpenAISettings = () => {
             return;
         }
 
-        updateProvider(defaultProvider.id, {
-            apiKey: localApiKey,
-            model: localModel,
-            settings: {
-                ...defaultProvider.settings,
-                temperature: localTemperature,
-                maxTokens: localMaxTokens,
-            }
-        });
-        toast.success('Settings saved successfully');
+        try {
+            updateProvider(defaultProvider.id, {
+                apiKey: localApiKey,
+                model: localModel,
+                settings: {
+                    ...defaultProvider.settings,
+                    temperature: localTemperature,
+                    maxTokens: localMaxTokens,
+                }
+            });
+            toast.success('Settings saved successfully');
+        } catch (error) {
+            toast.error(error.message || 'Failed to save settings');
+        }
     };
 
     return (

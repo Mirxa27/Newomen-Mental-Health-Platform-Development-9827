@@ -13,7 +13,8 @@
     "build:ios": "npm run build && npx cap add ios && npx cap sync ios && npx cap open ios",
     "sync:android": "npx cap sync android",
     "sync:ios": "npx cap sync ios",
-    "serve": "npm run build && npm run preview"
+    "serve": "npm run build && npm run preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@capacitor/android": "^5.6.0",
@@ -78,6 +79,8 @@
     "tailwindcss": "^3.4.17",
     "vite": "^7.0.2",
     "vite-plugin-pwa": "^1.0.1",
-    "workbox-window": "^7.0.0"
+    "workbox-window": "^7.0.0",
+    "vitest": "^3.2.4",
+    "jsdom": "^24.0.0"
   }
 }
