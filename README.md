@@ -210,6 +210,7 @@ npm run preview
 ### Unit Tests
 ```bash
 npm run test
+npm run test -- --coverage
 ```
 
 ### Mobile Testing

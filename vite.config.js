@@ -169,6 +169,10 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: 'jsdom',
+    coverage: {
+      reporter: ['text', 'html', 'json'],
+      provider: 'v8'
+    }
   }
 });

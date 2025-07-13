@@ -35,4 +35,25 @@ describe('aiProviderStore', () => {
       useAIProviderStore.getState().updateProvider('invalid', { model: 'x' });
     }).toThrow();
   });
+
+  it('adds a new provider and sets as default', () => {
+    useAIProviderStore.getState().addProvider({
+      id: 'gemini',
+      name: 'Gemini',
+      type: 'chat',
+      apiKey: 'abc',
+      isDefault: false,
+    });
+    useAIProviderStore.getState().setDefaultProvider('gemini');
+    const gemini = useAIProviderStore.getState().providers.find(p => p.id === 'gemini');
+    const openai = useAIProviderStore.getState().providers.find(p => p.id === 'openai');
+    expect(gemini.isDefault).toBe(true);
+    expect(openai.isDefault).toBe(false);
+  });
+
+  it('prevents deactivating default provider', () => {
+    expect(() => {
+      useAIProviderStore.getState().toggleActive('openai');
+    }).toThrow();
+  });
 });
