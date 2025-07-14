@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import toast from 'react-hot-toast';
+import { api } from '../../utils/api';
+import { useAIProviderStore } from '../../store/aiProviderStore';
 
 const { FiSave, FiRefreshCw, FiShield, FiDatabase, FiMail, FiGlobe } = FiIcons;
 
@@ -62,6 +64,20 @@ const SystemSettings = () => {
 
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
+  const updateStoreSettings = useAIProviderStore(state => state.updateSettings);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await api.admin.getSettings();
+        setSettings(prev => ({ ...prev, ...data }));
+        updateStoreSettings(data);
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      }
+    };
+    load();
+  }, []);
 
   const tabs = [
     { id: 'general', name: 'General', icon: FiGlobe },
@@ -74,12 +90,16 @@ const SystemSettings = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      await api.admin.updateSettings(settings);
+      updateStoreSettings(settings);
       toast.success('Settings saved successfully');
-    }, 1500);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {

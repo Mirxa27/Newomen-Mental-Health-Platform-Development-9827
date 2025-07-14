@@ -156,6 +156,7 @@ VITE_APP_ENV=development
 Create a `.env` file based on `.env.example` and make sure `VITE_OPENAI_API_KEY` is set to a valid key. The admin panel allows storing provider keys, but the fallback environment value is required for voice chat initialization.
 
 When running the app locally you can also store your OpenAI API key in the browser by navigating to **Admin → AI Provider Settings**, editing the default provider and entering your key. The realtime voice service will read this value automatically if the backend endpoint is unavailable.
+The **System Settings** page in the admin panel lets you configure application details like site name, email provider and rate limits. Changes are saved to the backend database and applied immediately.
 If you see "Missing API key" errors when starting a voice session, ensure the key is stored in the admin panel or defined as `VITE_OPENAI_API_KEY`.
 
 ### Admin Access

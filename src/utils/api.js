@@ -139,6 +139,8 @@ export const api = {
     createPrompt: (data) => apiClient.post('/admin/prompts', data),
     deletePrompt: (promptId) => apiClient.delete(`/admin/prompts/${promptId}`),
     exportAnalytics: (format) => apiClient.get(`/admin/analytics/export?format=${format}`),
+    getSettings: () => apiClient.get('/admin/settings'),
+    updateSettings: (data) => apiClient.put('/admin/settings', data),
   },
 
   // AI Provider endpoints
