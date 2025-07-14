@@ -28,27 +28,27 @@ const makeAuthenticatedRequest = async (endpoint, options = {}) => {
 
 // Get all shadow work questions
 export const getShadowWorkQuestions = async () => {
-  return makeAuthenticatedRequest('/selfdiscovery/questions');
+  return makeAuthenticatedRequest('/shadow-work/questions');
 };
 
 // Get a specific shadow work question
 export const getShadowWorkQuestion = async (questionId) => {
-  return makeAuthenticatedRequest(`/selfdiscovery/questions/${questionId}`);
+  return makeAuthenticatedRequest(`/shadow-work/questions/${questionId}`);
 };
 
 // Get user's shadow work sessions
 export const getShadowWorkSessions = async () => {
-  return makeAuthenticatedRequest('/selfdiscovery/sessions');
+  return makeAuthenticatedRequest('/shadow-work/sessions');
 };
 
 // Get a specific shadow work session
 export const getShadowWorkSession = async (sessionId) => {
-  return makeAuthenticatedRequest(`/selfdiscovery/sessions/${sessionId}`);
+  return makeAuthenticatedRequest(`/shadow-work/sessions/${sessionId}`);
 };
 
 // Create or update a shadow work session
 export const saveShadowWorkSession = async (questionId, response, insights = '') => {
-  return makeAuthenticatedRequest('/selfdiscovery/sessions', {
+  return makeAuthenticatedRequest('/shadow-work/sessions', {
     method: 'POST',
     body: JSON.stringify({ questionId, response, insights }),
   });
@@ -56,12 +56,12 @@ export const saveShadowWorkSession = async (questionId, response, insights = '')
 
 // Generate insights for a shadow work response
 export const generateInsights = async (sessionId) => {
-  return makeAuthenticatedRequest(`/selfdiscovery/sessions/${sessionId}/insights`, {
+  return makeAuthenticatedRequest(`/shadow-work/sessions/${sessionId}/insights`, {
     method: 'POST',
   });
 };
 
 // Get user's shadow work progress
 export const getShadowWorkProgress = async () => {
-  return makeAuthenticatedRequest('/selfdiscovery/progress');
+  return makeAuthenticatedRequest('/shadow-work/progress');
 };

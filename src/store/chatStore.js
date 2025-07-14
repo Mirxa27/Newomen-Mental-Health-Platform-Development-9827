@@ -82,9 +82,18 @@ export const useChatStore = create(
           }
         }));
 
-        try {
+       try {
           const response = await api.post(`/chat/conversations/${conversationId}/messages`, { content });
           const aiMessage = response.data;
+
+          // Analyze emotion for user and AI messages
+          const [userEmotion, aiEmotion] = await Promise.all([
+            api.emotion.analyze(content).catch(() => null),
+            api.emotion.analyze(aiMessage.content).catch(() => null)
+          ]);
+
+          const userMsgWithEmotion = { ...userMessage, id: `confirmed-${userMessage.id}`, emotion: userEmotion?.emotion };
+          const aiMsgWithEmotion = { ...aiMessage, emotion: aiEmotion?.emotion };
 
           // Replace temp user message and add AI response
           set(state => ({
@@ -93,9 +102,8 @@ export const useChatStore = create(
               ...state.currentConversation,
               messages: [
                 ...state.currentConversation.messages.filter(m => m.id !== userMessage.id),
-                // The backend should ideally return the saved user message, but we'll re-add for now
-                { ...userMessage, id: `confirmed-${userMessage.id}` },
-                aiMessage
+                userMsgWithEmotion,
+                aiMsgWithEmotion
               ]
             }
           }));

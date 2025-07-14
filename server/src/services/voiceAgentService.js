@@ -2,6 +2,7 @@ import { Room, RoomEvent, Participant, Track, RemoteParticipant } from 'livekit-
 import { createClient } from '@deepgram/sdk';
 import { ElevenLabsClient } from 'elevenlabs';
 import openaiService from './openaiService.js';
+import humeService from './humeService.js';
 
 const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel's voice ID as a default
 
@@ -30,12 +31,15 @@ class VoiceAgentService {
         const transcript = data.channel.alternatives[0].transcript;
         if (transcript && !this.isSpeaking) {
           this.isSpeaking = true;
+          const emotion = await humeService.analyzeText(transcript);
           const aiResponse = await openaiService.generateResponse(this.room.name, transcript);
           const audioStream = await this.elevenlabs.textToSpeech.convertAsStream(ELEVENLABS_VOICE_ID, { text: aiResponse });
 
           // This is a simplified approach. In a real scenario, you'd handle streaming audio properly.
           // For this example, we'll assume we can publish the stream directly.
           // A more robust solution would involve piping the stream to a local track.
+
+          console.log('Detected emotion:', emotion);
 
           this.isSpeaking = false;
         }

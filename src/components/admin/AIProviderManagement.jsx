@@ -44,6 +44,7 @@ const AIProviderManagement = () => {
     { value: 'TEXT_TO_SPEECH', label: 'Text to Speech', icon: FiVolume2 },
     { value: 'SPEECH_TO_TEXT', label: 'Speech to Text', icon: FiMic },
     { value: 'CHAT', label: 'Text Chat', icon: FiMessageCircle },
+    { value: 'EMOTION_ANALYSIS', label: 'Emotion Analysis', icon: FiActivity },
   ];
 
   const presetProviders = {
@@ -68,6 +69,21 @@ const AIProviderManagement = () => {
         style: 0.0,
         use_speaker_boost: true,
       },
+    },
+    'Deepgram': {
+      type: 'SPEECH_TO_TEXT',
+      apiUrl: 'https://api.deepgram.com',
+      model: 'nova-2',
+      settings: {
+        tier: 'nova',
+        version: 'latest',
+      },
+    },
+    'Hume Emotion': {
+      type: 'EMOTION_ANALYSIS',
+      apiUrl: 'https://api.hume.ai',
+      model: 'expression',
+      settings: {},
     },
     'Google Speech': {
       type: 'SPEECH_TO_TEXT',

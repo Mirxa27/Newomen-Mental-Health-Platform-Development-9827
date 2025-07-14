@@ -15,6 +15,7 @@ import paypalRouter from './routes/paypal.js';
 import livekitRouter from './routes/livekit.js';
 import agentRouter from './routes/agent.js';
 import connectionJourneyRouter from './routes/connectionJourney.js';
+import emotionRouter from './routes/emotion.js';
 import initSocket from './services/socketService.js';
 import {
   generalLimiter,
@@ -65,6 +66,7 @@ app.use('/api/shadow-work', shadowWorkRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/ai-providers', aiProvidersRouter);
 app.use('/api/voice', voiceChatRouter);
+app.use('/api/emotion', emotionRouter);
 app.use('/api/paypal', paypalRouter);
 app.use('/api/livekit', livekitRouter);
 app.use('/api/agent', agentRouter);

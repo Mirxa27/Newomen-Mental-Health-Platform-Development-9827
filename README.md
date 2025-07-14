@@ -140,6 +140,11 @@ src/
 # OpenAI
 VITE_OPENAI_API_KEY=your_openai_key_here
 
+# Voice Providers
+DEEPGRAM_API_KEY=your_deepgram_key_here
+HUME_API_KEY=your_hume_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_key_here
+
 # Supabase (optional)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key
@@ -205,6 +210,12 @@ npm run dev
 ```bash
 npm run build
 npm run preview
+```
+
+### Unit Tests
+```bash
+npm run test
+npm run test:coverage
 ```
 
 ### Mobile Testing

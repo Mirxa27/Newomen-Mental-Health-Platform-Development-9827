@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import LiquidGlass from 'liquid-glass-react';
 
 const MessageBubble = ({ message }) => {
   const isUser = message.sender === 'user';
@@ -34,17 +33,7 @@ const MessageBubble = ({ message }) => {
         </div>
       ) : (
         // Assistant message with glass effect
-        <LiquidGlass
-          displacementScale={40}
-          blurAmount={0.08}
-          saturation={120}
-          aberrationIntensity={1.5}
-          elasticity={0.2}
-          cornerRadius={16}
-          padding="16px"
-          overLight={true}
-          className="max-w-xs sm:max-w-sm md:max-w-md"
-        >
+        <div className="glass-card max-w-xs sm:max-w-sm md:max-w-md">
           <div className="text-gray-800">
             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
               {message.content}
@@ -61,7 +50,7 @@ const MessageBubble = ({ message }) => {
               </div>
             )}
           </div>
-        </LiquidGlass>
+        </div>
       )}
     </motion.div>
   );
