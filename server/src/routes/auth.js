@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import speakeasy from 'speakeasy';
+import { encryptionService } from '../services/encryptionService.js';
 import {
   authLimiter,
   validateRegistration,
@@ -80,7 +82,7 @@ router.post('/register', authLimiter, validateRegistration, handleValidationErro
 
 router.post('/login', authLimiter, validateLogin, handleValidationErrors, async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, token } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Missing fields' });
     }
@@ -93,6 +95,17 @@ router.post('/login', authLimiter, validateLogin, handleValidationErrors, async 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    if (user.isMfaEnabled) {
+      if (!token) {
+        return res.status(400).json({ error: 'MFA token required' });
+      }
+      const secret = encryptionService.decrypt(user.totpSecret);
+      const verified = speakeasy.totp.verify({ secret, encoding: 'base32', token });
+      if (!verified) {
+        return res.status(401).json({ error: 'Invalid MFA token' });
+      }
     }
 
     const tokens = generateTokens(user);

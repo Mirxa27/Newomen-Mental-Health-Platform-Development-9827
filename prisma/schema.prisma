@@ -29,13 +29,14 @@ model User {
   voiceProfiles       VoiceProfile[]
   voiceSessions       VoiceSession[]
   subscription        Subscription?
-  payments            Payment[]
   notifications       Notification[]
   crisisAlerts        CrisisAlert[]
   analytics           UserAnalytics?
   fileUploads         FileUpload[]
   moodEntries         MoodEntry[]
   activeSessions      ActiveSession[]
+  totpSecret          String?               // Encrypted TOTP secret
+  isMfaEnabled        Boolean               @default(false)
 }
 
 model Conversation {
