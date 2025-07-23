@@ -7,6 +7,7 @@ A comprehensive AI-powered platform for women's mental health and personal growt
 ### Core Functionality
 - **AI Companion Chat**: Culturally-aware conversations with emotional intelligence
 - **Shadow Work Journey**: Guided self-discovery through structured questionnaires
+- **Emotion Analysis**: Detects user emotions using Hume to adapt responses
 - **Voice Interactions**: Real-time voice chat with AI companion
 - **Multi-language Support**: English and Arabic with cultural context
 - **Progressive Web App**: Full mobile experience with offline capabilities
@@ -253,6 +254,12 @@ Deploy the `dist` folder to your hosting provider.
 - **Authentication**: Secure session management
 - **Data Privacy**: No sensitive data stored locally
 - **HTTPS**: Secure communication protocols
+
+
+### Multi-Factor Authentication
+1. Call `/api/mfa/setup` with your access token to generate a secret and QR code.
+2. Verify the code with `/api/mfa/verify` to enable MFA.
+3. Subsequent logins require a `token` along with email and password.
 
 ## 🌍 Localization
 
